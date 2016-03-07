@@ -48,22 +48,31 @@ type Scanner struct {
 	nextToken int
 }
 
-func NewScanner(r *bufio.Reader) *Scanner {
+func NewScanner(r io.Reader) *Scanner {
 	return &Scanner{
-		r: r,
+		r: bufio.NewReader(r),
 	}
 }
 
 func (s *Scanner) Next() bool {
-	switch s.nextToken {
+	if !s.scanToken() {
+		return false
+	}
+	switch s.t.ID {
 	case Text:
-		if !s.readText() {
-			return false
-		}
 		if len(s.t.Value) > 0 {
 			return true
 		}
-		return s.readTagName()
+		return s.scanToken()
+	default:
+		return true
+	}
+}
+
+func (s *Scanner) scanToken() bool {
+	switch s.nextToken {
+	case Text:
+		return s.readText()
 	case TagName:
 		return s.readTagName()
 	case TagContents:
@@ -101,9 +110,6 @@ func (s *Scanner) readTagName() bool {
 	s.skipSpace()
 	for {
 		if s.isSpace() || s.c == '%' {
-			if len(s.t.Value) == 0 {
-				panic("BUG: empty tag name")
-			}
 			if s.c == '%' {
 				s.unreadByte('~')
 			}

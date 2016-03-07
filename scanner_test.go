@@ -1,37 +1,62 @@
 package quicktemplate
 
 import (
-	"bufio"
 	"bytes"
 	"reflect"
 	"testing"
 )
 
 func TestScannerSuccess(t *testing.T) {
-	scannerTestSuccess(t, "", nil)
-	scannerTestSuccess(t, "foobar", []tt{{ID: Text, Value: "foobar"}})
-	scannerTestSuccess(t, "{% foo bar baz %}", []tt{
+	testScannerSuccess(t, "", nil)
+	testScannerSuccess(t, "a%}{foo}bar", []tt{{ID: Text, Value: "a%}{foo}bar"}})
+	testScannerSuccess(t, "{% foo bar baz(a, b, 123) %}", []tt{
 		{ID: TagName, Value: "foo"},
-		{ID: TagContents, Value: "bar baz"},
+		{ID: TagContents, Value: "bar baz(a, b, 123)"},
 	})
-	scannerTestSuccess(t, "foo{%bar%}baz", []tt{
+	testScannerSuccess(t, "foo{%bar%}baz", []tt{
 		{ID: Text, Value: "foo"},
 		{ID: TagName, Value: "bar"},
 		{ID: TagContents, Value: ""},
 		{ID: Text, Value: "baz"},
 	})
-	scannerTestSuccess(t, "{{{%\n\r\tfoo bar\n\rbaz%%\n   \r %}}", []tt{
+	testScannerSuccess(t, "{{{%\n\r\tfoo bar\n\rbaz%%\n   \r %}}", []tt{
 		{ID: Text, Value: "{{"},
 		{ID: TagName, Value: "foo"},
 		{ID: TagContents, Value: "bar\n\rbaz%%"},
 		{ID: Text, Value: "}"},
 	})
+	testScannerSuccess(t, "{%%}", []tt{
+		{ID: TagName, Value: ""},
+		{ID: TagContents, Value: ""},
+	})
+	testScannerSuccess(t, "{%%aaa bb%}", []tt{
+		{ID: TagName, Value: ""},
+		{ID: TagContents, Value: "%aaa bb"},
+	})
 }
 
-func scannerTestSuccess(t *testing.T, str string, expectedTokens []tt) {
+func TestScannerFailure(t *testing.T) {
+	testScannerFailure(t, "a{%")
+	testScannerFailure(t, "a{%foo")
+	testScannerFailure(t, "a{%% }foo")
+	testScannerFailure(t, "a{% foo %")
+	testScannerFailure(t, "b{% fo() %}bar")
+	testScannerFailure(t, "aa{% foo bar")
+}
+
+func testScannerFailure(t *testing.T, str string) {
 	r := bytes.NewBufferString(str)
-	br := bufio.NewReader(r)
-	s := NewScanner(br)
+	s := NewScanner(r)
+	for s.Next() {
+	}
+	if err := s.LastError(); err == nil {
+		t.Fatalf("expecting error when scanning %q", str)
+	}
+}
+
+func testScannerSuccess(t *testing.T, str string, expectedTokens []tt) {
+	r := bytes.NewBufferString(str)
+	s := NewScanner(r)
 	var tokens []tt
 	for s.Next() {
 		tokens = append(tokens, tt{
