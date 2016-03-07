@@ -6,7 +6,32 @@ import (
 	"testing"
 )
 
+func TestScannerPlainSuccess(t *testing.T) {
+	testScannerSuccess(t, "{%plain%}{%endplain%}", nil)
+	testScannerSuccess(t, "{%plain%}{%foo bar%}asdf{%endplain%}", []tt{
+		{ID: Text, Value: "{%foo bar%}asdf"},
+	})
+	testScannerSuccess(t, "{%plain%}{%foo{%endplain%}", []tt{
+		{ID: Text, Value: "{%foo"},
+	})
+	testScannerSuccess(t, "mmm{%plain%}aa{% bar {%%% }baz{%endplain%}nnn", []tt{
+		{ID: Text, Value: "mmm"},
+		{ID: Text, Value: "aa{% bar {%%% }baz"},
+		{ID: Text, Value: "nnn"},
+	})
+	testScannerSuccess(t, "{% plain dsd %}0{%comment%}123{%endcomment%}45{% endplain aaa %}", []tt{
+		{ID: Text, Value: "0{%comment%}123{%endcomment%}45"},
+	})
+}
+
+func TestScannerPlainFailure(t *testing.T) {
+	testScannerFailure(t, "{%plain%}sdfds")
+	testScannerFailure(t, "{%plain%}aaaa%{%endplain")
+	testScannerFailure(t, "{%plain%}{%endplain%")
+}
+
 func TestScannerCommentSuccess(t *testing.T) {
+	testScannerSuccess(t, "{%comment%}{%endcomment%}", nil)
 	testScannerSuccess(t, "{%comment%}foo{%endcomment%}", nil)
 	testScannerSuccess(t, "{%comment%}foo{%bar%}{%endcomment%}", nil)
 	testScannerSuccess(t, "{%comment%}foo{%bar {%endcomment%}", nil)
@@ -75,10 +100,15 @@ func TestScannerFailure(t *testing.T) {
 func testScannerFailure(t *testing.T, str string) {
 	r := bytes.NewBufferString(str)
 	s := NewScanner(r)
+	var tokens []tt
 	for s.Next() {
+		tokens = append(tokens, tt{
+			ID:    s.Token().ID,
+			Value: string(s.Token().Value),
+		})
 	}
 	if err := s.LastError(); err == nil {
-		t.Fatalf("expecting error when scanning %q", str)
+		t.Fatalf("expecting error when scanning %q. got tokens %v", str, tokens)
 	}
 }
 

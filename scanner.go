@@ -2,6 +2,7 @@ package quicktemplate
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"io"
 )
@@ -47,6 +48,9 @@ type Scanner struct {
 	pos  int
 
 	nextTokenID int
+
+	capture       bool
+	capturedValue []byte
 }
 
 func NewScanner(r io.Reader) *Scanner {
@@ -67,45 +71,81 @@ func (s *Scanner) Next() bool {
 				continue
 			}
 		case TagName:
-			if string(s.t.Value) == "comment" {
+			switch string(s.t.Value) {
+			case "comment":
 				if !s.skipComment() {
 					return false
 				}
 				continue
+			case "plain":
+				if !s.readPlain() {
+					return false
+				}
+				if len(s.t.Value) == 0 {
+					// skip empty text
+					continue
+				}
 			}
 		}
 		return true
 	}
 }
 
+func (s *Scanner) readPlain() bool {
+	s.startCapture()
+	ok := s.skipUntilTag("endplain")
+	v := s.stopCapture()
+	s.t.init(Text)
+	if ok {
+		n := bytes.Index(v, strTagClose)
+		v = v[n+len(strTagClose):]
+		n = bytes.LastIndex(v, strTagOpen)
+		v = v[:n]
+		s.t.Value = append(s.t.Value[:0], v...)
+	}
+	return ok
+}
+
+var (
+	strTagOpen  = []byte("{%")
+	strTagClose = []byte("%}")
+)
+
 func (s *Scanner) skipComment() bool {
+	return s.skipUntilTag("endcomment")
+}
+
+func (s *Scanner) skipUntilTag(tagName string) bool {
+	ok := false
 	for {
 		if !s.nextByte() {
-			return false
+			break
 		}
 		if s.c != '{' {
 			continue
 		}
 		if !s.nextByte() {
-			return false
+			break
 		}
 		if s.c != '%' {
 			s.unreadByte('~')
 			continue
 		}
-		ok := s.readTagName()
+		ok = s.readTagName()
 		s.nextTokenID = Text
 		if !ok {
 			s.err = nil
 			continue
 		}
-		if string(s.t.Value) == "endcomment" {
-			if !s.readTagContents() {
-				return false
-			}
-			return true
+		if string(s.t.Value) == tagName {
+			ok = s.readTagContents()
+			break
 		}
 	}
+	if !ok {
+		s.err = fmt.Errorf("cannot find %q tag: %s", tagName, s.err)
+	}
+	return ok
 }
 
 func (s *Scanner) scanToken() bool {
@@ -242,7 +282,22 @@ func (s *Scanner) nextByte() bool {
 		s.pos++
 	}
 	s.c = c
+	if s.capture {
+		s.capturedValue = append(s.capturedValue, c)
+	}
 	return true
+}
+
+func (s *Scanner) startCapture() {
+	s.capture = true
+	s.capturedValue = s.capturedValue[:0]
+}
+
+func (s *Scanner) stopCapture() []byte {
+	s.capture = false
+	v := s.capturedValue
+	s.capturedValue = s.capturedValue[:0]
+	return v
 }
 
 func (s *Scanner) Token() *Token {
@@ -275,6 +330,15 @@ func (s *Scanner) appendByte() {
 func (s *Scanner) unreadByte(c byte) {
 	if err := s.r.UnreadByte(); err != nil {
 		panic(fmt.Sprintf("BUG: bufio.Reader.UnreadByte returned non-nil error: %s", err))
+	}
+	if s.capture {
+		s.capturedValue = s.capturedValue[:len(s.capturedValue)-1]
+	}
+	if s.c == '\n' {
+		s.line--
+		s.pos = 0 // TODO: use correct position
+	} else {
+		s.pos--
 	}
 	s.c = c
 }
