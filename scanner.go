@@ -13,17 +13,18 @@ const (
 	TagContents
 )
 
+var tokenStrMap = map[int]string{
+	Text:        "Text",
+	TagName:     "TagName",
+	TagContents: "TagContents",
+}
+
 func tokenIDToStr(id int) string {
-	switch id {
-	case Text:
-		return "Text"
-	case TagName:
-		return "TagName"
-	case TagContents:
-		return "TagContents"
-	default:
+	str := tokenStrMap[id]
+	if str == "" {
 		panic(fmt.Sprintf("unknown tokenID=%d", id))
 	}
+	return str
 }
 
 type Token struct {
@@ -45,7 +46,7 @@ type Scanner struct {
 	line int
 	pos  int
 
-	nextToken int
+	nextTokenID int
 }
 
 func NewScanner(r io.Reader) *Scanner {
@@ -55,22 +56,60 @@ func NewScanner(r io.Reader) *Scanner {
 }
 
 func (s *Scanner) Next() bool {
-	if !s.scanToken() {
-		return false
-	}
-	switch s.t.ID {
-	case Text:
-		if len(s.t.Value) > 0 {
-			return true
+	for {
+		if !s.scanToken() {
+			return false
 		}
-		return s.scanToken()
-	default:
+		switch s.t.ID {
+		case Text:
+			if len(s.t.Value) == 0 {
+				// skip empty text
+				continue
+			}
+		case TagName:
+			if string(s.t.Value) == "comment" {
+				if !s.skipComment() {
+					return false
+				}
+				continue
+			}
+		}
 		return true
 	}
 }
 
+func (s *Scanner) skipComment() bool {
+	for {
+		if !s.nextByte() {
+			return false
+		}
+		if s.c != '{' {
+			continue
+		}
+		if !s.nextByte() {
+			return false
+		}
+		if s.c != '%' {
+			s.unreadByte('~')
+			continue
+		}
+		ok := s.readTagName()
+		s.nextTokenID = Text
+		if !ok {
+			s.err = nil
+			continue
+		}
+		if string(s.t.Value) == "endcomment" {
+			if !s.readTagContents() {
+				return false
+			}
+			return true
+		}
+	}
+}
+
 func (s *Scanner) scanToken() bool {
-	switch s.nextToken {
+	switch s.nextTokenID {
 	case Text:
 		return s.readText()
 	case TagName:
@@ -78,7 +117,7 @@ func (s *Scanner) scanToken() bool {
 	case TagContents:
 		return s.readTagContents()
 	default:
-		panic(fmt.Sprintf("BUG: unknown nextToken %d", s.nextToken))
+		panic(fmt.Sprintf("BUG: unknown nextTokenID %d", s.nextTokenID))
 	}
 }
 
@@ -97,7 +136,7 @@ func (s *Scanner) readText() bool {
 			return true
 		}
 		if s.c == '%' {
-			s.nextToken = TagName
+			s.nextTokenID = TagName
 			return true
 		}
 		s.unreadByte('{')
@@ -113,7 +152,7 @@ func (s *Scanner) readTagName() bool {
 			if s.c == '%' {
 				s.unreadByte('~')
 			}
-			s.nextToken = TagContents
+			s.nextTokenID = TagContents
 			return true
 		}
 		if (s.c >= 'a' && s.c <= 'z') || (s.c >= 'A' && s.c <= 'Z') || (s.c >= '0' && s.c <= '9') || s.c == '=' {
@@ -124,6 +163,7 @@ func (s *Scanner) readTagName() bool {
 			continue
 		}
 		s.err = fmt.Errorf("unexpected character: '%c'", s.c)
+		s.unreadByte('~')
 		return false
 	}
 }
@@ -144,7 +184,7 @@ func (s *Scanner) readTagContents() bool {
 			return false
 		}
 		if s.c == '}' {
-			s.nextToken = Text
+			s.nextTokenID = Text
 			s.t.Value = stripTrailingSpace(s.t.Value)
 			return true
 		}

@@ -6,6 +6,26 @@ import (
 	"testing"
 )
 
+func TestScannerCommentSuccess(t *testing.T) {
+	testScannerSuccess(t, "{%comment%}foo{%endcomment%}", nil)
+	testScannerSuccess(t, "{%comment%}foo{%bar%}{%endcomment%}", nil)
+	testScannerSuccess(t, "{%comment%}foo{%bar {%endcomment%}", nil)
+	testScannerSuccess(t, "{%comment%}foo{%bar&^{%endcomment%}", nil)
+	testScannerSuccess(t, "{%comment%}foo{% bar\n\rs%{%endcomment%}", nil)
+	testScannerSuccess(t, "xx{%x%}www{% comment aux data %}aaa{% comment %}{% endcomment %}yy", []tt{
+		{ID: Text, Value: "xx"},
+		{ID: TagName, Value: "x"},
+		{ID: TagContents, Value: ""},
+		{ID: Text, Value: "www"},
+		{ID: Text, Value: "yy"},
+	})
+}
+
+func TestScannerCommentFailure(t *testing.T) {
+	testScannerFailure(t, "{%comment%}...no endcomment")
+	testScannerFailure(t, "{% comment %}foobar{% endcomment")
+}
+
 func TestScannerSuccess(t *testing.T) {
 	testScannerSuccess(t, "", nil)
 	testScannerSuccess(t, "a%}{foo}bar", []tt{{ID: Text, Value: "a%}{foo}bar"}})
@@ -32,6 +52,14 @@ func TestScannerSuccess(t *testing.T) {
 	testScannerSuccess(t, "{%%aaa bb%}", []tt{
 		{ID: TagName, Value: ""},
 		{ID: TagContents, Value: "%aaa bb"},
+	})
+	testScannerSuccess(t, "foo{% bar %}{% baz aa (123)%}321", []tt{
+		{ID: Text, Value: "foo"},
+		{ID: TagName, Value: "bar"},
+		{ID: TagContents, Value: ""},
+		{ID: TagName, Value: "baz"},
+		{ID: TagContents, Value: "aa (123)"},
+		{ID: Text, Value: "321"},
 	})
 }
 
