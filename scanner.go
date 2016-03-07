@@ -38,6 +38,10 @@ func (t *Token) init(id int) {
 	t.Value = t.Value[:0]
 }
 
+func (t *Token) String() string {
+	return fmt.Sprintf("Token %q, value %q", tokenIDToStr(t.ID), t.Value)
+}
+
 type Scanner struct {
 	r   *bufio.Reader
 	t   Token
@@ -319,8 +323,8 @@ func (s *Scanner) LastError() error {
 	} else {
 		tStr = fmt.Sprintf("%q ... %q", v[:20], v[len(v)-20:])
 	}
-	return fmt.Errorf("error when reading %s at line %d, position %d: %s. Token %s",
-		tokenIDToStr(s.t.ID), s.line+1, s.pos+1, s.err, tStr)
+	return fmt.Errorf("error when reading %s at %s: %s. Token %s",
+		tokenIDToStr(s.t.ID), s.Pos(), s.err, tStr)
 }
 
 func (s *Scanner) appendByte() {
@@ -341,4 +345,8 @@ func (s *Scanner) unreadByte(c byte) {
 		s.pos--
 	}
 	s.c = c
+}
+
+func (s *Scanner) Pos() string {
+	return fmt.Sprintf("line %d, pos %d", s.line+1, s.pos+1)
 }
