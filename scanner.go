@@ -240,15 +240,6 @@ func (s *Scanner) readTagContents() bool {
 	}
 }
 
-func stripTrailingSpace(b []byte) []byte {
-	for i := len(b) - 1; i >= 0; i-- {
-		if !isSpace(b[i]) {
-			return b[:i+1]
-		}
-	}
-	return b[:0]
-}
-
 func (s *Scanner) skipSpace() {
 	for s.nextByte() && s.isSpace() {
 	}
@@ -256,15 +247,6 @@ func (s *Scanner) skipSpace() {
 
 func (s *Scanner) isSpace() bool {
 	return isSpace(s.c)
-}
-
-func isSpace(c byte) bool {
-	switch c {
-	case ' ', '\t', '\n', '\r':
-		return true
-	default:
-		return false
-	}
 }
 
 func (s *Scanner) nextByte() bool {
@@ -316,15 +298,8 @@ func (s *Scanner) LastError() error {
 		return nil
 	}
 
-	var lineStr string
-	v := s.lineStr
-	if len(v) <= 40 {
-		lineStr = fmt.Sprintf("%q", v)
-	} else {
-		lineStr = fmt.Sprintf("%q ... %q", v[:20], v[len(v)-20:])
-	}
-	return fmt.Errorf("error when reading %s at %s: %s. Line %s",
-		tokenIDToStr(s.t.ID), s.Pos(), s.err, lineStr)
+	return fmt.Errorf("error when reading %s at %s: %s",
+		tokenIDToStr(s.t.ID), s.Context(), s.err)
 }
 
 func (s *Scanner) appendByte() {
@@ -347,6 +322,13 @@ func (s *Scanner) unreadByte(c byte) {
 	s.c = c
 }
 
-func (s *Scanner) Pos() string {
-	return fmt.Sprintf("line %d, pos %d", s.line+1, len(s.lineStr))
+func (s *Scanner) Context() string {
+	var lineStr string
+	v := s.lineStr
+	if len(v) <= 40 {
+		lineStr = fmt.Sprintf("%q", v)
+	} else {
+		lineStr = fmt.Sprintf("%q ... %q", v[:20], v[len(v)-20:])
+	}
+	return fmt.Sprintf("line %d, pos %d, str %q", s.line+1, len(s.lineStr), lineStr)
 }

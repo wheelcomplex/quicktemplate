@@ -26,10 +26,10 @@ func parseTemplate(s *Scanner, w io.Writer) {
 			case "func":
 				parseFunc(s, w)
 			default:
-				log.Fatalf("unexpected tag found outside func: %s at %s", t.Value, s.Pos())
+				log.Fatalf("unexpected tag found outside func: %s at %s", t.Value, s.Context())
 			}
 		default:
-			log.Fatalf("unexpected token found when parsing template at %s: %s", s.Pos(), t)
+			log.Fatalf("unexpected token found %s when parsing template at %s", t, s.Context())
 		}
 	}
 	if err := s.LastError(); err != nil {
@@ -39,10 +39,9 @@ func parseTemplate(s *Scanner, w io.Writer) {
 
 func parseFunc(s *Scanner, w io.Writer) {
 	t := expectTagContents(s)
-	fOrig := string(t.Value)
-	fname, fargs, fargsNoTypes := splitFnameFargs(s, fOrig)
-
+	fname, fargs, fargsNoTypes := parseFnameFargs(s, t.Value)
 	emitFuncStart(w, fname, fargs)
+
 	for s.Next() {
 		t := s.Token()
 		switch t.ID {
@@ -63,10 +62,10 @@ func parseFunc(s *Scanner, w io.Writer) {
 			case "code":
 				parseCode(s, w)
 			default:
-				log.Fatalf("unexpected tag found inside func: %s at %s", t.Value, s.Pos())
+				log.Fatalf("unexpected tag found inside func: %s at %s", t.Value, s.Context())
 			}
 		default:
-			log.Fatalf("unexpected token found when parsing func at %s: %s", s.Pos(), t)
+			log.Fatalf("unexpected token found %s when parsing func at %s", t, s.Context())
 		}
 	}
 	if err := s.LastError(); err != nil {
@@ -90,38 +89,29 @@ func emitFuncEnd(w io.Writer, fname, fargs, fargsNoTypes string) {
 
 }
 
-func splitFnameFargs(s *Scanner, f string) (string, string, string) {
+func parseFnameFargs(s *Scanner, f []byte) (string, string, string) {
 	// TODO: use real Go parser here
 
-	n := strings.Index(f, "(")
+	n := bytes.IndexByte(f, '(')
 	if n < 0 {
-		log.Fatalf("missing '(' for function arguments at %s: %s", s.Pos(), f)
+		log.Fatalf("missing '(' for function arguments at %s", s.Context())
 	}
-	for n > 0 && isSpace(f[n-1]) {
-		n--
-	}
-	fname := f[:n]
+	fname := string(stripTrailingSpace(f[:n]))
 
-	fargs := f[n+1:]
-	n = strings.LastIndex(fargs, ")")
+	f = f[n+1:]
+	n = bytes.LastIndexByte(f, ')')
 	if n < 0 {
-		log.Fatalf("missing ')' for function arguments at %s: %s", s.Pos(), f)
+		log.Fatalf("missing ')' for function arguments at %s", s.Context())
 	}
-	fargs = fargs[:n]
+	fargs := string(f[:n])
 
 	var args []string
 	for _, a := range strings.Split(fargs, ",") {
-		n = 0
-		for n < len(a) && isSpace(a[n]) {
-			n++
-		}
-		a = a[n:]
-
+		a = string(stripLeadingSpace([]byte(a)))
 		n = 0
 		for n < len(a) && !isSpace(a[n]) {
 			n++
 		}
-
 		args = append(args, a[:n])
 	}
 	fargsNoTypes := strings.Join(args, ", ")
