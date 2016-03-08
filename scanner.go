@@ -48,8 +48,8 @@ type Scanner struct {
 	c   byte
 	err error
 
-	line int
-	pos  int
+	line    int
+	lineStr []byte
 
 	nextTokenID int
 
@@ -281,9 +281,9 @@ func (s *Scanner) nextByte() bool {
 	}
 	if c == '\n' {
 		s.line++
-		s.pos = 0
+		s.lineStr = s.lineStr[:0]
 	} else {
-		s.pos++
+		s.lineStr = append(s.lineStr, c)
 	}
 	s.c = c
 	if s.capture {
@@ -316,15 +316,15 @@ func (s *Scanner) LastError() error {
 		return nil
 	}
 
-	var tStr string
-	v := s.t.Value
+	var lineStr string
+	v := s.lineStr
 	if len(v) <= 40 {
-		tStr = fmt.Sprintf("%q", v)
+		lineStr = fmt.Sprintf("%q", v)
 	} else {
-		tStr = fmt.Sprintf("%q ... %q", v[:20], v[len(v)-20:])
+		lineStr = fmt.Sprintf("%q ... %q", v[:20], v[len(v)-20:])
 	}
-	return fmt.Errorf("error when reading %s at %s: %s. Token %s",
-		tokenIDToStr(s.t.ID), s.Pos(), s.err, tStr)
+	return fmt.Errorf("error when reading %s at %s: %s. Line %s",
+		tokenIDToStr(s.t.ID), s.Pos(), s.err, lineStr)
 }
 
 func (s *Scanner) appendByte() {
@@ -340,13 +340,13 @@ func (s *Scanner) unreadByte(c byte) {
 	}
 	if s.c == '\n' {
 		s.line--
-		s.pos = 0 // TODO: use correct position
+		s.lineStr = s.lineStr[:0] // TODO: use correct line
 	} else {
-		s.pos--
+		s.lineStr = s.lineStr[:len(s.lineStr)-1]
 	}
 	s.c = c
 }
 
 func (s *Scanner) Pos() string {
-	return fmt.Sprintf("line %d, pos %d", s.line+1, s.pos+1)
+	return fmt.Sprintf("line %d, pos %d", s.line+1, len(s.lineStr))
 }
