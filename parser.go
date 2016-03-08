@@ -63,6 +63,8 @@ func parseFunc(s *Scanner, w io.Writer) {
 				parseCode(s, w, prefix)
 			case "return":
 				parseReturn(s, w, prefix)
+			case "for":
+				parseFor(s, w, prefix)
 			default:
 				log.Fatalf("unexpected tag found inside func: %s at %s", t.Value, s.Context())
 			}
@@ -75,11 +77,45 @@ func parseFunc(s *Scanner, w io.Writer) {
 	}
 }
 
-func parseReturn(s *Scanner, w io.Writer, prefix string) {
+func parseFor(s *Scanner, w io.Writer, prefix string) {
 	t := expectTagContents(s)
-	if len(t.Value) > 0 {
-		log.Fatalf("unexpected nonempty value inside return tag: %q at %s", t.Value, s.Context())
+	fmt.Fprintf(w, "%sfor %s {\n", prefix, t.Value)
+	prefix += "\t"
+	for s.Next() {
+		t := s.Token()
+		switch t.ID {
+		case Text:
+			emitText(w, t.Value, prefix)
+		case TagName:
+			switch string(t.Value) {
+			case "endfor":
+				expectTagContents(s)
+				fmt.Fprintf(w, "%s}\n", prefix[1:])
+				return
+			case "s":
+				parseS(s, w, prefix)
+			case "d":
+				parseD(s, w, prefix)
+			case "f":
+				parseF(s, w, prefix)
+			case "code":
+				parseCode(s, w, prefix)
+			case "return":
+				parseReturn(s, w, prefix)
+			case "for":
+				parseFor(s, w, prefix)
+			default:
+				log.Fatalf("unexpected tag found inside for loop: %s at %s", t.Value, s.Context())
+			}
+		default:
+			log.Fatalf("unexpected token found %s when parsing for loop at %s", t, s.Context())
+		}
 	}
+}
+
+func parseReturn(s *Scanner, w io.Writer, prefix string) {
+	expectTagContents(s)
+	fmt.Fprintf(w, "%squicktemplate.ReleaseWriter(qw)\n", prefix)
 	fmt.Fprintf(w, "%sreturn\n", prefix)
 }
 

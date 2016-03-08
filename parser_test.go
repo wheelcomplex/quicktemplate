@@ -22,6 +22,10 @@ this is a sample func
 	he` + "`" + `llo, {%s s %}
 	{% code panic("foobar") %} aaa {% return %}
 	{% plain %}aaa {% ` + "`" + `foo %} bar{% endplain %}
+	{% for _, c := range s %}
+		c = {%d c %}
+		{% return %}
+	{% endfor %}
 bbb
 {% endfunc %}
 
