@@ -22,7 +22,7 @@ func parseTemplate(s *Scanner, w io.Writer) {
 		case TagName:
 			switch string(t.Value) {
 			case "code":
-				parseCode(s, w)
+				parseCode(s, w, "")
 			case "func":
 				parseFunc(s, w)
 			default:
@@ -41,12 +41,12 @@ func parseFunc(s *Scanner, w io.Writer) {
 	t := expectTagContents(s)
 	fname, fargs, fargsNoTypes := parseFnameFargs(s, t.Value)
 	emitFuncStart(w, fname, fargs)
-
+	prefix := "\t"
 	for s.Next() {
 		t := s.Token()
 		switch t.ID {
 		case Text:
-			emitText(w, t.Value)
+			emitText(w, t.Value, prefix)
 		case TagName:
 			switch string(t.Value) {
 			case "endfunc":
@@ -54,13 +54,15 @@ func parseFunc(s *Scanner, w io.Writer) {
 				emitFuncEnd(w, fname, fargs, fargsNoTypes)
 				return
 			case "s":
-				parseS(s, w)
+				parseS(s, w, prefix)
 			case "d":
-				parseD(s, w)
+				parseD(s, w, prefix)
 			case "f":
-				parseF(s, w)
+				parseF(s, w, prefix)
 			case "code":
-				parseCode(s, w)
+				parseCode(s, w, prefix)
+			case "return":
+				parseReturn(s, w, prefix)
 			default:
 				log.Fatalf("unexpected tag found inside func: %s at %s", t.Value, s.Context())
 			}
@@ -73,20 +75,35 @@ func parseFunc(s *Scanner, w io.Writer) {
 	}
 }
 
+func parseReturn(s *Scanner, w io.Writer, prefix string) {
+	t := expectTagContents(s)
+	if len(t.Value) > 0 {
+		log.Fatalf("unexpected nonempty value inside return tag: %q at %s", t.Value, s.Context())
+	}
+	fmt.Fprintf(w, "%sreturn\n", prefix)
+}
+
 func emitFuncStart(w io.Writer, fname, fargs string) {
-	fmt.Fprintf(w, "\nfunc %sStream(w *quicktemplate.Writer, %s) {\n", fname, fargs)
+	fmt.Fprintf(w, `
+func %sStream(w *io.Writer, %s) {
+	qw := quicktemplate.AcquireWriter(w)
+`,
+		fname, fargs)
 }
 
 func emitFuncEnd(w io.Writer, fname, fargs, fargsNoTypes string) {
-	fmt.Fprintf(w, "}\n\n")
-	fmt.Fprintf(w, `func %s(%s) string {
-	w := quicktemplate.AcquireWriter()
-	%sStream(w, %s)
-	s := w.String()
-	quicktemplate.ReleaseWriter(w)
-	return s
-}`, fname, fargs, fname, fargsNoTypes)
+	fmt.Fprintf(w, `
+	quicktemplate.ReleaseWriter(qw)
+}
 
+func %s(%s) string {
+	bb := quicktemplate.AcquireByteBuffer()
+	%sStream(bb, %s)
+	s := string(bb.Bytes())
+	quicktemplate.ReleaseByteBuffer(bb)
+	return s
+}`,
+		fname, fargs, fname, fargsNoTypes)
 }
 
 func parseFnameFargs(s *Scanner, f []byte) (string, string, string) {
@@ -118,35 +135,35 @@ func parseFnameFargs(s *Scanner, f []byte) (string, string, string) {
 	return fname, fargs, fargsNoTypes
 }
 
-func parseCode(s *Scanner, w io.Writer) {
+func parseCode(s *Scanner, w io.Writer, prefix string) {
 	t := expectTagContents(s)
-	fmt.Fprintf(w, "%s\n", t.Value)
+	fmt.Fprintf(w, "%s%s\n", prefix, t.Value)
 }
 
-func parseS(s *Scanner, w io.Writer) {
+func parseS(s *Scanner, w io.Writer, prefix string) {
 	t := expectTagContents(s)
-	fmt.Fprintf(w, "w.E.S(%s)\n", t.Value)
+	fmt.Fprintf(w, "%sqw.E.S(%s)\n", prefix, t.Value)
 }
 
-func parseD(s *Scanner, w io.Writer) {
+func parseD(s *Scanner, w io.Writer, prefix string) {
 	t := expectTagContents(s)
-	fmt.Fprintf(w, "w.D(%s)\n", t.Value)
+	fmt.Fprintf(w, "%sqw.D(%s)\n", prefix, t.Value)
 }
 
-func parseF(s *Scanner, w io.Writer) {
+func parseF(s *Scanner, w io.Writer, prefix string) {
 	t := expectTagContents(s)
-	fmt.Fprintf(w, "w.F(%s)\n", t.Value)
+	fmt.Fprintf(w, "%sqw.F(%s)\n", prefix, t.Value)
 }
 
-func emitText(w io.Writer, text []byte) {
+func emitText(w io.Writer, text []byte, prefix string) {
 	for len(text) > 0 {
 		n := bytes.IndexByte(text, '`')
 		if n < 0 {
-			fmt.Fprintf(w, "w.E.S(`%s`)\n", text)
+			fmt.Fprintf(w, "%sqw.E.S(`%s`)\n", prefix, text)
 			return
 		}
-		fmt.Fprintf(w, "w.E.S(`%s`)\n", text[:n])
-		fmt.Fprintf(w, "w.E.S(\"`\")\n")
+		fmt.Fprintf(w, "%sqw.E.S(`%s`)\n", prefix, text[:n])
+		fmt.Fprintf(w, "%sqw.E.S(\"`\")\n", prefix)
 		text = text[n+1:]
 	}
 }

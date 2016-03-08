@@ -16,10 +16,11 @@ import (
 %}
 
 this is a sample func
-{% func foobar(s string) %}
+{% func foobar (  s string , 
+ x int, a *Foo ) %}
 	{%comment%}this %}{% is a comment{%endcomment%}
 	he` + "`" + `llo, {%s s %}
-	{% code panic("foobar") %} aaa
+	{% code panic("foobar") %} aaa {% return %}
 	{% plain %}aaa {% ` + "`" + `foo %} bar{% endplain %}
 bbb
 {% endfunc %}

@@ -330,5 +330,5 @@ func (s *Scanner) Context() string {
 	} else {
 		lineStr = fmt.Sprintf("%q ... %q", v[:20], v[len(v)-20:])
 	}
-	return fmt.Sprintf("line %d, pos %d, str %q", s.line+1, len(s.lineStr), lineStr)
+	return fmt.Sprintf("line %d, pos %d, str %s", s.line+1, len(s.lineStr), lineStr)
 }
