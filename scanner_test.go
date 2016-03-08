@@ -14,6 +14,11 @@ func TestScannerPlainSuccess(t *testing.T) {
 	testScannerSuccess(t, "{%plain%}{%foo{%endplain%}", []tt{
 		{ID: Text, Value: "{%foo"},
 	})
+	testScannerSuccess(t, "aa{%plain%}bbb{%cc%}{%endplain%}{%plain%}dsff{%endplain%}", []tt{
+		{ID: Text, Value: "aa"},
+		{ID: Text, Value: "bbb{%cc%}"},
+		{ID: Text, Value: "dsff"},
+	})
 	testScannerSuccess(t, "mmm{%plain%}aa{% bar {%%% }baz{%endplain%}nnn", []tt{
 		{ID: Text, Value: "mmm"},
 		{ID: Text, Value: "aa{% bar {%%% }baz"},
@@ -33,6 +38,7 @@ func TestScannerPlainFailure(t *testing.T) {
 func TestScannerCommentSuccess(t *testing.T) {
 	testScannerSuccess(t, "{%comment%}{%endcomment%}", nil)
 	testScannerSuccess(t, "{%comment%}foo{%endcomment%}", nil)
+	testScannerSuccess(t, "{%comment%}foo{%endcomment%}{%comment%}sss{%endcomment%}", nil)
 	testScannerSuccess(t, "{%comment%}foo{%bar%}{%endcomment%}", nil)
 	testScannerSuccess(t, "{%comment%}foo{%bar {%endcomment%}", nil)
 	testScannerSuccess(t, "{%comment%}foo{%bar&^{%endcomment%}", nil)
