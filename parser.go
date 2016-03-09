@@ -150,6 +150,9 @@ func (p *parser) parseIf() error {
 	if err != nil {
 		return err
 	}
+	if len(t.Value) == 0 {
+		return fmt.Errorf("empty if condition at %s", s.Context())
+	}
 	fmt.Fprintf(w, "%sif %s {\n", p.prefix, t.Value)
 	p.prefix += "\t"
 	elseUsed := false

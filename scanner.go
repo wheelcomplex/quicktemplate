@@ -57,6 +57,8 @@ type Scanner struct {
 
 	capture       bool
 	capturedValue []byte
+
+	stripSpaceDepth int
 }
 
 func NewScanner(r io.Reader, filePath string) *Scanner {
@@ -92,6 +94,22 @@ func (s *Scanner) Next() bool {
 					// skip empty text
 					continue
 				}
+			case "stripspace":
+				if !s.readTagContents() {
+					return false
+				}
+				s.stripSpaceDepth++
+				continue
+			case "endstripspace":
+				if s.stripSpaceDepth == 0 {
+					s.err = fmt.Errorf("endstripspace tag found without the corresponding stripspace tag")
+					return false
+				}
+				if !s.readTagContents() {
+					return false
+				}
+				s.stripSpaceDepth--
+				continue
 			}
 		}
 		return true
@@ -170,9 +188,11 @@ func (s *Scanner) scanToken() bool {
 
 func (s *Scanner) readText() bool {
 	s.t.init(Text)
+	ok := false
 	for {
 		if !s.nextByte() {
-			return len(s.t.Value) > 0
+			ok = (len(s.t.Value) > 0)
+			break
 		}
 		if s.c != '{' {
 			s.appendByte()
@@ -180,15 +200,21 @@ func (s *Scanner) readText() bool {
 		}
 		if !s.nextByte() {
 			s.appendByte()
-			return true
+			ok = true
+			break
 		}
 		if s.c == '%' {
 			s.nextTokenID = TagName
-			return true
+			ok = true
+			break
 		}
 		s.unreadByte('{')
 		s.appendByte()
 	}
+	if s.stripSpaceDepth > 0 {
+		s.t.Value = stripSpace(s.t.Value)
+	}
+	return ok
 }
 
 func (s *Scanner) readTagName() bool {
@@ -298,6 +324,9 @@ func (s *Scanner) LastError() error {
 		return nil
 	}
 	if s.err == io.ErrUnexpectedEOF && s.t.ID == Text {
+		if s.stripSpaceDepth > 0 {
+			return fmt.Errorf("missing endstripspace tag at %s", s.Context())
+		}
 		return nil
 	}
 

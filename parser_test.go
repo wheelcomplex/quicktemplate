@@ -13,6 +13,9 @@ func TestParseFailure(t *testing.T) {
 	// empty func name
 	testParseFailure(t, "{% func () %}aaa{% endfunc %}")
 	testParseFailure(t, "{% func (a int, b string) %}aaa{% endfunc %}")
+
+	// empty if condition
+	testParseFailure(t, "{% if    %}aaaa{% endif %}")
 }
 
 func testParseFailure(t *testing.T, str string) {
@@ -34,12 +37,15 @@ import (
 %}
 
 this is a sample func
+{% stripspace %}
 {% func foobar (  s string , 
  x int, a *Foo ) %}
 	{%comment%}this %}{% is a comment{%endcomment%}
 	he` + "`" + `llo, {%s s %}
 	{% code panic("foobar") %} aaa {% return %}
-	{% plain %}aaa {% ` + "`" + `foo %} bar{% endplain %}
+	{% plain %}
+		aaa {% ` + "`" + `foo %} bar
+	{% endplain %}
 	{% for _, c := range s %}
 		c = {%d= c %}
 		{% if c == 'a' %}
@@ -52,6 +58,7 @@ this is a sample func
 	{% endfor %}
 bbb
 {% endfunc %}
+{% endstripspace %}
 
 this is a tail`
 

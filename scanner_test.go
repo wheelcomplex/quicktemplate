@@ -6,6 +6,37 @@ import (
 	"testing"
 )
 
+func TestScannerStripspaceSuccess(t *testing.T) {
+	testScannerSuccess(t, "  aa\n\t {%stripspace%} \t\n   foo  {%  bar baz  asd %}\nbaz \n   \n{%endstripspace%} bb  ", []tt{
+		{ID: Text, Value: "  aa\n\t "},
+		{ID: Text, Value: "foo"},
+		{ID: TagName, Value: "bar"},
+		{ID: TagContents, Value: "baz  asd"},
+		{ID: Text, Value: "baz"},
+		{ID: Text, Value: " bb  "},
+	})
+	testScannerSuccess(t, "{%stripspace  %}{% stripspace fobar %} aaa\n\r\t {%endstripspace  %}  {%endstripspace  baz%}", []tt{
+		{ID: Text, Value: "aaa"},
+	})
+}
+
+func TestScannerStripspaceFailure(t *testing.T) {
+	// incomplete stripspace tag
+	testScannerFailure(t, "{%stripspace   ")
+
+	// incomplete endstripspace tag
+	testScannerFailure(t, "{%stripspace%}aaa{%endstripspace")
+
+	// missing endstripspace
+	testScannerFailure(t, "{%stripspace%} foobar")
+
+	// missing stripspace
+	testScannerFailure(t, "aaa{%endstripspace%}")
+
+	// missing the second endstripspace
+	testScannerFailure(t, "{%stripspace%}{%stripspace%}aaaa{%endstripspace%}")
+}
+
 func TestScannerPlainSuccess(t *testing.T) {
 	testScannerSuccess(t, "{%plain%}{%endplain%}", nil)
 	testScannerSuccess(t, "{%plain%}{%foo bar%}asdf{%endplain%}", []tt{

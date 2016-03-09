@@ -18,6 +18,11 @@ func stripTrailingSpace(b []byte) []byte {
 	return b
 }
 
+func stripSpace(b []byte) []byte {
+	b = stripLeadingSpace(b)
+	return stripTrailingSpace(b)
+}
+
 func isSpace(c byte) bool {
 	return unicode.IsSpace(rune(c))
 }
