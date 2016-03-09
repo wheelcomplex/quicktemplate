@@ -228,7 +228,10 @@ func (p *parser) tryParseCommonTags(tagName []byte) (bool, error) {
 		}
 		filter := "N()."
 		if len(tagNameStr) == 1 {
-			filter = "E()."
+			switch tagNameStr {
+			case "s", "v", "q", "z":
+				filter = "E()."
+			}
 		} else {
 			tagNameStr = tagNameStr[:len(tagNameStr)-1]
 		}
