@@ -357,7 +357,7 @@ func (p *parser) emitFuncEnd(fname, fargs, fargsNoTypes string) {
 	p.prefix = "\t"
 	p.Printf("bb := quicktemplate.AcquireByteBuffer()")
 	p.Printf("Write%s(bb, %s)", fname, fargsNoTypes)
-	p.Printf("s := string(bb.Bytes())")
+	p.Printf("s := string(bb.B)")
 	p.Printf("quicktemplate.ReleaseByteBuffer(bb)")
 	p.Printf("return s")
 	p.prefix = ""

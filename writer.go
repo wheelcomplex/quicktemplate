@@ -7,35 +7,47 @@ import (
 	"sync"
 )
 
+// Writer implements auxiliary writer used by quicktemplate functions.
+//
+// Use AcquireWriter for creating new writers.
 type Writer struct {
 	e QWriter
 	n QWriter
 }
 
+// W returns the underlying writer passed to AcquireWriter.
 func (qw *Writer) W() io.Writer {
 	return qw.n.w
 }
 
+// E returns QWriter with enabled html escaping.
 func (qw *Writer) E() *QWriter {
 	return &qw.e
 }
 
+// N returns QWriter without html escaping.
 func (qw *Writer) N() *QWriter {
 	return &qw.n
 }
 
+// AcquireWriter returns new writer from the pool.
+//
+// Return unneeded writer to the pool by calling ReleaseWriter
+// in order to reduce memory allocations.
 func AcquireWriter(w io.Writer) *Writer {
-	var qw *Writer
 	v := writerPool.Get()
 	if v == nil {
-		qw = &Writer{}
+		v = &Writer{}
 	}
-	qw = v.(*Writer)
+	qw := v.(*Writer)
 	qw.e.w = acquireHTMLEscapeWriter(w)
 	qw.n.w = w
 	return qw
 }
 
+// ReleaseWriter returns the writer to the pool.
+//
+// Do not access released writer, otherwise data races may occur.
 func ReleaseWriter(qw *Writer) {
 	releaseHTMLEscapeWriter(qw.e.w)
 	qw.e.w = nil
@@ -45,46 +57,46 @@ func ReleaseWriter(qw *Writer) {
 
 var writerPool sync.Pool
 
+// QWriter is auxiliary writer used by Writer.
 type QWriter struct {
 	w io.Writer
 }
 
+// S writes s to w.
 func (w *QWriter) S(s string) {
 	w.w.Write(unsafeStrToBytes(s))
 }
 
+// Z writes z to w.
 func (w *QWriter) Z(z []byte) {
 	w.w.Write(z)
 }
 
+// D writes n to w.
 func (w *QWriter) D(n int) {
 	bb := AcquireByteBuffer()
-	bb.b = strconv.AppendInt(bb.b, int64(n), 10)
-	w.w.Write(bb.b)
+	bb.B = strconv.AppendInt(bb.B, int64(n), 10)
+	w.w.Write(bb.B)
 	ReleaseByteBuffer(bb)
 }
 
+// F writes f to w.
 func (w *QWriter) F(f float64) {
 	bb := AcquireByteBuffer()
-	bb.b = strconv.AppendFloat(bb.b, f, 'f', -1, 64)
-	w.w.Write(bb.b)
+	bb.B = strconv.AppendFloat(bb.B, f, 'f', -1, 64)
+	w.w.Write(bb.B)
 	ReleaseByteBuffer(bb)
 }
 
+// Q writes quoted s to w.
 func (w *QWriter) Q(s string) {
 	bb := AcquireByteBuffer()
-	bb.b = strconv.AppendQuote(bb.b, s)
-	w.w.Write(bb.b)
+	bb.B = strconv.AppendQuote(bb.B, s)
+	w.w.Write(bb.B)
 	ReleaseByteBuffer(bb)
 }
 
+// V writes v to w.
 func (w *QWriter) V(v interface{}) {
 	fmt.Fprintf(w.w, "%v", v)
-}
-
-func acquireHTMLEscapeWriter(w io.Writer) io.Writer {
-	return w
-}
-
-func releaseHTMLEscapeWriter(w io.Writer) {
 }
