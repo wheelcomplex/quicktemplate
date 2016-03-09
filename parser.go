@@ -221,17 +221,18 @@ func (p *parser) tryParseCommonTags(tagName []byte) (bool, error) {
 	s := p.s
 	tagNameStr := string(tagName)
 	switch tagNameStr {
-	case "s", "v", "d", "f", "s=", "v=", "d=", "f=":
+	case "s", "v", "d", "f", "q", "z", "s=", "v=", "d=", "f=", "q=", "z=":
 		t, err := expectTagContents(s)
 		if err != nil {
 			return false, err
 		}
-		filter := ""
+		filter := "N()."
 		if len(tagNameStr) == 1 {
-			filter = "e."
+			filter = "E()."
 		} else {
 			tagNameStr = tagNameStr[:len(tagNameStr)-1]
 		}
+		tagNameStr = strings.ToUpper(tagNameStr)
 		p.Printf("qw.%s%s(%s)", filter, tagNameStr, t.Value)
 	case "=":
 		t, err := expectTagContents(s)
@@ -242,12 +243,11 @@ func (p *parser) tryParseCommonTags(tagName []byte) (bool, error) {
 		if err != nil {
 			return false, err
 		}
-		p.Printf("%sStream(qw.w, %s)", fname, fargs)
+		p.Printf("write%s(qw, %s)", fname, fargs)
 	case "return":
 		if err := skipTagContents(s); err != nil {
 			return false, err
 		}
-		p.Printf("quicktemplate.ReleaseWriter(qw)")
 		p.Printf("return")
 	case "break":
 		if p.forDepth <= 0 {
@@ -327,22 +327,28 @@ func (p *parser) emitText(text []byte) {
 	for len(text) > 0 {
 		n := bytes.IndexByte(text, '`')
 		if n < 0 {
-			p.Printf("qw.s(`%s`)", text)
+			p.Printf("qw.N().S(`%s`)", text)
 			return
 		}
-		p.Printf("qw.s(`%s`)", text[:n])
-		p.Printf("qw.s(\"`\")")
+		p.Printf("qw.N().S(`%s`)", text[:n])
+		p.Printf("qw.N().S(\"`\")")
 		text = text[n+1:]
 	}
 }
 
 func (p *parser) emitFuncStart(fname, fargs string) {
-	p.Printf("func %sStream(w io.Writer, %s) {", fname, fargs)
+	p.Printf("func write%s(qw *quicktemplate.Writer, %s) {", fname, fargs)
 	p.prefix = "\t"
-	p.Printf("qw := quicktemplate.AcquireWriter(w)")
 }
 
 func (p *parser) emitFuncEnd(fname, fargs, fargsNoTypes string) {
+	p.prefix = ""
+	p.Printf("}\n")
+
+	p.Printf("func Write%s(w io.Writer, %s) {", fname, fargs)
+	p.prefix = "\t"
+	p.Printf("qw := quicktemplate.AcquireWriter(w)")
+	p.Printf("write%s(qw, %s)", fname, fargsNoTypes)
 	p.Printf("quicktemplate.ReleaseWriter(qw)")
 	p.prefix = ""
 	p.Printf("}\n")
@@ -350,7 +356,7 @@ func (p *parser) emitFuncEnd(fname, fargs, fargsNoTypes string) {
 	p.Printf("func %s(%s) string {", fname, fargs)
 	p.prefix = "\t"
 	p.Printf("bb := quicktemplate.AcquireByteBuffer()")
-	p.Printf("%sStream(bb, %s)", fname, fargsNoTypes)
+	p.Printf("Write%s(bb, %s)", fname, fargsNoTypes)
 	p.Printf("s := string(bb.Bytes())")
 	p.Printf("quicktemplate.ReleaseByteBuffer(bb)")
 	p.Printf("return s")
