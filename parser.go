@@ -48,7 +48,7 @@ func (p *parser) parseTemplate() error {
 					return err
 				}
 			default:
-				return fmt.Errorf("unexpected tag found outside func: %s at %s", t.Value, s.Context())
+				return fmt.Errorf("unexpected tag found outside func: %q at %s", t.Value, s.Context())
 			}
 		default:
 			return fmt.Errorf("unexpected token found %s outside func at %s", t, s.Context())
@@ -79,7 +79,7 @@ func (p *parser) parseFunc() error {
 		case tagName:
 			ok, err := p.tryParseCommonTags(t.Value)
 			if err != nil {
-				return err
+				return fmt.Errorf("error in func %q: %s", fname, err)
 			}
 			if ok {
 				continue
@@ -92,16 +92,16 @@ func (p *parser) parseFunc() error {
 				p.emitFuncEnd(fname, fargs, fargsNoTypes)
 				return nil
 			default:
-				return fmt.Errorf("unexpected tag found inside func: %s at %s", t.Value, s.Context())
+				return fmt.Errorf("unexpected tag found in func %q: %q at %s", fname, t.Value, s.Context())
 			}
 		default:
-			return fmt.Errorf("unexpected token found %s when parsing func at %s", t, s.Context())
+			return fmt.Errorf("unexpected token found when parsing func %q: %s at %s", fname, t, s.Context())
 		}
 	}
 	if err := s.LastError(); err != nil {
-		return fmt.Errorf("cannot parse func: %s", err)
+		return fmt.Errorf("cannot parse func %q: %s", fname, err)
 	}
-	return fmt.Errorf("cannot find endfunc tag at %s", s.Context())
+	return fmt.Errorf("cannot find endfunc tag for func %q at %s", fname, s.Context())
 }
 
 func (p *parser) parseFor() error {
@@ -113,6 +113,7 @@ func (p *parser) parseFor() error {
 	p.Printf("for %s {", t.Value)
 	p.prefix += "\t"
 	p.forDepth++
+	forStr := "for " + string(t.Value)
 	for s.Next() {
 		t := s.Token()
 		switch t.ID {
@@ -121,7 +122,7 @@ func (p *parser) parseFor() error {
 		case tagName:
 			ok, err := p.tryParseCommonTags(t.Value)
 			if err != nil {
-				return err
+				return fmt.Errorf("error in %q: %s", forStr, err)
 			}
 			if ok {
 				continue
@@ -136,16 +137,16 @@ func (p *parser) parseFor() error {
 				p.Printf("}")
 				return nil
 			default:
-				return fmt.Errorf("unexpected tag found inside for loop: %s at %s", t.Value, s.Context())
+				return fmt.Errorf("unexpected tag found in %q: %q at %s", forStr, t.Value, s.Context())
 			}
 		default:
-			return fmt.Errorf("unexpected token found %s when parsing for loop at %s", t, s.Context())
+			return fmt.Errorf("unexpected token found when parsing %q: %s at %s", forStr, t, s.Context())
 		}
 	}
 	if err := s.LastError(); err != nil {
-		return fmt.Errorf("cannot parse for loop: %s", err)
+		return fmt.Errorf("cannot parse %q: %s", forStr, err)
 	}
-	return fmt.Errorf("cannot find endfor tag at %s", s.Context())
+	return fmt.Errorf("cannot find endfor tag for %q at %s", forStr, s.Context())
 }
 
 func (p *parser) parseIf() error {
@@ -160,6 +161,7 @@ func (p *parser) parseIf() error {
 	p.Printf("if %s {", t.Value)
 	p.prefix += "\t"
 	elseUsed := false
+	ifStr := "if " + string(t.Value)
 	for s.Next() {
 		t := s.Token()
 		switch t.ID {
@@ -168,7 +170,7 @@ func (p *parser) parseIf() error {
 		case tagName:
 			ok, err := p.tryParseCommonTags(t.Value)
 			if err != nil {
-				return err
+				return fmt.Errorf("error in %q: %s", ifStr, err)
 			}
 			if ok {
 				continue
@@ -183,7 +185,7 @@ func (p *parser) parseIf() error {
 				return nil
 			case "else":
 				if elseUsed {
-					return fmt.Errorf("duplicate else branch found at %s", s.Context())
+					return fmt.Errorf("duplicate else branch found for %q at %s", ifStr, s.Context())
 				}
 				if err = skipTagContents(s); err != nil {
 					return err
@@ -194,7 +196,8 @@ func (p *parser) parseIf() error {
 				elseUsed = true
 			case "elseif":
 				if elseUsed {
-					return fmt.Errorf("unexpected elseif branch found after else branch at %s", s.Context())
+					return fmt.Errorf("unexpected elseif branch found after else branch for %q at %s",
+						ifStr, s.Context())
 				}
 				t, err = expectTagContents(s)
 				if err != nil {
@@ -204,14 +207,14 @@ func (p *parser) parseIf() error {
 				p.Printf("} else if %s {", t.Value)
 				p.prefix += "\t"
 			default:
-				return fmt.Errorf("unexpected tag found inside if condition: %s at %s", t.Value, s.Context())
+				return fmt.Errorf("unexpected tag found in %q: %q at %s", ifStr, t.Value, s.Context())
 			}
 		}
 	}
 	if err := s.LastError(); err != nil {
-		return fmt.Errorf("cannot parse if branch: %s", err)
+		return fmt.Errorf("cannot parse %q: %s", ifStr, err)
 	}
-	return fmt.Errorf("cannot find endif tag at %s", s.Context())
+	return fmt.Errorf("cannot find endif tag for %q at %s", ifStr, s.Context())
 }
 
 func (p *parser) tryParseCommonTags(tagName []byte) (bool, error) {
