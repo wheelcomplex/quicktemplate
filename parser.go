@@ -14,9 +14,9 @@ type parser struct {
 	forDepth int
 }
 
-func Parse(w io.Writer, r io.Reader) error {
+func Parse(w io.Writer, r io.Reader, filePath string) error {
 	p := &parser{
-		s: NewScanner(r),
+		s: NewScanner(r, filePath),
 		w: w,
 	}
 	return p.parseTemplate()

@@ -18,7 +18,7 @@ func TestParseFailure(t *testing.T) {
 func testParseFailure(t *testing.T, str string) {
 	r := bytes.NewBufferString(str)
 	w := &bytes.Buffer{}
-	if err := Parse(w, r); err == nil {
+	if err := Parse(w, r, "memory"); err == nil {
 		t.Fatalf("expecting error when parsing %q", str)
 	}
 }
@@ -57,7 +57,7 @@ this is a tail`
 
 	r := bytes.NewBufferString(s)
 	w := &bytes.Buffer{}
-	if err := Parse(w, r); err != nil {
+	if err := Parse(w, r, "memory"); err != nil {
 		t.Fatalf("unexpected error: %s", err)
 	}
 

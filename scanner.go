@@ -48,6 +48,8 @@ type Scanner struct {
 	c   byte
 	err error
 
+	filePath string
+
 	line    int
 	lineStr []byte
 
@@ -57,9 +59,10 @@ type Scanner struct {
 	capturedValue []byte
 }
 
-func NewScanner(r io.Reader) *Scanner {
+func NewScanner(r io.Reader, filePath string) *Scanner {
 	return &Scanner{
-		r: bufio.NewReader(r),
+		r:        bufio.NewReader(r),
+		filePath: filePath,
 	}
 }
 
@@ -330,5 +333,5 @@ func (s *Scanner) Context() string {
 	} else {
 		lineStr = fmt.Sprintf("%q ... %q", v[:20], v[len(v)-20:])
 	}
-	return fmt.Sprintf("line %d, pos %d, str %s", s.line+1, len(s.lineStr), lineStr)
+	return fmt.Sprintf("file %q, line %d, pos %d, str %s", s.filePath, s.line+1, len(s.lineStr), lineStr)
 }
