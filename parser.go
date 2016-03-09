@@ -9,7 +9,7 @@ import (
 )
 
 type parser struct {
-	s           *Scanner
+	s           *scanner
 	w           io.Writer
 	packageName string
 	prefix      string
@@ -22,7 +22,7 @@ func Parse(w io.Writer, r io.Reader, filePath string) error {
 		return err
 	}
 	p := &parser{
-		s:           NewScanner(r, filePath),
+		s:           newScanner(r, filePath),
 		w:           w,
 		packageName: packageName,
 	}
@@ -283,7 +283,7 @@ func (p *parser) parseCode() error {
 	return nil
 }
 
-func parseFnameFargsNoTypes(s *Scanner, f []byte) (string, string, string, error) {
+func parseFnameFargsNoTypes(s *scanner, f []byte) (string, string, string, error) {
 	fname, fargs, err := parseFnameFargs(s, f)
 	if err != nil {
 		return "", "", "", err
@@ -302,7 +302,7 @@ func parseFnameFargsNoTypes(s *Scanner, f []byte) (string, string, string, error
 	return fname, fargs, fargsNoTypes, nil
 }
 
-func parseFnameFargs(s *Scanner, f []byte) (string, string, error) {
+func parseFnameFargs(s *scanner, f []byte) (string, string, error) {
 	// TODO: use real Go parser here
 	n := bytes.IndexByte(f, '(')
 	if n < 0 {
@@ -360,16 +360,16 @@ func %s(%s) string {
 		fname, fargs, fname, fargsNoTypes)
 }
 
-func skipTagContents(s *Scanner) error {
+func skipTagContents(s *scanner) error {
 	_, err := expectTagContents(s)
 	return err
 }
 
-func expectTagContents(s *Scanner) (*Token, error) {
+func expectTagContents(s *scanner) (*Token, error) {
 	return expectToken(s, TagContents)
 }
 
-func expectToken(s *Scanner, id int) (*Token, error) {
+func expectToken(s *scanner, id int) (*Token, error) {
 	if !s.Next() {
 		return nil, fmt.Errorf("cannot find token %s: %v", tokenIDToStr(id), s.LastError())
 	}

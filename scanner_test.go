@@ -136,7 +136,7 @@ func TestScannerFailure(t *testing.T) {
 
 func testScannerFailure(t *testing.T, str string) {
 	r := bytes.NewBufferString(str)
-	s := NewScanner(r, "memory")
+	s := newScanner(r, "memory")
 	var tokens []tt
 	for s.Next() {
 		tokens = append(tokens, tt{
@@ -151,7 +151,7 @@ func testScannerFailure(t *testing.T, str string) {
 
 func testScannerSuccess(t *testing.T, str string, expectedTokens []tt) {
 	r := bytes.NewBufferString(str)
-	s := NewScanner(r, "memory")
+	s := newScanner(r, "memory")
 	var tokens []tt
 	for s.Next() {
 		tokens = append(tokens, tt{

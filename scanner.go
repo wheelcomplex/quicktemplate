@@ -42,7 +42,7 @@ func (t *Token) String() string {
 	return fmt.Sprintf("Token %q, value %q", tokenIDToStr(t.ID), t.Value)
 }
 
-type Scanner struct {
+type scanner struct {
 	r   *bufio.Reader
 	t   Token
 	c   byte
@@ -61,14 +61,14 @@ type Scanner struct {
 	stripSpaceDepth int
 }
 
-func NewScanner(r io.Reader, filePath string) *Scanner {
-	return &Scanner{
+func newScanner(r io.Reader, filePath string) *scanner {
+	return &scanner{
 		r:        bufio.NewReader(r),
 		filePath: filePath,
 	}
 }
 
-func (s *Scanner) Next() bool {
+func (s *scanner) Next() bool {
 	for {
 		if !s.scanToken() {
 			return false
@@ -116,7 +116,7 @@ func (s *Scanner) Next() bool {
 	}
 }
 
-func (s *Scanner) readPlain() bool {
+func (s *scanner) readPlain() bool {
 	s.startCapture()
 	ok := s.skipUntilTag("endplain")
 	v := s.stopCapture()
@@ -136,11 +136,11 @@ var (
 	strTagClose = []byte("%}")
 )
 
-func (s *Scanner) skipComment() bool {
+func (s *scanner) skipComment() bool {
 	return s.skipUntilTag("endcomment")
 }
 
-func (s *Scanner) skipUntilTag(tagName string) bool {
+func (s *scanner) skipUntilTag(tagName string) bool {
 	ok := false
 	for {
 		if !s.nextByte() {
@@ -173,7 +173,7 @@ func (s *Scanner) skipUntilTag(tagName string) bool {
 	return ok
 }
 
-func (s *Scanner) scanToken() bool {
+func (s *scanner) scanToken() bool {
 	switch s.nextTokenID {
 	case Text:
 		return s.readText()
@@ -186,7 +186,7 @@ func (s *Scanner) scanToken() bool {
 	}
 }
 
-func (s *Scanner) readText() bool {
+func (s *scanner) readText() bool {
 	s.t.init(Text)
 	ok := false
 	for {
@@ -217,7 +217,7 @@ func (s *Scanner) readText() bool {
 	return ok
 }
 
-func (s *Scanner) readTagName() bool {
+func (s *scanner) readTagName() bool {
 	s.t.init(TagName)
 	s.skipSpace()
 	for {
@@ -241,7 +241,7 @@ func (s *Scanner) readTagName() bool {
 	}
 }
 
-func (s *Scanner) readTagContents() bool {
+func (s *scanner) readTagContents() bool {
 	s.t.init(TagContents)
 	s.skipSpace()
 	for {
@@ -269,16 +269,16 @@ func (s *Scanner) readTagContents() bool {
 	}
 }
 
-func (s *Scanner) skipSpace() {
+func (s *scanner) skipSpace() {
 	for s.nextByte() && s.isSpace() {
 	}
 }
 
-func (s *Scanner) isSpace() bool {
+func (s *scanner) isSpace() bool {
 	return isSpace(s.c)
 }
 
-func (s *Scanner) nextByte() bool {
+func (s *scanner) nextByte() bool {
 	if s.err != nil {
 		return false
 	}
@@ -303,23 +303,23 @@ func (s *Scanner) nextByte() bool {
 	return true
 }
 
-func (s *Scanner) startCapture() {
+func (s *scanner) startCapture() {
 	s.capture = true
 	s.capturedValue = s.capturedValue[:0]
 }
 
-func (s *Scanner) stopCapture() []byte {
+func (s *scanner) stopCapture() []byte {
 	s.capture = false
 	v := s.capturedValue
 	s.capturedValue = s.capturedValue[:0]
 	return v
 }
 
-func (s *Scanner) Token() *Token {
+func (s *scanner) Token() *Token {
 	return &s.t
 }
 
-func (s *Scanner) LastError() error {
+func (s *scanner) LastError() error {
 	if s.err == nil {
 		return nil
 	}
@@ -334,11 +334,11 @@ func (s *Scanner) LastError() error {
 		tokenIDToStr(s.t.ID), s.Context(), s.err)
 }
 
-func (s *Scanner) appendByte() {
+func (s *scanner) appendByte() {
 	s.t.Value = append(s.t.Value, s.c)
 }
 
-func (s *Scanner) unreadByte(c byte) {
+func (s *scanner) unreadByte(c byte) {
 	if err := s.r.UnreadByte(); err != nil {
 		panic(fmt.Sprintf("BUG: bufio.Reader.UnreadByte returned non-nil error: %s", err))
 	}
@@ -354,7 +354,7 @@ func (s *Scanner) unreadByte(c byte) {
 	s.c = c
 }
 
-func (s *Scanner) Context() string {
+func (s *scanner) Context() string {
 	var lineStr string
 	v := s.lineStr
 	if len(v) <= 40 {
