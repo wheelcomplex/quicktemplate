@@ -338,7 +338,7 @@ func %sStream(w io.Writer, %s) {
 }
 
 func (p *parser) emitFuncEnd(fname, fargs, fargsNoTypes string) {
-	fmt.Fprintf(p.w, "\tquicktemplate.ReleaseWriter(qw)\n" + `
+	fmt.Fprintf(p.w, "\tquicktemplate.ReleaseWriter(qw)\n"+`
 }
 
 func %s(%s) string {
