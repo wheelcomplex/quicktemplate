@@ -347,7 +347,7 @@ func expectToken(s *Scanner, id int) (*Token, error) {
 	}
 	t := s.Token()
 	if t.ID != id {
-		return nil, fmt.Errorf("unexpected token found %s. Expecting %s", t, tokenIDToStr(id))
+		return nil, fmt.Errorf("unexpected token found %s. Expecting %s at %s", t, tokenIDToStr(id), s.Context())
 	}
 	return t, nil
 }
