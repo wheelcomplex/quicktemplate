@@ -36,8 +36,9 @@ import (
 )
 %}
 
-this is a sample func
 {% stripspace %}
+
+this is a sample func
 {% func foobar (  s string , 
  x int, a *Foo ) %}
 	{%comment%}this %}{% is a comment{%endcomment%}
@@ -53,11 +54,16 @@ this is a sample func
 		{% elseif c == 'b' %}
 			return {% return %}
 		{% else %}
-			foobar
+			{%= echo(s) %}
 		{% endif %}
 	{% endfor %}
 bbb
 {% endfunc %}
+
+{% func echo(s string) %}
+	s={%s s %}
+{% endfunc %}
+
 {% endstripspace %}
 
 this is a tail`

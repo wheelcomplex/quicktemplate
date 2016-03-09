@@ -58,7 +58,7 @@ func (p *parser) parseFunc() error {
 	if err != nil {
 		return err
 	}
-	fname, fargs, fargsNoTypes, err := parseFnameFargs(s, t.Value)
+	fname, fargs, fargsNoTypes, err := parseFnameFargsNoTypes(s, t.Value)
 	if err != nil {
 		return err
 	}
@@ -224,6 +224,16 @@ func (p *parser) tryParseCommonTags(tagName []byte) (bool, error) {
 			tagNameStr = tagNameStr[:len(tagNameStr)-1]
 		}
 		fmt.Fprintf(w, "%sqw.%s%s(%s)\n", prefix, filter, tagNameStr, t.Value)
+	case "=":
+		t, err := expectTagContents(s)
+		if err != nil {
+			return false, err
+		}
+		fname, fargs, err := parseFnameFargs(s, t.Value)
+		if err != nil {
+			return false, err
+		}
+		fmt.Fprintf(w, "%s%sStream(qw.w, %s)\n", prefix, fname, fargs)
 	case "return":
 		if err := skipTagContents(s); err != nil {
 			return false, err
@@ -265,29 +275,16 @@ func (p *parser) parseCode() error {
 	return nil
 }
 
-func parseFnameFargs(s *Scanner, f []byte) (string, string, string, error) {
-	// TODO: use real Go parser here
-
-	n := bytes.IndexByte(f, '(')
-	if n < 0 {
-		return "", "", "", fmt.Errorf("missing '(' for function arguments at %s", s.Context())
+func parseFnameFargsNoTypes(s *Scanner, f []byte) (string, string, string, error) {
+	fname, fargs, err := parseFnameFargs(s, f)
+	if err != nil {
+		return "", "", "", err
 	}
-	fname := string(stripTrailingSpace(f[:n]))
-	if len(fname) == 0 {
-		return "", "", "", fmt.Errorf("empty function name at %s", s.Context())
-	}
-
-	f = f[n+1:]
-	n = bytes.LastIndexByte(f, ')')
-	if n < 0 {
-		return "", "", "", fmt.Errorf("missing ')' for function arguments at %s", s.Context())
-	}
-	fargs := string(f[:n])
 
 	var args []string
 	for _, a := range strings.Split(fargs, ",") {
 		a = string(stripLeadingSpace([]byte(a)))
-		n = 0
+		n := 0
 		for n < len(a) && !isSpace(a[n]) {
 			n++
 		}
@@ -295,6 +292,26 @@ func parseFnameFargs(s *Scanner, f []byte) (string, string, string, error) {
 	}
 	fargsNoTypes := strings.Join(args, ", ")
 	return fname, fargs, fargsNoTypes, nil
+}
+
+func parseFnameFargs(s *Scanner, f []byte) (string, string, error) {
+	// TODO: use real Go parser here
+	n := bytes.IndexByte(f, '(')
+	if n < 0 {
+		return "", "", fmt.Errorf("missing '(' for function arguments at %s", s.Context())
+	}
+	fname := string(stripTrailingSpace(f[:n]))
+	if len(fname) == 0 {
+		return "", "", fmt.Errorf("empty function name at %s", s.Context())
+	}
+
+	f = f[n+1:]
+	n = bytes.LastIndexByte(f, ')')
+	if n < 0 {
+		return "", "", fmt.Errorf("missing ')' for function arguments at %s", s.Context())
+	}
+	fargs := string(f[:n])
+	return fname, fargs, nil
 }
 
 func (p *parser) emitText(text []byte) {
@@ -314,15 +331,14 @@ func (p *parser) emitText(text []byte) {
 
 func (p *parser) emitFuncStart(fname, fargs string) {
 	fmt.Fprintf(p.w, `
-func %sStream(w *io.Writer, %s) {
+func %sStream(w io.Writer, %s) {
 	qw := quicktemplate.AcquireWriter(w)
 `,
 		fname, fargs)
 }
 
 func (p *parser) emitFuncEnd(fname, fargs, fargsNoTypes string) {
-	fmt.Fprintf(p.w, `
-	quicktemplate.ReleaseWriter(qw)
+	fmt.Fprintf(p.w, "\tquicktemplate.ReleaseWriter(qw)\n" + `
 }
 
 func %s(%s) string {
@@ -331,7 +347,8 @@ func %s(%s) string {
 	s := string(bb.Bytes())
 	quicktemplate.ReleaseByteBuffer(bb)
 	return s
-}`,
+}
+`,
 		fname, fargs, fname, fargsNoTypes)
 }
 
