@@ -8,15 +8,15 @@ import (
 
 func TestScannerStripspaceSuccess(t *testing.T) {
 	testScannerSuccess(t, "  aa\n\t {%stripspace%} \t\n   foo  {%  bar baz  asd %}\nbaz \n   \n{%endstripspace%} bb  ", []tt{
-		{ID: Text, Value: "  aa\n\t "},
-		{ID: Text, Value: "foo"},
-		{ID: TagName, Value: "bar"},
-		{ID: TagContents, Value: "baz  asd"},
-		{ID: Text, Value: "baz"},
-		{ID: Text, Value: " bb  "},
+		{ID: text, Value: "  aa\n\t "},
+		{ID: text, Value: "foo"},
+		{ID: tagName, Value: "bar"},
+		{ID: tagContents, Value: "baz  asd"},
+		{ID: text, Value: "baz"},
+		{ID: text, Value: " bb  "},
 	})
 	testScannerSuccess(t, "{%stripspace  %}{% stripspace fobar %} aaa\n\r\t {%endstripspace  %}  {%endstripspace  baz%}", []tt{
-		{ID: Text, Value: "aaa"},
+		{ID: text, Value: "aaa"},
 	})
 }
 
@@ -40,23 +40,23 @@ func TestScannerStripspaceFailure(t *testing.T) {
 func TestScannerPlainSuccess(t *testing.T) {
 	testScannerSuccess(t, "{%plain%}{%endplain%}", nil)
 	testScannerSuccess(t, "{%plain%}{%foo bar%}asdf{%endplain%}", []tt{
-		{ID: Text, Value: "{%foo bar%}asdf"},
+		{ID: text, Value: "{%foo bar%}asdf"},
 	})
 	testScannerSuccess(t, "{%plain%}{%foo{%endplain%}", []tt{
-		{ID: Text, Value: "{%foo"},
+		{ID: text, Value: "{%foo"},
 	})
 	testScannerSuccess(t, "aa{%plain%}bbb{%cc%}{%endplain%}{%plain%}dsff{%endplain%}", []tt{
-		{ID: Text, Value: "aa"},
-		{ID: Text, Value: "bbb{%cc%}"},
-		{ID: Text, Value: "dsff"},
+		{ID: text, Value: "aa"},
+		{ID: text, Value: "bbb{%cc%}"},
+		{ID: text, Value: "dsff"},
 	})
 	testScannerSuccess(t, "mmm{%plain%}aa{% bar {%%% }baz{%endplain%}nnn", []tt{
-		{ID: Text, Value: "mmm"},
-		{ID: Text, Value: "aa{% bar {%%% }baz"},
-		{ID: Text, Value: "nnn"},
+		{ID: text, Value: "mmm"},
+		{ID: text, Value: "aa{% bar {%%% }baz"},
+		{ID: text, Value: "nnn"},
 	})
 	testScannerSuccess(t, "{% plain dsd %}0{%comment%}123{%endcomment%}45{% endplain aaa %}", []tt{
-		{ID: Text, Value: "0{%comment%}123{%endcomment%}45"},
+		{ID: text, Value: "0{%comment%}123{%endcomment%}45"},
 	})
 }
 
@@ -75,11 +75,11 @@ func TestScannerCommentSuccess(t *testing.T) {
 	testScannerSuccess(t, "{%comment%}foo{%bar&^{%endcomment%}", nil)
 	testScannerSuccess(t, "{%comment%}foo{% bar\n\rs%{%endcomment%}", nil)
 	testScannerSuccess(t, "xx{%x%}www{% comment aux data %}aaa{% comment %}{% endcomment %}yy", []tt{
-		{ID: Text, Value: "xx"},
-		{ID: TagName, Value: "x"},
-		{ID: TagContents, Value: ""},
-		{ID: Text, Value: "www"},
-		{ID: Text, Value: "yy"},
+		{ID: text, Value: "xx"},
+		{ID: tagName, Value: "x"},
+		{ID: tagContents, Value: ""},
+		{ID: text, Value: "www"},
+		{ID: text, Value: "yy"},
 	})
 }
 
@@ -90,38 +90,40 @@ func TestScannerCommentFailure(t *testing.T) {
 
 func TestScannerSuccess(t *testing.T) {
 	testScannerSuccess(t, "", nil)
-	testScannerSuccess(t, "a%}{foo}bar", []tt{{ID: Text, Value: "a%}{foo}bar"}})
+	testScannerSuccess(t, "a%}{foo}bar", []tt{
+		{ID: text, Value: "a%}{foo}bar"},
+	})
 	testScannerSuccess(t, "{% foo bar baz(a, b, 123) %}", []tt{
-		{ID: TagName, Value: "foo"},
-		{ID: TagContents, Value: "bar baz(a, b, 123)"},
+		{ID: tagName, Value: "foo"},
+		{ID: tagContents, Value: "bar baz(a, b, 123)"},
 	})
 	testScannerSuccess(t, "foo{%bar%}baz", []tt{
-		{ID: Text, Value: "foo"},
-		{ID: TagName, Value: "bar"},
-		{ID: TagContents, Value: ""},
-		{ID: Text, Value: "baz"},
+		{ID: text, Value: "foo"},
+		{ID: tagName, Value: "bar"},
+		{ID: tagContents, Value: ""},
+		{ID: text, Value: "baz"},
 	})
 	testScannerSuccess(t, "{{{%\n\r\tfoo bar\n\rbaz%%\n   \r %}}", []tt{
-		{ID: Text, Value: "{{"},
-		{ID: TagName, Value: "foo"},
-		{ID: TagContents, Value: "bar\n\rbaz%%"},
-		{ID: Text, Value: "}"},
+		{ID: text, Value: "{{"},
+		{ID: tagName, Value: "foo"},
+		{ID: tagContents, Value: "bar\n\rbaz%%"},
+		{ID: text, Value: "}"},
 	})
 	testScannerSuccess(t, "{%%}", []tt{
-		{ID: TagName, Value: ""},
-		{ID: TagContents, Value: ""},
+		{ID: tagName, Value: ""},
+		{ID: tagContents, Value: ""},
 	})
 	testScannerSuccess(t, "{%%aaa bb%}", []tt{
-		{ID: TagName, Value: ""},
-		{ID: TagContents, Value: "%aaa bb"},
+		{ID: tagName, Value: ""},
+		{ID: tagContents, Value: "%aaa bb"},
 	})
 	testScannerSuccess(t, "foo{% bar %}{% baz aa (123)%}321", []tt{
-		{ID: Text, Value: "foo"},
-		{ID: TagName, Value: "bar"},
-		{ID: TagContents, Value: ""},
-		{ID: TagName, Value: "baz"},
-		{ID: TagContents, Value: "aa (123)"},
-		{ID: Text, Value: "321"},
+		{ID: text, Value: "foo"},
+		{ID: tagName, Value: "bar"},
+		{ID: tagContents, Value: ""},
+		{ID: tagName, Value: "baz"},
+		{ID: tagContents, Value: "aa (123)"},
+		{ID: text, Value: "321"},
 	})
 }
 

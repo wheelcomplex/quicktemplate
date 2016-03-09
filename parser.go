@@ -35,9 +35,9 @@ func (p *parser) parseTemplate() error {
 	for s.Next() {
 		t := s.Token()
 		switch t.ID {
-		case Text:
+		case text:
 			// just skip top-level text
-		case TagName:
+		case tagName:
 			switch string(t.Value) {
 			case "code":
 				if err := p.parseCode(); err != nil {
@@ -75,9 +75,9 @@ func (p *parser) parseFunc() error {
 	for s.Next() {
 		t := s.Token()
 		switch t.ID {
-		case Text:
+		case text:
 			p.emitText(t.Value)
-		case TagName:
+		case tagName:
 			ok, err := p.tryParseCommonTags(t.Value)
 			if err != nil {
 				return err
@@ -119,9 +119,9 @@ func (p *parser) parseFor() error {
 	for s.Next() {
 		t := s.Token()
 		switch t.ID {
-		case Text:
+		case text:
 			p.emitText(t.Value)
-		case TagName:
+		case tagName:
 			ok, err := p.tryParseCommonTags(t.Value)
 			if err != nil {
 				return err
@@ -167,9 +167,9 @@ func (p *parser) parseIf() error {
 	for s.Next() {
 		t := s.Token()
 		switch t.ID {
-		case Text:
+		case text:
 			p.emitText(t.Value)
-		case TagName:
+		case tagName:
 			ok, err := p.tryParseCommonTags(t.Value)
 			if err != nil {
 				return err
@@ -366,7 +366,7 @@ func skipTagContents(s *scanner) error {
 }
 
 func expectTagContents(s *scanner) (*token, error) {
-	return expectToken(s, TagContents)
+	return expectToken(s, tagContents)
 }
 
 func expectToken(s *scanner, id int) (*token, error) {

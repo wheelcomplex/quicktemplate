@@ -9,15 +9,15 @@ import (
 
 // token ids
 const (
-	Text = iota
-	TagName
-	TagContents
+	text = iota
+	tagName
+	tagContents
 )
 
 var tokenStrMap = map[int]string{
-	Text:        "Text",
-	TagName:     "TagName",
-	TagContents: "TagContents",
+	text:        "text",
+	tagName:     "tagName",
+	tagContents: "tagContents",
 }
 
 func tokenIDToStr(id int) string {
@@ -74,12 +74,12 @@ func (s *scanner) Next() bool {
 			return false
 		}
 		switch s.t.ID {
-		case Text:
+		case text:
 			if len(s.t.Value) == 0 {
 				// skip empty text
 				continue
 			}
-		case TagName:
+		case tagName:
 			switch string(s.t.Value) {
 			case "comment":
 				if !s.skipComment() {
@@ -120,7 +120,7 @@ func (s *scanner) readPlain() bool {
 	s.startCapture()
 	ok := s.skipUntilTag("endplain")
 	v := s.stopCapture()
-	s.t.init(Text)
+	s.t.init(text)
 	if ok {
 		n := bytes.Index(v, strTagClose)
 		v = v[n+len(strTagClose):]
@@ -157,7 +157,7 @@ func (s *scanner) skipUntilTag(tagName string) bool {
 			continue
 		}
 		ok = s.readTagName()
-		s.nextTokenID = Text
+		s.nextTokenID = text
 		if !ok {
 			s.err = nil
 			continue
@@ -175,11 +175,11 @@ func (s *scanner) skipUntilTag(tagName string) bool {
 
 func (s *scanner) scanToken() bool {
 	switch s.nextTokenID {
-	case Text:
+	case text:
 		return s.readText()
-	case TagName:
+	case tagName:
 		return s.readTagName()
-	case TagContents:
+	case tagContents:
 		return s.readTagContents()
 	default:
 		panic(fmt.Sprintf("BUG: unknown nextTokenID %d", s.nextTokenID))
@@ -187,7 +187,7 @@ func (s *scanner) scanToken() bool {
 }
 
 func (s *scanner) readText() bool {
-	s.t.init(Text)
+	s.t.init(text)
 	ok := false
 	for {
 		if !s.nextByte() {
@@ -204,7 +204,7 @@ func (s *scanner) readText() bool {
 			break
 		}
 		if s.c == '%' {
-			s.nextTokenID = TagName
+			s.nextTokenID = tagName
 			ok = true
 			break
 		}
@@ -218,14 +218,14 @@ func (s *scanner) readText() bool {
 }
 
 func (s *scanner) readTagName() bool {
-	s.t.init(TagName)
+	s.t.init(tagName)
 	s.skipSpace()
 	for {
 		if s.isSpace() || s.c == '%' {
 			if s.c == '%' {
 				s.unreadByte('~')
 			}
-			s.nextTokenID = TagContents
+			s.nextTokenID = tagContents
 			return true
 		}
 		if (s.c >= 'a' && s.c <= 'z') || (s.c >= 'A' && s.c <= 'Z') || (s.c >= '0' && s.c <= '9') || s.c == '=' {
@@ -242,7 +242,7 @@ func (s *scanner) readTagName() bool {
 }
 
 func (s *scanner) readTagContents() bool {
-	s.t.init(TagContents)
+	s.t.init(tagContents)
 	s.skipSpace()
 	for {
 		if s.c != '%' {
@@ -257,7 +257,7 @@ func (s *scanner) readTagContents() bool {
 			return false
 		}
 		if s.c == '}' {
-			s.nextTokenID = Text
+			s.nextTokenID = text
 			s.t.Value = stripTrailingSpace(s.t.Value)
 			return true
 		}
@@ -323,7 +323,7 @@ func (s *scanner) LastError() error {
 	if s.err == nil {
 		return nil
 	}
-	if s.err == io.ErrUnexpectedEOF && s.t.ID == Text {
+	if s.err == io.ErrUnexpectedEOF && s.t.ID == text {
 		if s.stripSpaceDepth > 0 {
 			return fmt.Errorf("missing endstripspace tag at %s", s.Context())
 		}
