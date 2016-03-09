@@ -365,11 +365,11 @@ func skipTagContents(s *scanner) error {
 	return err
 }
 
-func expectTagContents(s *scanner) (*Token, error) {
+func expectTagContents(s *scanner) (*token, error) {
 	return expectToken(s, TagContents)
 }
 
-func expectToken(s *scanner, id int) (*Token, error) {
+func expectToken(s *scanner, id int) (*token, error) {
 	if !s.Next() {
 		return nil, fmt.Errorf("cannot find token %s: %v", tokenIDToStr(id), s.LastError())
 	}

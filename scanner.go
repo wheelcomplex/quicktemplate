@@ -7,7 +7,7 @@ import (
 	"io"
 )
 
-// Token ids
+// token ids
 const (
 	Text = iota
 	TagName
@@ -28,23 +28,23 @@ func tokenIDToStr(id int) string {
 	return str
 }
 
-type Token struct {
+type token struct {
 	ID    int
 	Value []byte
 }
 
-func (t *Token) init(id int) {
+func (t *token) init(id int) {
 	t.ID = id
 	t.Value = t.Value[:0]
 }
 
-func (t *Token) String() string {
+func (t *token) String() string {
 	return fmt.Sprintf("Token %q, value %q", tokenIDToStr(t.ID), t.Value)
 }
 
 type scanner struct {
 	r   *bufio.Reader
-	t   Token
+	t   token
 	c   byte
 	err error
 
@@ -315,7 +315,7 @@ func (s *scanner) stopCapture() []byte {
 	return v
 }
 
-func (s *scanner) Token() *Token {
+func (s *scanner) Token() *token {
 	return &s.t
 }
 
