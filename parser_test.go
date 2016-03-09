@@ -127,7 +127,7 @@ this is a tail`
 
 	r := bytes.NewBufferString(s)
 	w := &bytes.Buffer{}
-	if err := parse(w, r, "memory"); err != nil {
+	if err := parse(w, r, "memory/foobar.tpl"); err != nil {
 		t.Fatalf("unexpected error: %s", err)
 	}
 

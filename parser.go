@@ -31,7 +31,7 @@ func parse(w io.Writer, r io.Reader, filePath string) error {
 
 func (p *parser) parseTemplate() error {
 	s := p.s
-	fmt.Fprintf(p.w, "package %s\n\n", p.packageName)
+	p.Printf("package %s\n", p.packageName)
 	for s.Next() {
 		t := s.Token()
 		switch t.ID {
@@ -71,7 +71,6 @@ func (p *parser) parseFunc() error {
 		return err
 	}
 	p.emitFuncStart(fname, fargs)
-	p.prefix += "\t"
 	for s.Next() {
 		t := s.Token()
 		switch t.ID {
@@ -91,7 +90,6 @@ func (p *parser) parseFunc() error {
 					return err
 				}
 				p.emitFuncEnd(fname, fargs, fargsNoTypes)
-				p.prefix = p.prefix[1:]
 				return nil
 			default:
 				return fmt.Errorf("unexpected tag found inside func: %s at %s", t.Value, s.Context())
@@ -108,12 +106,11 @@ func (p *parser) parseFunc() error {
 
 func (p *parser) parseFor() error {
 	s := p.s
-	w := p.w
 	t, err := expectTagContents(s)
 	if err != nil {
 		return err
 	}
-	fmt.Fprintf(w, "%sfor %s {\n", p.prefix, t.Value)
+	p.Printf("for %s {", t.Value)
 	p.prefix += "\t"
 	p.forDepth++
 	for s.Next() {
@@ -136,7 +133,7 @@ func (p *parser) parseFor() error {
 				}
 				p.forDepth--
 				p.prefix = p.prefix[1:]
-				fmt.Fprintf(w, "%s}\n", p.prefix)
+				p.Printf("}")
 				return nil
 			default:
 				return fmt.Errorf("unexpected tag found inside for loop: %s at %s", t.Value, s.Context())
@@ -153,7 +150,6 @@ func (p *parser) parseFor() error {
 
 func (p *parser) parseIf() error {
 	s := p.s
-	w := p.w
 	t, err := expectTagContents(s)
 	if err != nil {
 		return err
@@ -161,7 +157,7 @@ func (p *parser) parseIf() error {
 	if len(t.Value) == 0 {
 		return fmt.Errorf("empty if condition at %s", s.Context())
 	}
-	fmt.Fprintf(w, "%sif %s {\n", p.prefix, t.Value)
+	p.Printf("if %s {", t.Value)
 	p.prefix += "\t"
 	elseUsed := false
 	for s.Next() {
@@ -183,7 +179,7 @@ func (p *parser) parseIf() error {
 					return err
 				}
 				p.prefix = p.prefix[1:]
-				fmt.Fprintf(w, "%s}\n", p.prefix)
+				p.Printf("}")
 				return nil
 			case "else":
 				if elseUsed {
@@ -192,7 +188,9 @@ func (p *parser) parseIf() error {
 				if err = skipTagContents(s); err != nil {
 					return err
 				}
-				fmt.Fprintf(w, "%s} else {\n", p.prefix[1:])
+				p.prefix = p.prefix[1:]
+				p.Printf("} else {")
+				p.prefix += "\t"
 				elseUsed = true
 			case "elseif":
 				if elseUsed {
@@ -202,7 +200,9 @@ func (p *parser) parseIf() error {
 				if err != nil {
 					return err
 				}
-				fmt.Fprintf(w, "%s} else if %s {\n", p.prefix[1:], t.Value)
+				p.prefix = p.prefix[1:]
+				p.Printf("} else if %s {", t.Value)
+				p.prefix += "\t"
 			default:
 				return fmt.Errorf("unexpected tag found inside if condition: %s at %s", t.Value, s.Context())
 			}
@@ -216,8 +216,6 @@ func (p *parser) parseIf() error {
 
 func (p *parser) tryParseCommonTags(tagName []byte) (bool, error) {
 	s := p.s
-	w := p.w
-	prefix := p.prefix
 	tagNameStr := string(tagName)
 	switch tagNameStr {
 	case "s", "v", "d", "f", "s=", "v=", "d=", "f=":
@@ -231,7 +229,7 @@ func (p *parser) tryParseCommonTags(tagName []byte) (bool, error) {
 		} else {
 			tagNameStr = tagNameStr[:len(tagNameStr)-1]
 		}
-		fmt.Fprintf(w, "%sqw.%s%s(%s)\n", prefix, filter, tagNameStr, t.Value)
+		p.Printf("qw.%s%s(%s)", filter, tagNameStr, t.Value)
 	case "=":
 		t, err := expectTagContents(s)
 		if err != nil {
@@ -241,13 +239,13 @@ func (p *parser) tryParseCommonTags(tagName []byte) (bool, error) {
 		if err != nil {
 			return false, err
 		}
-		fmt.Fprintf(w, "%s%sStream(qw.w, %s)\n", prefix, fname, fargs)
+		p.Printf("%sStream(qw.w, %s)", fname, fargs)
 	case "return":
 		if err := skipTagContents(s); err != nil {
 			return false, err
 		}
-		fmt.Fprintf(w, "%squicktemplate.ReleaseWriter(qw)\n", prefix)
-		fmt.Fprintf(w, "%sreturn\n", prefix)
+		p.Printf("quicktemplate.ReleaseWriter(qw)")
+		p.Printf("return")
 	case "break":
 		if p.forDepth <= 0 {
 			return false, fmt.Errorf("found break tag outside for loop at %s", s.Context())
@@ -255,7 +253,7 @@ func (p *parser) tryParseCommonTags(tagName []byte) (bool, error) {
 		if err := skipTagContents(s); err != nil {
 			return false, err
 		}
-		fmt.Fprintf(w, "%sbreak\n", prefix)
+		p.Printf("break")
 	case "code":
 		if err := p.parseCode(); err != nil {
 			return false, err
@@ -279,7 +277,7 @@ func (p *parser) parseCode() error {
 	if err != nil {
 		return err
 	}
-	fmt.Fprintf(p.w, "%s%s\n", p.prefix, t.Value)
+	p.Printf("%s\n", t.Value)
 	return nil
 }
 
@@ -323,41 +321,47 @@ func parseFnameFargs(s *scanner, f []byte) (string, string, error) {
 }
 
 func (p *parser) emitText(text []byte) {
-	w := p.w
-	prefix := p.prefix
 	for len(text) > 0 {
 		n := bytes.IndexByte(text, '`')
 		if n < 0 {
-			fmt.Fprintf(w, "%sqw.s(`%s`)\n", prefix, text)
+			p.Printf("qw.s(`%s`)", text)
 			return
 		}
-		fmt.Fprintf(w, "%sqw.s(`%s`)\n", prefix, text[:n])
-		fmt.Fprintf(w, "%sqw.s(\"`\")\n", prefix)
+		p.Printf("qw.s(`%s`)", text[:n])
+		p.Printf("qw.s(\"`\")")
 		text = text[n+1:]
 	}
 }
 
 func (p *parser) emitFuncStart(fname, fargs string) {
-	fmt.Fprintf(p.w, `
-func %sStream(w io.Writer, %s) {
-	qw := quicktemplate.AcquireWriter(w)
-`,
-		fname, fargs)
+	p.Printf("func %sStream(w io.Writer, %s) {", fname, fargs)
+	p.prefix = "\t"
+	p.Printf("qw := quicktemplate.AcquireWriter(w)")
 }
 
 func (p *parser) emitFuncEnd(fname, fargs, fargsNoTypes string) {
-	fmt.Fprintf(p.w, "\tquicktemplate.ReleaseWriter(qw)\n"+`
+	p.Printf("quicktemplate.ReleaseWriter(qw)")
+	p.prefix = ""
+	p.Printf("}\n")
+
+	p.Printf("func %s(%s) string {", fname, fargs)
+	p.prefix = "\t"
+	p.Printf("bb := quicktemplate.AcquireByteBuffer()")
+	p.Printf("%sStream(bb, %s)", fname, fargsNoTypes)
+	p.Printf("s := string(bb.Bytes())")
+	p.Printf("quicktemplate.ReleaseByteBuffer(bb)")
+	p.Printf("return s")
+	p.prefix = ""
+	p.Printf("}\n")
 }
 
-func %s(%s) string {
-	bb := quicktemplate.AcquireByteBuffer()
-	%sStream(bb, %s)
-	s := string(bb.Bytes())
-	quicktemplate.ReleaseByteBuffer(bb)
-	return s
-}
-`,
-		fname, fargs, fname, fargsNoTypes)
+func (p *parser) Printf(format string, args ...interface{}) {
+	w := p.w
+	fmt.Fprintf(w, "%s", p.prefix)
+	p.s.WriteLineComment(w)
+	fmt.Fprintf(w, "%s", p.prefix)
+	fmt.Fprintf(w, format, args...)
+	fmt.Fprintf(w, "\n")
 }
 
 func skipTagContents(s *scanner) error {

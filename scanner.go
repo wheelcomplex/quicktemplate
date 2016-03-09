@@ -364,3 +364,7 @@ func (s *scanner) Context() string {
 	}
 	return fmt.Sprintf("file %q, line %d, pos %d, str %s", s.filePath, s.line+1, len(s.lineStr), lineStr)
 }
+
+func (s *scanner) WriteLineComment(w io.Writer) {
+	fmt.Fprintf(w, "//line %s:%d\n", s.filePath, s.line+1)
+}
