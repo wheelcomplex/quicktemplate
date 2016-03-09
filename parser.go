@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"log"
 	"strings"
 )
 
@@ -15,15 +14,15 @@ type parser struct {
 	forDepth int
 }
 
-func Parse(w io.Writer, r io.Reader) {
+func Parse(w io.Writer, r io.Reader) error {
 	p := &parser{
 		s: NewScanner(r),
 		w: w,
 	}
-	p.parseTemplate()
+	return p.parseTemplate()
 }
 
-func (p *parser) parseTemplate() {
+func (p *parser) parseTemplate() error {
 	s := p.s
 	for s.Next() {
 		t := s.Token()
@@ -33,25 +32,36 @@ func (p *parser) parseTemplate() {
 		case TagName:
 			switch string(t.Value) {
 			case "code":
-				p.parseCode()
+				if err := p.parseCode(); err != nil {
+					return err
+				}
 			case "func":
-				p.parseFunc()
+				if err := p.parseFunc(); err != nil {
+					return err
+				}
 			default:
-				log.Fatalf("unexpected tag found outside func: %s at %s", t.Value, s.Context())
+				return fmt.Errorf("unexpected tag found outside func: %s at %s", t.Value, s.Context())
 			}
 		default:
-			log.Fatalf("unexpected token found %s when parsing template at %s", t, s.Context())
+			return fmt.Errorf("unexpected token found %s when parsing template at %s", t, s.Context())
 		}
 	}
 	if err := s.LastError(); err != nil {
-		log.Fatalf("cannot parse template: %s", err)
+		return fmt.Errorf("cannot parse template: %s", err)
 	}
+	return nil
 }
 
-func (p *parser) parseFunc() {
+func (p *parser) parseFunc() error {
 	s := p.s
-	t := expectTagContents(s)
-	fname, fargs, fargsNoTypes := parseFnameFargs(s, t.Value)
+	t, err := expectTagContents(s)
+	if err != nil {
+		return err
+	}
+	fname, fargs, fargsNoTypes, err := parseFnameFargs(s, t.Value)
+	if err != nil {
+		return err
+	}
 	p.emitFuncStart(fname, fargs)
 	p.prefix += "\t"
 	for s.Next() {
@@ -60,33 +70,41 @@ func (p *parser) parseFunc() {
 		case Text:
 			p.emitText(t.Value)
 		case TagName:
-			if p.tryParseCommonTags(t.Value) {
+			ok, err := p.tryParseCommonTags(t.Value)
+			if err != nil {
+				return err
+			}
+			if ok {
 				continue
 			}
 			switch string(t.Value) {
 			case "endfunc":
-				skipTagContents(s)
+				if err = skipTagContents(s); err != nil {
+					return err
+				}
 				p.emitFuncEnd(fname, fargs, fargsNoTypes)
 				p.prefix = p.prefix[1:]
-				return
+				return nil
 			default:
-				log.Fatalf("unexpected tag found inside func: %s at %s", t.Value, s.Context())
+				return fmt.Errorf("unexpected tag found inside func: %s at %s", t.Value, s.Context())
 			}
 		default:
-			log.Fatalf("unexpected token found %s when parsing func at %s", t, s.Context())
+			return fmt.Errorf("unexpected token found %s when parsing func at %s", t, s.Context())
 		}
 	}
 	if err := s.LastError(); err != nil {
-		log.Fatalf("cannot parse func: %s", err)
-	} else {
-		log.Fatalf("cannot find endfunc tag at %s", s.Context())
+		return fmt.Errorf("cannot parse func: %s", err)
 	}
+	return fmt.Errorf("cannot find endfunc tag at %s", s.Context())
 }
 
-func (p *parser) parseFor() {
+func (p *parser) parseFor() error {
 	s := p.s
 	w := p.w
-	t := expectTagContents(s)
+	t, err := expectTagContents(s)
+	if err != nil {
+		return err
+	}
 	fmt.Fprintf(w, "%sfor %s {\n", p.prefix, t.Value)
 	p.prefix += "\t"
 	p.forDepth++
@@ -96,34 +114,42 @@ func (p *parser) parseFor() {
 		case Text:
 			p.emitText(t.Value)
 		case TagName:
-			if p.tryParseCommonTags(t.Value) {
+			ok, err := p.tryParseCommonTags(t.Value)
+			if err != nil {
+				return err
+			}
+			if ok {
 				continue
 			}
 			switch string(t.Value) {
 			case "endfor":
-				skipTagContents(s)
+				if err = skipTagContents(s); err != nil {
+					return err
+				}
 				p.forDepth--
 				p.prefix = p.prefix[1:]
 				fmt.Fprintf(w, "%s}\n", p.prefix)
-				return
+				return nil
 			default:
-				log.Fatalf("unexpected tag found inside for loop: %s at %s", t.Value, s.Context())
+				return fmt.Errorf("unexpected tag found inside for loop: %s at %s", t.Value, s.Context())
 			}
 		default:
-			log.Fatalf("unexpected token found %s when parsing for loop at %s", t, s.Context())
+			return fmt.Errorf("unexpected token found %s when parsing for loop at %s", t, s.Context())
 		}
 	}
 	if err := s.LastError(); err != nil {
-		log.Fatalf("cannot parse for loop: %s", err)
-	} else {
-		log.Fatalf("cannot find endfor tag at %s", s.Context())
+		return fmt.Errorf("cannot parse for loop: %s", err)
 	}
+	return fmt.Errorf("cannot find endfor tag at %s", s.Context())
 }
 
-func (p *parser) parseIf() {
+func (p *parser) parseIf() error {
 	s := p.s
 	w := p.w
-	t := expectTagContents(s)
+	t, err := expectTagContents(s)
+	if err != nil {
+		return err
+	}
 	fmt.Fprintf(w, "%sif %s {\n", p.prefix, t.Value)
 	p.prefix += "\t"
 	elseUsed := false
@@ -133,82 +159,139 @@ func (p *parser) parseIf() {
 		case Text:
 			p.emitText(t.Value)
 		case TagName:
-			if p.tryParseCommonTags(t.Value) {
+			ok, err := p.tryParseCommonTags(t.Value)
+			if err != nil {
+				return err
+			}
+			if ok {
 				continue
 			}
 			switch string(t.Value) {
 			case "endif":
-				skipTagContents(s)
+				if err = skipTagContents(s); err != nil {
+					return err
+				}
 				p.prefix = p.prefix[1:]
 				fmt.Fprintf(w, "%s}\n", p.prefix)
-				return
+				return nil
 			case "else":
 				if elseUsed {
-					log.Fatalf("duplicate else branch found at %s", s.Context())
+					return fmt.Errorf("duplicate else branch found at %s", s.Context())
 				}
-				skipTagContents(s)
+				if err = skipTagContents(s); err != nil {
+					return err
+				}
 				fmt.Fprintf(w, "%s} else {\n", p.prefix[1:])
 				elseUsed = true
 			case "elseif":
 				if elseUsed {
-					log.Fatalf("unexpected elseif branch found after else branch at %s", s.Context())
+					return fmt.Errorf("unexpected elseif branch found after else branch at %s", s.Context())
 				}
-				t = expectTagContents(s)
+				t, err = expectTagContents(s)
+				if err != nil {
+					return err
+				}
 				fmt.Fprintf(w, "%s} else if %s {\n", p.prefix[1:], t.Value)
 			default:
-				log.Fatalf("unexpected tag found inside if condition: %s at %s", t.Value, s.Context())
+				return fmt.Errorf("unexpected tag found inside if condition: %s at %s", t.Value, s.Context())
 			}
 		}
 	}
 	if err := s.LastError(); err != nil {
-		log.Fatalf("cannot parse if branch: %s", err)
-	} else {
-		log.Fatalf("cannot find endif tag at %s", s.Context())
+		return fmt.Errorf("cannot parse if branch: %s", err)
 	}
+	return fmt.Errorf("cannot find endif tag at %s", s.Context())
 }
 
-func (p *parser) tryParseCommonTags(tagName []byte) bool {
+func (p *parser) tryParseCommonTags(tagName []byte) (bool, error) {
 	s := p.s
 	w := p.w
 	prefix := p.prefix
-	switch string(tagName) {
-	case "s":
-		t := expectTagContents(s)
-		fmt.Fprintf(w, "%sqw.E.S(%s)\n", prefix, t.Value)
-	case "v":
-		t := expectTagContents(s)
-		fmt.Fprintf(w, "%sqw.E.V(%s)\n", prefix, t.Value)
-	case "d":
-		t := expectTagContents(s)
-		fmt.Fprintf(w, "%sqw.D(%s)\n", prefix, t.Value)
-	case "f":
-		t := expectTagContents(s)
-		fmt.Fprintf(w, "%sqw.F(%s)\n", prefix, t.Value)
+	tagNameStr := string(tagName)
+	switch tagNameStr {
+	case "s", "v", "d", "f", "s=", "v=", "d=", "f=":
+		t, err := expectTagContents(s)
+		if err != nil {
+			return false, err
+		}
+		filter := ""
+		if len(tagNameStr) == 1 {
+			filter = "e."
+		} else {
+			tagNameStr = tagNameStr[:len(tagNameStr)-1]
+		}
+		fmt.Fprintf(w, "%sqw.%s%s(%s)\n", prefix, filter, tagNameStr, t.Value)
 	case "return":
-		skipTagContents(s)
+		if err := skipTagContents(s); err != nil {
+			return false, err
+		}
 		fmt.Fprintf(w, "%squicktemplate.ReleaseWriter(qw)\n", prefix)
 		fmt.Fprintf(w, "%sreturn\n", prefix)
 	case "break":
 		if p.forDepth <= 0 {
-			log.Fatalf("found break tag outside for loop at %s", s.Context())
+			return false, fmt.Errorf("found break tag outside for loop at %s", s.Context())
 		}
-		skipTagContents(s)
+		if err := skipTagContents(s); err != nil {
+			return false, err
+		}
 		fmt.Fprintf(w, "%sbreak\n", prefix)
 	case "code":
-		p.parseCode()
+		if err := p.parseCode(); err != nil {
+			return false, err
+		}
 	case "for":
-		p.parseFor()
+		if err := p.parseFor(); err != nil {
+			return false, err
+		}
 	case "if":
-		p.parseIf()
+		if err := p.parseIf(); err != nil {
+			return false, err
+		}
 	default:
-		return false
+		return false, nil
 	}
-	return true
+	return true, nil
 }
 
-func (p *parser) parseCode() {
-	t := expectTagContents(p.s)
+func (p *parser) parseCode() error {
+	t, err := expectTagContents(p.s)
+	if err != nil {
+		return err
+	}
 	fmt.Fprintf(p.w, "%s%s\n", p.prefix, t.Value)
+	return nil
+}
+
+func parseFnameFargs(s *Scanner, f []byte) (string, string, string, error) {
+	// TODO: use real Go parser here
+
+	n := bytes.IndexByte(f, '(')
+	if n < 0 {
+		return "", "", "", fmt.Errorf("missing '(' for function arguments at %s", s.Context())
+	}
+	fname := string(stripTrailingSpace(f[:n]))
+	if len(fname) == 0 {
+		return "", "", "", fmt.Errorf("empty function name at %s", s.Context())
+	}
+
+	f = f[n+1:]
+	n = bytes.LastIndexByte(f, ')')
+	if n < 0 {
+		return "", "", "", fmt.Errorf("missing ')' for function arguments at %s", s.Context())
+	}
+	fargs := string(f[:n])
+
+	var args []string
+	for _, a := range strings.Split(fargs, ",") {
+		a = string(stripLeadingSpace([]byte(a)))
+		n = 0
+		for n < len(a) && !isSpace(a[n]) {
+			n++
+		}
+		args = append(args, a[:n])
+	}
+	fargsNoTypes := strings.Join(args, ", ")
+	return fname, fargs, fargsNoTypes, nil
 }
 
 func (p *parser) emitText(text []byte) {
@@ -217,11 +300,11 @@ func (p *parser) emitText(text []byte) {
 	for len(text) > 0 {
 		n := bytes.IndexByte(text, '`')
 		if n < 0 {
-			fmt.Fprintf(w, "%sqw.E.S(`%s`)\n", prefix, text)
+			fmt.Fprintf(w, "%sqw.s(`%s`)\n", prefix, text)
 			return
 		}
-		fmt.Fprintf(w, "%sqw.E.S(`%s`)\n", prefix, text[:n])
-		fmt.Fprintf(w, "%sqw.E.S(\"`\")\n", prefix)
+		fmt.Fprintf(w, "%sqw.s(`%s`)\n", prefix, text[:n])
+		fmt.Fprintf(w, "%sqw.s(\"`\")\n", prefix)
 		text = text[n+1:]
 	}
 }
@@ -249,50 +332,22 @@ func %s(%s) string {
 		fname, fargs, fname, fargsNoTypes)
 }
 
-func parseFnameFargs(s *Scanner, f []byte) (string, string, string) {
-	// TODO: use real Go parser here
-
-	n := bytes.IndexByte(f, '(')
-	if n < 0 {
-		log.Fatalf("missing '(' for function arguments at %s", s.Context())
-	}
-	fname := string(stripTrailingSpace(f[:n]))
-
-	f = f[n+1:]
-	n = bytes.LastIndexByte(f, ')')
-	if n < 0 {
-		log.Fatalf("missing ')' for function arguments at %s", s.Context())
-	}
-	fargs := string(f[:n])
-
-	var args []string
-	for _, a := range strings.Split(fargs, ",") {
-		a = string(stripLeadingSpace([]byte(a)))
-		n = 0
-		for n < len(a) && !isSpace(a[n]) {
-			n++
-		}
-		args = append(args, a[:n])
-	}
-	fargsNoTypes := strings.Join(args, ", ")
-	return fname, fargs, fargsNoTypes
+func skipTagContents(s *Scanner) error {
+	_, err := expectTagContents(s)
+	return err
 }
 
-func skipTagContents(s *Scanner) {
-	expectTagContents(s)
-}
-
-func expectTagContents(s *Scanner) *Token {
+func expectTagContents(s *Scanner) (*Token, error) {
 	return expectToken(s, TagContents)
 }
 
-func expectToken(s *Scanner, id int) *Token {
+func expectToken(s *Scanner, id int) (*Token, error) {
 	if !s.Next() {
-		log.Fatalf("cannot find token %s: %v", tokenIDToStr(id), s.LastError())
+		return nil, fmt.Errorf("cannot find token %s: %v", tokenIDToStr(id), s.LastError())
 	}
 	t := s.Token()
 	if t.ID != id {
-		log.Fatalf("unexpected token found %s. Expecting %s", t, tokenIDToStr(id))
+		return nil, fmt.Errorf("unexpected token found %s. Expecting %s", t, tokenIDToStr(id))
 	}
-	return t
+	return t, nil
 }
