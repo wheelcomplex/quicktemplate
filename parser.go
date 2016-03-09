@@ -366,7 +366,7 @@ func (p *parser) emitFuncEnd(fname, fargs, fargsNoTypes string) {
 
 func (p *parser) Printf(format string, args ...interface{}) {
 	w := p.w
-	fmt.Fprintf(w, "%s", p.prefix)
+	fmt.Fprintf(w, "\n%s", p.prefix)
 	p.s.WriteLineComment(w)
 	fmt.Fprintf(w, "%s", p.prefix)
 	fmt.Fprintf(w, format, args...)

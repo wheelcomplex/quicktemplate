@@ -2,6 +2,7 @@ package quicktemplate
 
 import (
 	"bytes"
+	"os"
 	"testing"
 )
 
@@ -83,53 +84,19 @@ func testParseSuccess(t *testing.T, str string) {
 	}
 }
 
-func TestParse(t *testing.T) {
-	s := `
-this is a sample template
-{% code
-import (
-	"foo"
-	"bar"
-)
-%}
+func TestParseFile(t *testing.T) {
+	filename := "parser_test_template.tpl"
+	f, err := os.Open(filename)
+	if err != nil {
+		t.Fatalf("cannot open file %q: %s", filename, err)
+	}
+	defer f.Close()
 
-{% stripspace %}
-
-this is a sample func
-{% func foobar (  s string , 
- x int, a *Foo ) %}
-	{%comment%}this %}{% is a comment{%endcomment%}
-	he` + "`" + `llo, {%s s %}
-	{% code panic("foobar") %} aaa {% return %}
-	{% plain %}
-		aaa {% ` + "`" + `foo %} bar
-	{% endplain %}
-	{% for _, c := range s %}
-		c = {%d= c %}
-		{% if c == 'a' %}
-			break {% break %}
-		{% elseif c == 'b' %}
-			return {% return %}
-		{% else %}
-			{%= echo(s) %}
-		{% endif %}
-	{% endfor %}
-bbb
-{% endfunc %}
-
-{% func echo(s string) %}
-	s={%s s %}
-{% endfunc %}
-
-{% endstripspace %}
-
-this is a tail`
-
-	r := bytes.NewBufferString(s)
-	w := &bytes.Buffer{}
-	if err := parse(w, r, "memory/foobar.tpl"); err != nil {
+	w := AcquireByteBuffer()
+	if err := parse(w, f, filename); err != nil {
 		t.Fatalf("unexpected error: %s", err)
 	}
 
-	t.Fatalf("result\n%s\n", w.Bytes())
+	t.Fatalf("result\n%s\n", w.B)
+	ReleaseByteBuffer(w)
 }
