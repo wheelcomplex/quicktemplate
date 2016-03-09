@@ -24,13 +24,18 @@ this is a sample func
 	{% plain %}aaa {% ` + "`" + `foo %} bar{% endplain %}
 	{% for _, c := range s %}
 		c = {%d c %}
-		{% return %}
+		{% if c == 'a' %}
+			break {% break %}
+		{% elseif c == 'b' %}
+			return {% return %}
+		{% else %}
+			foobar
+		{% endif %}
 	{% endfor %}
 bbb
 {% endfunc %}
 
-this is a tail
-`
+this is a tail`
 
 	r := bytes.NewBufferString(s)
 	w := &bytes.Buffer{}
