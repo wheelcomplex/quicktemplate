@@ -34,7 +34,7 @@ Now define an exported function template
 					{% break %}
 				{% endif %}
 				{%= printArgs(i, aa) %}
-				Arbitrary Go code may be inserted here: {% code	str := strconv.Atoi(i+42) %}
+				Arbitrary Go code may be inserted here: {% code	str := strconv.Itoa(i+42) %}
 				str = {%s str %}
 			{% endfor %}
 			</ul>
