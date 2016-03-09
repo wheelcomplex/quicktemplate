@@ -16,7 +16,7 @@ type parser struct {
 	forDepth    int
 }
 
-func Parse(w io.Writer, r io.Reader, filePath string) error {
+func parse(w io.Writer, r io.Reader, filePath string) error {
 	packageName, err := getPackageName(filePath)
 	if err != nil {
 		return err
