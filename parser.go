@@ -4,26 +4,34 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"path/filepath"
 	"strings"
 )
 
 type parser struct {
-	s        *Scanner
-	w        io.Writer
-	prefix   string
-	forDepth int
+	s           *Scanner
+	w           io.Writer
+	packageName string
+	prefix      string
+	forDepth    int
 }
 
 func Parse(w io.Writer, r io.Reader, filePath string) error {
+	packageName, err := getPackageName(filePath)
+	if err != nil {
+		return err
+	}
 	p := &parser{
-		s: NewScanner(r, filePath),
-		w: w,
+		s:           NewScanner(r, filePath),
+		w:           w,
+		packageName: packageName,
 	}
 	return p.parseTemplate()
 }
 
 func (p *parser) parseTemplate() error {
 	s := p.s
+	fmt.Fprintf(p.w, "package %s\n\n", p.packageName)
 	for s.Next() {
 		t := s.Token()
 		switch t.ID {
@@ -43,7 +51,7 @@ func (p *parser) parseTemplate() error {
 				return fmt.Errorf("unexpected tag found outside func: %s at %s", t.Value, s.Context())
 			}
 		default:
-			return fmt.Errorf("unexpected token found %s when parsing template at %s", t, s.Context())
+			return fmt.Errorf("unexpected token found %s outside func at %s", t, s.Context())
 		}
 	}
 	if err := s.LastError(); err != nil {
@@ -370,4 +378,18 @@ func expectToken(s *Scanner, id int) (*Token, error) {
 		return nil, fmt.Errorf("unexpected token found %s. Expecting %s at %s", t, tokenIDToStr(id), s.Context())
 	}
 	return t, nil
+}
+
+func getPackageName(filePath string) (string, error) {
+	fname := filepath.Base(filePath)
+	n := strings.LastIndex(fname, ".")
+	if n < 0 {
+		n = len(fname)
+	}
+	packageName := fname[:n]
+
+	if len(packageName) == 0 {
+		return "", fmt.Errorf("cannot derive package name from filePath %q", filePath)
+	}
+	return packageName, nil
 }
