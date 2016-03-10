@@ -246,7 +246,7 @@ func (p *parser) tryParseCommonTags(tagName []byte) (bool, error) {
 		if err != nil {
 			return false, err
 		}
-		p.Printf("write%s(qw, %s)", fname, fargs)
+		p.Printf("stream%s(qw, %s)", fname, fargs)
 	case "return":
 		if err := skipTagContents(s); err != nil {
 			return false, err
@@ -340,7 +340,7 @@ func (p *parser) emitText(text []byte) {
 }
 
 func (p *parser) emitFuncStart(fname, fargs string) {
-	p.Printf("func write%s(qw *quicktemplate.Writer, %s) {", fname, fargs)
+	p.Printf("func stream%s(qw *quicktemplate.Writer, %s) {", fname, fargs)
 	p.prefix = "\t"
 }
 
@@ -348,10 +348,14 @@ func (p *parser) emitFuncEnd(fname, fargs, fargsNoTypes string) {
 	p.prefix = ""
 	p.Printf("}\n")
 
-	p.Printf("func Write%s(w io.Writer, %s) {", fname, fargs)
+	fPrefix := "Write"
+	if !isUpper(fname[0]) {
+		fPrefix = "write"
+	}
+	p.Printf("func %s%s(w io.Writer, %s) {", fPrefix, fname, fargs)
 	p.prefix = "\t"
 	p.Printf("qw := quicktemplate.AcquireWriter(w)")
-	p.Printf("write%s(qw, %s)", fname, fargsNoTypes)
+	p.Printf("stream%s(qw, %s)", fname, fargsNoTypes)
 	p.Printf("quicktemplate.ReleaseWriter(qw)")
 	p.prefix = ""
 	p.Printf("}\n")
@@ -359,7 +363,7 @@ func (p *parser) emitFuncEnd(fname, fargs, fargsNoTypes string) {
 	p.Printf("func %s(%s) string {", fname, fargs)
 	p.prefix = "\t"
 	p.Printf("bb := quicktemplate.AcquireByteBuffer()")
-	p.Printf("Write%s(bb, %s)", fname, fargsNoTypes)
+	p.Printf("%s%s(bb, %s)", fPrefix, fname, fargsNoTypes)
 	p.Printf("s := string(bb.B)")
 	p.Printf("quicktemplate.ReleaseByteBuffer(bb)")
 	p.Printf("return s")

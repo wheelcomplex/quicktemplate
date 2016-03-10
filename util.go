@@ -29,6 +29,10 @@ func isSpace(c byte) bool {
 	return unicode.IsSpace(rune(c))
 }
 
+func isUpper(c byte) bool {
+	return unicode.IsUpper(rune(c))
+}
+
 func unsafeStrToBytes(s string) []byte {
 	sh := (*reflect.StringHeader)(unsafe.Pointer(&s))
 	bh := reflect.SliceHeader{
