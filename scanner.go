@@ -110,6 +110,13 @@ func (s *scanner) Next() bool {
 				}
 				s.stripSpaceDepth--
 				continue
+			case "space":
+				if !s.readTagContents() {
+					return false
+				}
+				s.t.ID = text
+				s.t.Value = append(s.t.Value[:0], ' ')
+				return true
 			}
 		}
 		return true

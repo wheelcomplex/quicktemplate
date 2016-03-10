@@ -7,7 +7,7 @@ import (
 )
 
 func TestScannerStripspaceSuccess(t *testing.T) {
-	testScannerSuccess(t, "  aa\n\t {%stripspace%} \t\n   foo  {%  bar baz  asd %}\nbaz \n   \n{%endstripspace%} bb  ", []tt{
+	testScannerSuccess(t, "  aa\n\t {%stripspace%} \t\n  foo  {%  bar baz  asd %}\nbaz \n   \n{%endstripspace%} bb  ", []tt{
 		{ID: text, Value: "  aa\n\t "},
 		{ID: text, Value: "foo"},
 		{ID: tagName, Value: "bar"},
@@ -15,7 +15,8 @@ func TestScannerStripspaceSuccess(t *testing.T) {
 		{ID: text, Value: "baz"},
 		{ID: text, Value: " bb  "},
 	})
-	testScannerSuccess(t, "{%stripspace  %}{% stripspace fobar %} aaa\n\r\t {%endstripspace  %}  {%endstripspace  baz%}", []tt{
+	testScannerSuccess(t, "{%stripspace  %}{% stripspace fobar %} {%space%}aaa\n\r\t {%endstripspace  %}  {%endstripspace  baz%}", []tt{
+		{ID: text, Value: " "},
 		{ID: text, Value: "aaa"},
 	})
 }
