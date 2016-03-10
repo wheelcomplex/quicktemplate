@@ -21,7 +21,7 @@ func stripTrailingSpace(b []byte) []byte {
 	return b
 }
 
-func stripSpace(b []byte) []byte {
+func collapseSpace(b []byte) []byte {
 	b = stripLeadingSpace(b)
 	return stripTrailingSpace(b)
 }

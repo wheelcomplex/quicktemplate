@@ -58,7 +58,7 @@ type scanner struct {
 	capture       bool
 	capturedValue []byte
 
-	stripSpaceDepth int
+	collapseSpaceDepth int
 }
 
 func newScanner(r io.Reader, filePath string) *scanner {
@@ -94,21 +94,21 @@ func (s *scanner) Next() bool {
 					// skip empty text
 					continue
 				}
-			case "stripspace":
+			case "collapsespace":
 				if !s.readTagContents() {
 					return false
 				}
-				s.stripSpaceDepth++
+				s.collapseSpaceDepth++
 				continue
-			case "endstripspace":
-				if s.stripSpaceDepth == 0 {
-					s.err = fmt.Errorf("endstripspace tag found without the corresponding stripspace tag")
+			case "endcollapsespace":
+				if s.collapseSpaceDepth == 0 {
+					s.err = fmt.Errorf("endcollapsespace tag found without the corresponding collapsespace tag")
 					return false
 				}
 				if !s.readTagContents() {
 					return false
 				}
-				s.stripSpaceDepth--
+				s.collapseSpaceDepth--
 				continue
 			case "space":
 				if !s.readTagContents() {
@@ -218,8 +218,8 @@ func (s *scanner) readText() bool {
 		s.unreadByte('{')
 		s.appendByte()
 	}
-	if s.stripSpaceDepth > 0 {
-		s.t.Value = stripSpace(s.t.Value)
+	if s.collapseSpaceDepth > 0 {
+		s.t.Value = collapseSpace(s.t.Value)
 	}
 	return ok
 }
@@ -331,8 +331,8 @@ func (s *scanner) LastError() error {
 		return nil
 	}
 	if s.err == io.ErrUnexpectedEOF && s.t.ID == text {
-		if s.stripSpaceDepth > 0 {
-			return fmt.Errorf("missing endstripspace tag at %s", s.Context())
+		if s.collapseSpaceDepth > 0 {
+			return fmt.Errorf("missing endcollapsespace tag at %s", s.Context())
 		}
 		return nil
 	}

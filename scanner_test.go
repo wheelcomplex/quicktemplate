@@ -6,8 +6,8 @@ import (
 	"testing"
 )
 
-func TestScannerStripspaceSuccess(t *testing.T) {
-	testScannerSuccess(t, "  aa\n\t {%stripspace%} \t\n  foo  {%  bar baz  asd %}\nbaz \n   \n{%endstripspace%} bb  ", []tt{
+func TestScannerCollapsespaceSuccess(t *testing.T) {
+	testScannerSuccess(t, "  aa\n\t {%collapsespace%} \t\n  foo  {%  bar baz  asd %}\nbaz \n   \n{%endcollapsespace%} bb  ", []tt{
 		{ID: text, Value: "  aa\n\t "},
 		{ID: text, Value: "foo"},
 		{ID: tagName, Value: "bar"},
@@ -15,27 +15,27 @@ func TestScannerStripspaceSuccess(t *testing.T) {
 		{ID: text, Value: "baz"},
 		{ID: text, Value: " bb  "},
 	})
-	testScannerSuccess(t, "{%stripspace  %}{% stripspace fobar %} {%space%}aaa\n\r\t {%endstripspace  %}  {%endstripspace  baz%}", []tt{
+	testScannerSuccess(t, "{%collapsespace  %}{% collapsespace fobar %} {%space%}aaa\n\r\t {%endcollapsespace  %}  {%endcollapsespace  baz%}", []tt{
 		{ID: text, Value: " "},
 		{ID: text, Value: "aaa"},
 	})
 }
 
-func TestScannerStripspaceFailure(t *testing.T) {
-	// incomplete stripspace tag
-	testScannerFailure(t, "{%stripspace   ")
+func TestScannerCollapsespaceFailure(t *testing.T) {
+	// incomplete collapsespace tag
+	testScannerFailure(t, "{%collapsespace   ")
 
-	// incomplete endstripspace tag
-	testScannerFailure(t, "{%stripspace%}aaa{%endstripspace")
+	// incomplete endcollapsespace tag
+	testScannerFailure(t, "{%collapsespace%}aaa{%endcollapsespace")
 
-	// missing endstripspace
-	testScannerFailure(t, "{%stripspace%} foobar")
+	// missing endcollapsespace
+	testScannerFailure(t, "{%collapsespace%} foobar")
 
-	// missing stripspace
-	testScannerFailure(t, "aaa{%endstripspace%}")
+	// missing collapsespace
+	testScannerFailure(t, "aaa{%endcollapsespace%}")
 
-	// missing the second endstripspace
-	testScannerFailure(t, "{%stripspace%}{%stripspace%}aaaa{%endstripspace%}")
+	// missing the second endcollapsespace
+	testScannerFailure(t, "{%collapsespace%}{%collapsespace%}aaaa{%endcollapsespace%}")
 }
 
 func TestScannerPlainSuccess(t *testing.T) {

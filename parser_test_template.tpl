@@ -45,10 +45,10 @@ Now define an exported function template
 		{% func %} {% code %} {% return %} {% break %} {% comment %}
 		and even {% unclosed tag
 	{% endplain %}
-	{% stripspace %}
+	{% collapsespace %}
 		Leading and trailing space between template tags is collapsed
-		inside stripspace unless {%space%} is used: {%space%}
-	{% endstripspace %}
+		inside collapsespace unless {%space%} is used: {%space%}
+	{% endcollapsespace %}
 {% endfunc %}
 
 Now define private printArgs, which is used in Foo
