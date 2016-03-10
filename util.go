@@ -1,6 +1,7 @@
 package quicktemplate
 
 import (
+	"path/filepath"
 	"reflect"
 	"unicode"
 	"unsafe"
@@ -41,4 +42,13 @@ func unsafeStrToBytes(s string) []byte {
 		Cap:  sh.Len,
 	}
 	return *(*[]byte)(unsafe.Pointer(&bh))
+}
+
+func getPackageName(filename string) (string, error) {
+	filenameAbs, err := filepath.Abs(filename)
+	if err != nil {
+		return "", err
+	}
+	dir, _ := filepath.Split(filenameAbs)
+	return filepath.Base(dir), nil
 }

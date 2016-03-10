@@ -19,6 +19,10 @@ func TestParseFailure(t *testing.T) {
 	testParseFailure(t, "{%v= aaaa(xx) %}")
 	testParseFailure(t, "{%= a() %}")
 
+	// import after func and/or code
+	testParseFailure(t, `{%code var i = 0 %}{%import "fmt"%}`)
+	testParseFailure(t, `{%func f()%}{%endfunc%}{%import "fmt"%}`)
+
 	// missing endfunc
 	testParseFailure(t, "{%func a() %}aaaa")
 
@@ -52,6 +56,14 @@ func TestParserSuccess(t *testing.T) {
 	// template with code
 	testParseSuccess(t, "{%code var a struct {}\nconst n = 123%}")
 
+	// import
+	testParseSuccess(t, `{%import "foobar"%}`)
+	testParseSuccess(t, `{% import (
+	"foo"
+	"bar"
+)%}`)
+	testParseSuccess(t, `{%import "foo"%}{%import "bar"%}`)
+
 	// func
 	testParseSuccess(t, "{%func a()%}{%endfunc%}")
 
@@ -71,7 +83,7 @@ func TestParserSuccess(t *testing.T) {
 func testParseFailure(t *testing.T, str string) {
 	r := bytes.NewBufferString(str)
 	w := &bytes.Buffer{}
-	if err := parse(w, r, "memory/foobar.tpl"); err == nil {
+	if err := parse(w, r, "memory/foobar.tpl", "memory"); err == nil {
 		t.Fatalf("expecting error when parsing %q", str)
 	}
 }
@@ -79,7 +91,7 @@ func testParseFailure(t *testing.T, str string) {
 func testParseSuccess(t *testing.T, str string) {
 	r := bytes.NewBufferString(str)
 	w := &bytes.Buffer{}
-	if err := parse(w, r, "memory/foobar.tpl"); err != nil {
+	if err := parse(w, r, "memory/foobar.tpl", "memory"); err != nil {
 		t.Fatalf("unexpected error when parsing %q: %s", str, err)
 	}
 }
@@ -92,8 +104,13 @@ func TestParseFile(t *testing.T) {
 	}
 	defer f.Close()
 
+	packageName, err := getPackageName(filename)
+	if err != nil {
+		t.Fatalf("unexpected error: %s", err)
+	}
+
 	w := AcquireByteBuffer()
-	if err := parse(w, f, filename); err != nil {
+	if err := parse(w, f, filename, packageName); err != nil {
 		t.Fatalf("unexpected error: %s", err)
 	}
 

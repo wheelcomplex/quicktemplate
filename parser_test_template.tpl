@@ -1,15 +1,14 @@
 This is a test template file.
 All the lines outside func and code are just comments.
 
-Insert usual Go code. For instance, import certain packages
-{% code
-import (
+Optional imports must be at the top of template
+{% import (
 	"fmt"
 	"strconv"
 )
 %}
 
-Now insert type definition
+Arbitrary go code may be inserted here. For instance, type definition:
 {% code
 type FooArgs struct {
 	S string
@@ -47,7 +46,8 @@ Now define an exported function template
 		and even {% unclosed tag
 	{% endplain %}
 	{% stripspace %}
-		Space between template tags is collapsed inside stripspace.
+		Leading and trailing space between template tags is collapsed
+		inside stripspace unless {%space%} is used: {%space%}
 	{% endstripspace %}
 {% endfunc %}
 
@@ -58,7 +58,7 @@ Now define private printArgs, which is used in Foo
 		{% return %}
 	{% endif %}
 	<li>
-		a[{%d i %}] = {S: {%q aa.S %}, N: {%d aa.N %}}<br>
+		a[{%d i %}] = {S: {%q a.S %}, N: {%d a.N %}}<br>
 	</li>
 {% endfunc %}
 

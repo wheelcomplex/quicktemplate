@@ -4,23 +4,19 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"path/filepath"
 	"strings"
 )
 
 type parser struct {
-	s           *scanner
-	w           io.Writer
-	packageName string
-	prefix      string
-	forDepth    int
+	s                 *scanner
+	w                 io.Writer
+	packageName       string
+	prefix            string
+	forDepth          int
+	importsUseEmitted bool
 }
 
-func parse(w io.Writer, r io.Reader, filePath string) error {
-	packageName, err := getPackageName(filePath)
-	if err != nil {
-		return err
-	}
+func parse(w io.Writer, r io.Reader, filePath, packageName string) error {
 	p := &parser{
 		s:           newScanner(r, filePath),
 		w:           w,
@@ -32,6 +28,13 @@ func parse(w io.Writer, r io.Reader, filePath string) error {
 func (p *parser) parseTemplate() error {
 	s := p.s
 	p.Printf("package %s\n", p.packageName)
+	p.Printf(`import (
+	"io"
+
+	"github.com/valyala/quicktemplate"
+)
+`)
+	nonimportEmitted := false
 	for s.Next() {
 		t := s.Token()
 		switch t.ID {
@@ -39,14 +42,25 @@ func (p *parser) parseTemplate() error {
 			// just skip top-level text
 		case tagName:
 			switch string(t.Value) {
+			case "import":
+				if nonimportEmitted {
+					return fmt.Errorf("imports must be at the top of the template. Found at %s", s.Context())
+				}
+				if err := p.parseImport(); err != nil {
+					return err
+				}
 			case "code":
+				p.emitImportsUse()
 				if err := p.parseCode(); err != nil {
 					return err
 				}
+				nonimportEmitted = true
 			case "func":
+				p.emitImportsUse()
 				if err := p.parseFunc(); err != nil {
 					return err
 				}
+				nonimportEmitted = true
 			default:
 				return fmt.Errorf("unexpected tag found outside func: %q at %s", t.Value, s.Context())
 			}
@@ -54,10 +68,23 @@ func (p *parser) parseTemplate() error {
 			return fmt.Errorf("unexpected token found %s outside func at %s", t, s.Context())
 		}
 	}
+	p.emitImportsUse()
 	if err := s.LastError(); err != nil {
 		return fmt.Errorf("cannot parse template: %s", err)
 	}
 	return nil
+}
+
+func (p *parser) emitImportsUse() {
+	if p.importsUseEmitted {
+		return
+	}
+	p.Printf(`var (
+	_ = io.Copy
+	_ = quicktemplate.ByteBuffer
+)
+`)
+	p.importsUseEmitted = true
 }
 
 func (p *parser) parseFunc() error {
@@ -278,6 +305,18 @@ func (p *parser) tryParseCommonTags(tagName []byte) (bool, error) {
 	return true, nil
 }
 
+func (p *parser) parseImport() error {
+	t, err := expectTagContents(p.s)
+	if err != nil {
+		return err
+	}
+	if len(t.Value) == 0 {
+		return fmt.Errorf("empty import found at %s", p.s.Context())
+	}
+	p.Printf("import %s\n", t.Value)
+	return nil
+}
+
 func (p *parser) parseCode() error {
 	t, err := expectTagContents(p.s)
 	if err != nil {
@@ -398,18 +437,4 @@ func expectToken(s *scanner, id int) (*token, error) {
 		return nil, fmt.Errorf("unexpected token found %s. Expecting %s at %s", t, tokenIDToStr(id), s.Context())
 	}
 	return t, nil
-}
-
-func getPackageName(filePath string) (string, error) {
-	fname := filepath.Base(filePath)
-	n := strings.LastIndex(fname, ".")
-	if n < 0 {
-		n = len(fname)
-	}
-	packageName := fname[:n]
-
-	if len(packageName) == 0 {
-		return "", fmt.Errorf("cannot derive package name from filePath %q", filePath)
-	}
-	return packageName, nil
 }
