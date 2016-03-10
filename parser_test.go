@@ -59,6 +59,10 @@ func TestParseFailure(t *testing.T) {
 	// invalid for
 	testParseFailure(t, "{%func a()%}{%for a = b %}{%endfor%}{%endfunc%}")
 	testParseFailure(t, "{%func f()%}{%for { %}{%endfor%}{%endfunc%}")
+
+	// invalid code inside func
+	testParseFailure(t, "{%func f()%}{%code } %}{%endfunc%}")
+	testParseFailure(t, "{%func f()%}{%code { %}{%endfunc%}")
 }
 
 func TestParserSuccess(t *testing.T) {
@@ -108,6 +112,28 @@ func TestParserSuccess(t *testing.T) {
 
 	// complex for
 	testParseSuccess(t, "{%func a()%}{%for i, n := 0, len(s); i < n && f(i); i++ %}{%endfor%}{%endfunc%}")
+
+	// complex code inside func
+	testParseSuccess(t, `{%func f()%}{%code
+		type A struct{}
+		var aa []A
+		for i := 0; i < 10; i++ {
+			aa = append(aa, &A{})
+			if i == 42 {
+				break
+			}
+		}
+		return }
+	%}{%endfunc%}`)
+
+	// break inside for loop
+	testParseSuccess(t, `{%func f()%}{%for%}{%code
+		if a() {
+			break
+		} else {
+			return
+		}
+	%}{%endfor%}{%endfunc%}`)
 }
 
 func testParseFailure(t *testing.T, str string) {

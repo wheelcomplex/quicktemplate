@@ -54,7 +54,7 @@ func (p *parser) parseTemplate() error {
 				}
 			case "code":
 				p.emitImportsUse()
-				if err := p.parseCode(); err != nil {
+				if err := p.parseTemplateCode(); err != nil {
 					return err
 				}
 				nonimportEmitted = true
@@ -140,13 +140,13 @@ func (p *parser) parseFor() error {
 	if err != nil {
 		return err
 	}
+	forStr := "for " + string(t.Value)
 	if err = validateForStmt(t.Value); err != nil {
-		return err
+		return fmt.Errorf("invalid statement %q at %s: %s", forStr, s.Context(), err)
 	}
 	p.Printf("for %s {", t.Value)
 	p.prefix += "\t"
 	p.forDepth++
-	forStr := "for " + string(t.Value)
 	for s.Next() {
 		t := s.Token()
 		switch t.ID {
@@ -191,13 +191,13 @@ func (p *parser) parseIf() error {
 	if len(t.Value) == 0 {
 		return fmt.Errorf("empty if condition at %s", s.Context())
 	}
+	ifStr := "if " + string(t.Value)
 	if err = validateIfStmt(t.Value); err != nil {
-		return fmt.Errorf("error in if condition at %s: %s", s.Context(), err)
+		return fmt.Errorf("invalid statement %q at %s: %s", ifStr, s.Context(), err)
 	}
 	p.Printf("if %s {", t.Value)
 	p.prefix += "\t"
 	elseUsed := false
-	ifStr := "if " + string(t.Value)
 	for s.Next() {
 		t := s.Token()
 		switch t.ID {
@@ -291,13 +291,13 @@ func (p *parser) tryParseCommonTags(tagBytes []byte) (bool, error) {
 		}
 	case "break":
 		if p.forDepth <= 0 {
-			return false, fmt.Errorf("found break tag outside for loop at %s", s.Context())
+			return false, fmt.Errorf("found break tag outside for loop")
 		}
 		if err := p.skipAfterTag("break"); err != nil {
 			return false, err
 		}
 	case "code":
-		if err := p.parseCode(); err != nil {
+		if err := p.parseFuncCode(); err != nil {
 			return false, err
 		}
 	case "for":
@@ -366,10 +366,22 @@ func (p *parser) parseImport() error {
 	return nil
 }
 
-func (p *parser) parseCode() error {
+func (p *parser) parseTemplateCode() error {
 	t, err := expectTagContents(p.s)
 	if err != nil {
 		return err
+	}
+	p.Printf("%s\n", t.Value)
+	return nil
+}
+
+func (p *parser) parseFuncCode() error {
+	t, err := expectTagContents(p.s)
+	if err != nil {
+		return err
+	}
+	if err = validateFuncCode(t.Value); err != nil {
+		return fmt.Errorf("invalid code at %s: %s", p.s.Context(), err)
 	}
 	p.Printf("%s\n", t.Value)
 	return nil
@@ -508,6 +520,12 @@ func validateForStmt(stmt []byte) error {
 
 func validateIfStmt(stmt []byte) error {
 	exprStr := fmt.Sprintf("func () { if %s {} }", stmt)
+	_, err := goparser.ParseExpr(exprStr)
+	return err
+}
+
+func validateFuncCode(code []byte) error {
+	exprStr := fmt.Sprintf("func () { for { %s } }", code)
 	_, err := goparser.ParseExpr(exprStr)
 	return err
 }
