@@ -140,6 +140,9 @@ func (p *parser) parseFor() error {
 	if err != nil {
 		return err
 	}
+	if err = validateForStmt(t.Value); err != nil {
+		return err
+	}
 	p.Printf("for %s {", t.Value)
 	p.prefix += "\t"
 	p.forDepth++
@@ -188,7 +191,7 @@ func (p *parser) parseIf() error {
 	if len(t.Value) == 0 {
 		return fmt.Errorf("empty if condition at %s", s.Context())
 	}
-	if err = validateIfCondition(t.Value); err != nil {
+	if err = validateIfStmt(t.Value); err != nil {
 		return fmt.Errorf("error in if condition at %s: %s", s.Context(), err)
 	}
 	p.Printf("if %s {", t.Value)
@@ -250,15 +253,6 @@ func (p *parser) parseIf() error {
 		return fmt.Errorf("cannot parse %q: %s", ifStr, err)
 	}
 	return fmt.Errorf("cannot find endif tag for %q at %s", ifStr, s.Context())
-}
-
-func validateIfCondition(cond []byte) error {
-	exprStr := fmt.Sprintf("func () { if %s {} }", cond)
-	_, err := goparser.ParseExpr(exprStr)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func (p *parser) tryParseCommonTags(tagBytes []byte) (bool, error) {
@@ -504,4 +498,16 @@ func expectToken(s *scanner, id int) (*token, error) {
 		return nil, fmt.Errorf("unexpected token found %s. Expecting %s at %s", t, tokenIDToStr(id), s.Context())
 	}
 	return t, nil
+}
+
+func validateForStmt(stmt []byte) error {
+	exprStr := fmt.Sprintf("func () { for %s {} }", stmt)
+	_, err := goparser.ParseExpr(exprStr)
+	return err
+}
+
+func validateIfStmt(stmt []byte) error {
+	exprStr := fmt.Sprintf("func () { if %s {} }", stmt)
+	_, err := goparser.ParseExpr(exprStr)
+	return err
 }

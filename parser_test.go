@@ -55,6 +55,10 @@ func TestParseFailure(t *testing.T) {
 	// invalid if condition
 	testParseFailure(t, "{%func a()%}{%if a = b %}{%endif%}{%endfunc%}")
 	testParseFailure(t, "{%func f()%}{%if a { %}{%endif%}{%endfunc%}")
+
+	// invalid for
+	testParseFailure(t, "{%func a()%}{%for a = b %}{%endfor%}{%endfunc%}")
+	testParseFailure(t, "{%func f()%}{%for { %}{%endfor%}{%endfunc%}")
 }
 
 func TestParserSuccess(t *testing.T) {
@@ -101,6 +105,9 @@ func TestParserSuccess(t *testing.T) {
 
 	// complex if
 	testParseSuccess(t, "{%func a()%}{%if n, err := w.Write(p); err != nil %}{%endif%}{%endfunc%}")
+
+	// complex for
+	testParseSuccess(t, "{%func a()%}{%for i, n := 0, len(s); i < n && f(i); i++ %}{%endfor%}{%endfunc%}")
 }
 
 func testParseFailure(t *testing.T, str string) {
