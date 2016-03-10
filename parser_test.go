@@ -33,6 +33,13 @@ func TestParseFailure(t *testing.T) {
 	// empty func arguments
 	testParseFailure(t, "{% func aaa %}aaa{% endfunc %}")
 
+	// func with anonymous argument
+	testParseFailure(t, "{% func a(x int, string) %}{%endfunc%}")
+
+	// func with incorrect arguments' list
+	testParseFailure(t, "{% func x(foo, bar) %}{%endfunc%}")
+	testParseFailure(t, "{% func x(foo bar baz) %}{%endfunc%}")
+
 	// empty if condition
 	testParseFailure(t, "{% func a() %}{% if    %}aaaa{% endif %}{% endfunc %}")
 
@@ -69,6 +76,9 @@ func TestParserSuccess(t *testing.T) {
 
 	// func with with condition
 	testParseSuccess(t, "{%func a(x bool)%}{%if x%}foobar{%endif%}{%endfunc%}")
+
+	// func with complex arguments
+	testParseSuccess(t, "{%func f(h1, h2 func(x, y int) string, d int)%}{%endfunc%}")
 
 	// for
 	testParseSuccess(t, "{%func a()%}{%for%}aaa{%endfor%}{%endfunc%}")

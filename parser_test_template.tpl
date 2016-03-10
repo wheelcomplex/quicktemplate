@@ -33,7 +33,7 @@ Now define an exported function template
 					{% break %}
 					All the stuff after break {%s "is" %} ignored
 				{% endif %}
-				{%= printArgs(i, aa) %}
+				{%= printArgs(i, &aa) %}
 				Arbitrary Go code may be inserted here: {% code	str := strconv.Itoa(i+42) %}
 				str = {%s fmt.Sprintf("this html will be escaped <b>%s</b>", str) %}
 			{% endfor %}
@@ -53,7 +53,7 @@ Now define an exported function template
 {% endfunc %}
 
 Now define private printArgs, which is used in Foo
-{% func printArgs(i int, a FooArgs) %}
+{% func printArgs(i int, a *FooArgs) %}
 	{% if i == 0 %}
 		Hide args for i = 0
 		{% return %}

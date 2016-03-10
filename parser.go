@@ -3,6 +3,8 @@ package quicktemplate
 import (
 	"bytes"
 	"fmt"
+	"go/ast"
+	goparser "go/parser"
 	"io"
 	"strings"
 )
@@ -373,21 +375,30 @@ func parseFnameFargsNoTypes(s *scanner, f []byte) (string, string, string, error
 		return "", "", "", err
 	}
 
+	// extract function arg names
+	fStr := fmt.Sprintf("func (%s)", fargs)
+	expr, err := goparser.ParseExpr(fStr)
+	if err != nil {
+		return "", "", "", fmt.Errorf("cannot parse arguments for func %q at %s: %s", fname, s.Context(), err)
+	}
+	ft := expr.(*ast.FuncType)
 	var args []string
-	for _, a := range strings.Split(fargs, ",") {
-		a = string(stripLeadingSpace([]byte(a)))
-		n := 0
-		for n < len(a) && !isSpace(a[n]) {
-			n++
+	for _, f := range ft.Params.List {
+		if len(f.Names) == 0 {
+			return "", "", "", fmt.Errorf("func %q cannot contain untyped arguments at %s", fname, s.Context())
 		}
-		args = append(args, a[:n])
+		for _, n := range f.Names {
+			if n == nil {
+				return "", "", "", fmt.Errorf("func %q cannot contain untyped arguments at %s", fname, s.Context())
+			}
+			args = append(args, n.Name)
+		}
 	}
 	fargsNoTypes := strings.Join(args, ", ")
 	return fname, fargs, fargsNoTypes, nil
 }
 
 func parseFnameFargs(s *scanner, f []byte) (string, string, error) {
-	// TODO: use real Go parser here
 	n := bytes.IndexByte(f, '(')
 	if n < 0 {
 		return "", "", fmt.Errorf("missing '(' for function arguments at %s", s.Context())
