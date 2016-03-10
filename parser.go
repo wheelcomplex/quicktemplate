@@ -13,6 +13,7 @@ type parser struct {
 	packageName       string
 	prefix            string
 	forDepth          int
+	skipOutputDepth   int
 	importsUseEmitted bool
 }
 
@@ -236,6 +237,8 @@ func (p *parser) parseIf() error {
 			default:
 				return fmt.Errorf("unexpected tag found in %q: %q at %s", ifStr, t.Value, s.Context())
 			}
+		default:
+			return fmt.Errorf("unexpected token found when parsing %q: %s at %s", ifStr, t, s.Context())
 		}
 	}
 	if err := s.LastError(); err != nil {
@@ -244,9 +247,9 @@ func (p *parser) parseIf() error {
 	return fmt.Errorf("cannot find endif tag for %q at %s", ifStr, s.Context())
 }
 
-func (p *parser) tryParseCommonTags(tagName []byte) (bool, error) {
+func (p *parser) tryParseCommonTags(tagBytes []byte) (bool, error) {
 	s := p.s
-	tagNameStr := string(tagName)
+	tagNameStr := string(tagBytes)
 	switch tagNameStr {
 	case "s", "v", "d", "f", "q", "z", "s=", "v=", "d=", "f=", "q=", "z=":
 		t, err := expectTagContents(s)
@@ -275,18 +278,16 @@ func (p *parser) tryParseCommonTags(tagName []byte) (bool, error) {
 		}
 		p.Printf("stream%s(qw, %s)", fname, fargs)
 	case "return":
-		if err := skipTagContents(s); err != nil {
+		if err := p.skipAfterTag("return"); err != nil {
 			return false, err
 		}
-		p.Printf("return")
 	case "break":
 		if p.forDepth <= 0 {
 			return false, fmt.Errorf("found break tag outside for loop at %s", s.Context())
 		}
-		if err := skipTagContents(s); err != nil {
+		if err := p.skipAfterTag("break"); err != nil {
 			return false, err
 		}
-		p.Printf("break")
 	case "code":
 		if err := p.parseCode(); err != nil {
 			return false, err
@@ -303,6 +304,46 @@ func (p *parser) tryParseCommonTags(tagName []byte) (bool, error) {
 		return false, nil
 	}
 	return true, nil
+}
+
+func (p *parser) skipAfterTag(tagStr string) error {
+	s := p.s
+	if err := skipTagContents(s); err != nil {
+		return err
+	}
+	p.Printf("%s", tagStr)
+	p.skipOutputDepth++
+	defer func() {
+		p.skipOutputDepth--
+	}()
+	for s.Next() {
+		t := s.Token()
+		switch t.ID {
+		case text:
+			// skip text
+		case tagName:
+			ok, err := p.tryParseCommonTags(t.Value)
+			if err != nil {
+				return fmt.Errorf("error when parsing contents after %q: %s", tagStr, err)
+			}
+			if ok {
+				continue
+			}
+			switch string(t.Value) {
+			case "endfunc", "endfor", "endif", "else", "elseif":
+				s.Rewind()
+				return nil
+			default:
+				return fmt.Errorf("unexpected tag found after %q: %q at %s", tagStr, t.Value, s.Context())
+			}
+		default:
+			return fmt.Errorf("unexpected token found when parsing contents after %q: %s at %s", tagStr, t, s.Context())
+		}
+	}
+	if err := s.LastError(); err != nil {
+		return fmt.Errorf("cannot parse contents after %q: %s", tagStr, err)
+	}
+	return fmt.Errorf("cannot find closing tag after %q at %s", tagStr, s.Context())
 }
 
 func (p *parser) parseImport() error {
@@ -411,6 +452,9 @@ func (p *parser) emitFuncEnd(fname, fargs, fargsNoTypes string) {
 }
 
 func (p *parser) Printf(format string, args ...interface{}) {
+	if p.skipOutputDepth > 0 {
+		return
+	}
 	w := p.w
 	fmt.Fprintf(w, "%s", p.prefix)
 	p.s.WriteLineComment(w)

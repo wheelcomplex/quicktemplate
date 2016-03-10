@@ -59,6 +59,7 @@ type scanner struct {
 	capturedValue []byte
 
 	collapseSpaceDepth int
+	rewind             bool
 }
 
 func newScanner(r io.Reader, filePath string) *scanner {
@@ -68,7 +69,19 @@ func newScanner(r io.Reader, filePath string) *scanner {
 	}
 }
 
+func (s *scanner) Rewind() {
+	if s.rewind {
+		panic("BUG: duplicate Rewind call")
+	}
+	s.rewind = true
+}
+
 func (s *scanner) Next() bool {
+	if s.rewind {
+		s.rewind = false
+		return true
+	}
+
 	for {
 		if !s.scanToken() {
 			return false

@@ -78,6 +78,12 @@ func TestParserSuccess(t *testing.T) {
 
 	// nested for
 	testParseSuccess(t, "{%func a()%}{%for i := 0; i < 10; i++ %}{%for j := 0; j < i; j++%}aaa{%endfor%}{%endfor%}{%endfunc%}")
+
+	// plain containing arbitrary tags
+	testParseSuccess(t, "{%func f()%}{%plain%}This {%endfunc%} is ignored{%endplain%}{%endfunc%}")
+
+	// comment with arbitrary tags
+	testParseSuccess(t, "{%func f()%}{%comment%}This {%endfunc%} is ignored{%endcomment%}{%endfunc%}")
 }
 
 func testParseFailure(t *testing.T, str string) {

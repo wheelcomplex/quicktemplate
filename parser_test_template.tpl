@@ -31,6 +31,7 @@ Now define an exported function template
 				{% if i >= 42 %}
 					There are other args, but only the first 42 of them are shown
 					{% break %}
+					All the stuff after break {%s "is" %} ignored
 				{% endif %}
 				{%= printArgs(i, aa) %}
 				Arbitrary Go code may be inserted here: {% code	str := strconv.Itoa(i+42) %}
@@ -56,6 +57,9 @@ Now define private printArgs, which is used in Foo
 	{% if i == 0 %}
 		Hide args for i = 0
 		{% return %}
+		All the stuff after return is ignored:
+		{% if 123 %}this{% endif %}
+		{% for %}And this: {% break %} {% return %}{% endfor %}
 	{% endif %}
 	<li>
 		a[{%d i %}] = {S: {%q a.S %}, N: {%d a.N %}}<br>
