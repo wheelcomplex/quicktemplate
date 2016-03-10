@@ -81,7 +81,7 @@ func (p *parser) emitImportsUse() {
 	}
 	p.Printf(`var (
 	_ = io.Copy
-	_ = quicktemplate.ByteBuffer
+	_ = quicktemplate.AcquireByteBuffer
 )
 `)
 	p.importsUseEmitted = true
