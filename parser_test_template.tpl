@@ -34,7 +34,7 @@ Now define an exported function template
 				{% endif %}
 				{%= printArgs(i, aa) %}
 				Arbitrary Go code may be inserted here: {% code	str := strconv.Itoa(i+42) %}
-				str = {%s str %}
+				str = {%s fmt.Sprintf("this html will be escaped <b>%s</b>", str) %}
 			{% endfor %}
 			</ul>
 		{% endif %}
