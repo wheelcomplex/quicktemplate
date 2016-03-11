@@ -134,6 +134,13 @@ func (s *scanner) Next() bool {
 				s.t.init(text, s.t.line)
 				s.t.Value = append(s.t.Value[:0], ' ')
 				return true
+			case "newline":
+				if !s.readTagContents() {
+					return false
+				}
+				s.t.init(text, s.t.line)
+				s.t.Value = append(s.t.Value[:0], '\n')
+				return true
 			}
 		}
 		return true
