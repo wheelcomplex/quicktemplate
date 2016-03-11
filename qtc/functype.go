@@ -49,7 +49,7 @@ func parseFuncDef(b []byte) (*funcType, error) {
 		}
 		recvName := ft.Params.List[0].Names[0].Name
 		if isReservedArgName(recvName) {
-			return nil, fmt.Errorf("arg name %q is reserved. Use another name")
+			return nil, fmt.Errorf("arg name %q is reserved. Use another name", recvName)
 		}
 		defPrefix = fmt.Sprintf("(%s) ", recvStr)
 		callPrefix = recvName + "."
@@ -92,7 +92,7 @@ func parseFuncDef(b []byte) (*funcType, error) {
 				return nil, fmt.Errorf("func cannot contain untyped arguments")
 			}
 			if isReservedArgName(n.Name) {
-				return nil, fmt.Errorf("arg name %q is reserved. Use other name")
+				return nil, fmt.Errorf("arg name %q is reserved. Use other name", n.Name)
 			}
 			tmp = append(tmp, n.Name)
 		}
