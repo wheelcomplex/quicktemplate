@@ -7,17 +7,17 @@ import (
 )
 
 func TestScannerCollapsespaceSuccess(t *testing.T) {
-	testScannerSuccess(t, "  aa\n\t {%collapsespace%} \t\n  foo \n  {%  bar baz  asd %}\n\nbaz \n   \n{%endcollapsespace%} bb  ", []tt{
+	testScannerSuccess(t, "  aa\n\t {%collapsespace%} \t\n  foo \n   bar{%  bar baz  asd %}\n\nbaz \n   \n{%endcollapsespace%} bb  ", []tt{
 		{ID: text, Value: "  aa\n\t "},
-		{ID: text, Value: "foo "},
+		{ID: text, Value: "foo bar"},
 		{ID: tagName, Value: "bar"},
 		{ID: tagContents, Value: "baz  asd"},
 		{ID: text, Value: "baz "},
 		{ID: text, Value: " bb  "},
 	})
-	testScannerSuccess(t, "{%collapsespace  %}{% collapsespace fobar %} {%space%}aaa\n\r\t {%endcollapsespace  %}  {%endcollapsespace  baz%}", []tt{
+	testScannerSuccess(t, "{%collapsespace  %}{% collapsespace fobar %} {%space%}aaa\n\r\t bbb{%endcollapsespace  %}  {%endcollapsespace  baz%}", []tt{
 		{ID: text, Value: " "},
-		{ID: text, Value: "aaa "},
+		{ID: text, Value: "aaa bbb"},
 	})
 }
 
