@@ -24,7 +24,7 @@ Now define an exported function template
 		{% if len(a) == 0 %}
 			no args!
 		{% elseif len(a) == 1 %}
-			a single arg: {%= printArgs(0, a[0]) %}
+			a single arg: {%= printArgs(0, &a[0]) %}
 		{% else %}
 			<ul>
 			{% for i, aa := range a %}
@@ -52,7 +52,9 @@ Now define an exported function template
 	{% endcollapsespace %}
 {% endfunc %}
 
-Now define private printArgs, which is used in Foo
+{%plain%}
+Now define private printArgs, which is used in Foo via {%= %} tag
+{%endplain%}
 {% func printArgs(i int, a *FooArgs) %}
 	{% if i == 0 %}
 		Hide args for i = 0
@@ -66,6 +68,32 @@ Now define private printArgs, which is used in Foo
 	</li>
 {% endfunc %}
 
+
+// Now create base template struct.
+{% code type Base struct {} %}
+
+{% func (b *Base) Run() %}
+	<html>
+		<head>{%= b.Head() %}</head>
+		<body>{%= b.Body() %}</body>
+	</html>
+{% endfunc %}
+
+{% func (b *Base) Head() %}<title>Base title. Override it!</title>{% endfunc %}
+{% func (b *Base) Body() %}Base body. Override it!{% endfunc Body %}
+
+// Now create derived template struct.
+{% code
+type Homepage struct {
+	Base
+}
+%}
+
+{% func (h *Homepage) Head() %}<title>Homepage</title>{% endfunc %}
+{% func (h *Homepage) Body() %}
+	Homepage body.
+	And this is base body: {%= h.Base.Body() %}
+{% endfunc %}
 
 unused code may be commented:
 {% comment %}

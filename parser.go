@@ -3,7 +3,6 @@ package quicktemplate
 import (
 	"bytes"
 	"fmt"
-	"go/ast"
 	goparser "go/parser"
 	"io"
 	"strings"
@@ -96,11 +95,12 @@ func (p *parser) parseFunc() error {
 	if err != nil {
 		return err
 	}
-	fname, fargs, fargsNoTypes, err := parseFnameFargsNoTypes(s, t.Value)
+	funcStr := "func " + string(t.Value)
+	f, err := parseFuncDef(t.Value)
 	if err != nil {
-		return err
+		return fmt.Errorf("error in %q at %s: %s", funcStr, s.Context(), err)
 	}
-	p.emitFuncStart(fname, fargs)
+	p.emitFuncStart(f)
 	for s.Next() {
 		t := s.Token()
 		switch t.ID {
@@ -109,7 +109,7 @@ func (p *parser) parseFunc() error {
 		case tagName:
 			ok, err := p.tryParseCommonTags(t.Value)
 			if err != nil {
-				return fmt.Errorf("error in func %q: %s", fname, err)
+				return fmt.Errorf("error in %q: %s", funcStr, err)
 			}
 			if ok {
 				continue
@@ -119,19 +119,19 @@ func (p *parser) parseFunc() error {
 				if err = skipTagContents(s); err != nil {
 					return err
 				}
-				p.emitFuncEnd(fname, fargs, fargsNoTypes)
+				p.emitFuncEnd(f)
 				return nil
 			default:
-				return fmt.Errorf("unexpected tag found in func %q: %q at %s", fname, t.Value, s.Context())
+				return fmt.Errorf("unexpected tag found in %q: %q at %s", funcStr, t.Value, s.Context())
 			}
 		default:
-			return fmt.Errorf("unexpected token found when parsing func %q: %s at %s", fname, t, s.Context())
+			return fmt.Errorf("unexpected token found when parsing %q: %s at %s", funcStr, t, s.Context())
 		}
 	}
 	if err := s.LastError(); err != nil {
-		return fmt.Errorf("cannot parse func %q: %s", fname, err)
+		return fmt.Errorf("cannot parse %q: %s", funcStr, err)
 	}
-	return fmt.Errorf("cannot find endfunc tag for func %q at %s", fname, s.Context())
+	return fmt.Errorf("cannot find endfunc tag for %q at %s", funcStr, s.Context())
 }
 
 func (p *parser) parseFor() error {
@@ -280,11 +280,11 @@ func (p *parser) tryParseCommonTags(tagBytes []byte) (bool, error) {
 		if err != nil {
 			return false, err
 		}
-		fname, fargs, err := parseFnameFargs(s, t.Value)
+		f, err := parseFuncCall(t.Value)
 		if err != nil {
-			return false, err
+			return false, fmt.Errorf("error at %s: %s", s.Context(), err)
 		}
-		p.Printf("stream%s(qw, %s)", fname, fargs)
+		p.Printf("%s", f.CallStream("qw"))
 	case "return":
 		if err := p.skipAfterTag("return"); err != nil {
 			return false, err
@@ -387,54 +387,6 @@ func (p *parser) parseFuncCode() error {
 	return nil
 }
 
-func parseFnameFargsNoTypes(s *scanner, f []byte) (string, string, string, error) {
-	fname, fargs, err := parseFnameFargs(s, f)
-	if err != nil {
-		return "", "", "", err
-	}
-
-	// extract function arg names
-	fStr := fmt.Sprintf("func (%s)", fargs)
-	expr, err := goparser.ParseExpr(fStr)
-	if err != nil {
-		return "", "", "", fmt.Errorf("cannot parse arguments for func %q at %s: %s", fname, s.Context(), err)
-	}
-	ft := expr.(*ast.FuncType)
-	var args []string
-	for _, f := range ft.Params.List {
-		if len(f.Names) == 0 {
-			return "", "", "", fmt.Errorf("func %q cannot contain untyped arguments at %s", fname, s.Context())
-		}
-		for _, n := range f.Names {
-			if n == nil {
-				return "", "", "", fmt.Errorf("func %q cannot contain untyped arguments at %s", fname, s.Context())
-			}
-			args = append(args, n.Name)
-		}
-	}
-	fargsNoTypes := strings.Join(args, ", ")
-	return fname, fargs, fargsNoTypes, nil
-}
-
-func parseFnameFargs(s *scanner, f []byte) (string, string, error) {
-	n := bytes.IndexByte(f, '(')
-	if n < 0 {
-		return "", "", fmt.Errorf("missing '(' for function arguments at %s", s.Context())
-	}
-	fname := string(stripTrailingSpace(f[:n]))
-	if len(fname) == 0 {
-		return "", "", fmt.Errorf("empty function name at %s", s.Context())
-	}
-
-	f = f[n+1:]
-	n = bytes.LastIndexByte(f, ')')
-	if n < 0 {
-		return "", "", fmt.Errorf("missing ')' for function arguments at %s", s.Context())
-	}
-	fargs := string(f[:n])
-	return fname, fargs, nil
-}
-
 func (p *parser) emitText(text []byte) {
 	for len(text) > 0 {
 		n := bytes.IndexByte(text, '`')
@@ -448,31 +400,27 @@ func (p *parser) emitText(text []byte) {
 	}
 }
 
-func (p *parser) emitFuncStart(fname, fargs string) {
-	p.Printf("func stream%s(qw *quicktemplate.Writer, %s) {", fname, fargs)
+func (p *parser) emitFuncStart(f *funcType) {
+	p.Printf("func %s {", f.DefStream("qw"))
 	p.prefix = "\t"
 }
 
-func (p *parser) emitFuncEnd(fname, fargs, fargsNoTypes string) {
+func (p *parser) emitFuncEnd(f *funcType) {
 	p.prefix = ""
 	p.Printf("}\n")
 
-	fPrefix := "Write"
-	if !isUpper(fname[0]) {
-		fPrefix = "write"
-	}
-	p.Printf("func %s%s(w io.Writer, %s) {", fPrefix, fname, fargs)
+	p.Printf("func %s {", f.DefWrite("w"))
 	p.prefix = "\t"
 	p.Printf("qw := quicktemplate.AcquireWriter(w)")
-	p.Printf("stream%s(qw, %s)", fname, fargsNoTypes)
+	p.Printf("%s", f.CallStream("qw"))
 	p.Printf("quicktemplate.ReleaseWriter(qw)")
 	p.prefix = ""
 	p.Printf("}\n")
 
-	p.Printf("func %s(%s) string {", fname, fargs)
+	p.Printf("func %s {", f.DefString())
 	p.prefix = "\t"
 	p.Printf("bb := quicktemplate.AcquireByteBuffer()")
-	p.Printf("%s%s(bb, %s)", fPrefix, fname, fargsNoTypes)
+	p.Printf("%s", f.CallWrite("bb"))
 	p.Printf("s := string(bb.B)")
 	p.Printf("quicktemplate.ReleaseByteBuffer(bb)")
 	p.Printf("return s")
