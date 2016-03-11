@@ -2,6 +2,8 @@ package main
 
 import (
 	"flag"
+	"go/format"
+	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -89,13 +91,12 @@ func compileFile(infile string) {
 	if err != nil {
 		logger.Fatalf("cannot open file %q: %s", infile, err)
 	}
-	defer inf.Close()
 
-	outf, err := os.Create(outfile)
+	tmpfile := outfile + ".dirty"
+	outf, err := os.Create(tmpfile)
 	if err != nil {
-		logger.Fatalf("cannot create file %q: %s", outfile, err)
+		logger.Fatalf("cannot create file %q: %s", tmpfile, err)
 	}
-	defer outf.Close()
 
 	packageName, err := getPackageName(infile)
 	if err != nil {
@@ -104,5 +105,28 @@ func compileFile(infile string) {
 	if err = parse(outf, inf, infile, packageName); err != nil {
 		logger.Fatalf("error when parsing file %q: %s", infile, err)
 	}
+	if err = outf.Close(); err != nil {
+		logger.Fatalf("error when closing file %q: %s", tmpfile, err)
+	}
+	if err = inf.Close(); err != nil {
+		logger.Fatalf("error when closing file %q: %s", infile, err)
+	}
+
+	// prettify the output file
+	dirtyCode, err := ioutil.ReadFile(tmpfile)
+	if err != nil {
+		logger.Fatalf("cannot read file %q: %s", tmpfile, err)
+	}
+	prettyCode, err := format.Source(dirtyCode)
+	if err != nil {
+		logger.Fatalf("error when formatting compiled code for %q: %s", infile, err)
+	}
+	if err = ioutil.WriteFile(outfile, prettyCode, 0666); err != nil {
+		logger.Fatalf("error when writing file %q: %s", outfile, err)
+	}
+	if err = os.Remove(tmpfile); err != nil {
+		logger.Fatalf("error when removing file %q: %s", tmpfile, err)
+	}
+
 	filesCompiled++
 }
