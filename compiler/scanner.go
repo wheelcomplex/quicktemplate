@@ -1,4 +1,4 @@
-package quicktemplate
+package main
 
 import (
 	"bufio"

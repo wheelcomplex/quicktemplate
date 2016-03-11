@@ -1,9 +1,11 @@
-package quicktemplate
+package main
 
 import (
 	"bytes"
 	"os"
 	"testing"
+
+	"github.com/valyala/quicktemplate"
 )
 
 func TestParseFailure(t *testing.T) {
@@ -165,11 +167,11 @@ func TestParseFile(t *testing.T) {
 		t.Fatalf("unexpected error: %s", err)
 	}
 
-	w := AcquireByteBuffer()
+	w := quicktemplate.AcquireByteBuffer()
 	if err := parse(w, f, filename, packageName); err != nil {
 		t.Fatalf("unexpected error: %s", err)
 	}
 
 	t.Fatalf("result\n%s\n", w.B)
-	ReleaseByteBuffer(w)
+	quicktemplate.ReleaseByteBuffer(w)
 }
