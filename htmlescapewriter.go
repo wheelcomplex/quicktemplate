@@ -30,8 +30,11 @@ type htmlEscapeWriter struct {
 func (w *htmlEscapeWriter) Write(p []byte) (int, error) {
 	i := 0
 	ww := w.w
-	var b []byte
-	var err error
+	var (
+		b   []byte
+		err error
+		n   int
+	)
 	for j, c := range p {
 		b = nil
 		switch c {
@@ -45,16 +48,18 @@ func (w *htmlEscapeWriter) Write(p []byte) (int, error) {
 			b = strApos
 		}
 		if b != nil {
-			if _, err = ww.Write(p[i:j]); err != nil {
-				return i, err
+			if n, err = ww.Write(p[i:j]); err != nil {
+				return i + n, err
+			}
+			if n, err = ww.Write(b); err != nil {
+				return j, err
 			}
 			i = j + 1
-			if _, err = ww.Write(b); err != nil {
-				return i, err
-			}
 		}
 	}
-	ww.Write(p[i:])
+	if n, err = ww.Write(p[i:]); err != nil {
+		return i + n, err
+	}
 	return len(p), nil
 }
 
