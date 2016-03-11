@@ -48,7 +48,7 @@ Now define an exported function template
 	{% endplain %}
 	{% collapsespace %}
 		Leading and trailing space between template tags is collapsed
-		inside collapsespace unless {%space%} is used: {%space%}
+		on each line inside collapsespace unless {%space%} or {%newline%} is used
 	{% endcollapsespace %}
 {% endfunc %}
 

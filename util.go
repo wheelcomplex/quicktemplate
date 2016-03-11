@@ -1,6 +1,7 @@
 package quicktemplate
 
 import (
+	"bytes"
 	"path/filepath"
 	"reflect"
 	"unicode"
@@ -22,8 +23,27 @@ func stripTrailingSpace(b []byte) []byte {
 }
 
 func collapseSpace(b []byte) []byte {
-	b = stripLeadingSpace(b)
-	return stripTrailingSpace(b)
+	var dst []byte
+	for len(b) > 0 {
+		n := bytes.IndexByte(b, '\n')
+		if n < 0 {
+			n = len(b)
+		}
+		z := b[:n]
+		if n == len(b) {
+			b = b[n:]
+		} else {
+			b = b[n+1:]
+		}
+		z = stripLeadingSpace(z)
+		z = stripTrailingSpace(z)
+		if len(z) == 0 {
+			continue
+		}
+		dst = append(dst, z...)
+		dst = append(dst, ' ')
+	}
+	return dst
 }
 
 func isSpace(c byte) bool {
