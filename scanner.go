@@ -31,11 +31,15 @@ func tokenIDToStr(id int) string {
 type token struct {
 	ID    int
 	Value []byte
+
+	line int
 }
 
-func (t *token) init(id int) {
+func (t *token) init(id, line int) {
 	t.ID = id
 	t.Value = t.Value[:0]
+
+	t.line = line
 }
 
 func (t *token) String() string {
@@ -127,7 +131,7 @@ func (s *scanner) Next() bool {
 				if !s.readTagContents() {
 					return false
 				}
-				s.t.ID = text
+				s.t.init(text, s.t.line)
 				s.t.Value = append(s.t.Value[:0], ' ')
 				return true
 			}
@@ -137,26 +141,28 @@ func (s *scanner) Next() bool {
 }
 
 func (s *scanner) readPlain() bool {
+	if !s.readTagContents() {
+		return false
+	}
+	startLine := s.line
 	s.startCapture()
 	ok := s.skipUntilTag("endplain")
 	v := s.stopCapture()
-	s.t.init(text)
+	s.t.init(text, startLine)
 	if ok {
-		n := bytes.Index(v, strTagClose)
-		v = v[n+len(strTagClose):]
-		n = bytes.LastIndex(v, strTagOpen)
+		n := bytes.LastIndex(v, strTagOpen)
 		v = v[:n]
 		s.t.Value = append(s.t.Value[:0], v...)
 	}
 	return ok
 }
 
-var (
-	strTagOpen  = []byte("{%")
-	strTagClose = []byte("%}")
-)
+var strTagOpen = []byte("{%")
 
 func (s *scanner) skipComment() bool {
+	if !s.readTagContents() {
+		return false
+	}
 	return s.skipUntilTag("endcomment")
 }
 
@@ -207,7 +213,7 @@ func (s *scanner) scanToken() bool {
 }
 
 func (s *scanner) readText() bool {
-	s.t.init(text)
+	s.t.init(text, s.line)
 	ok := false
 	for {
 		if !s.nextByte() {
@@ -238,8 +244,8 @@ func (s *scanner) readText() bool {
 }
 
 func (s *scanner) readTagName() bool {
-	s.t.init(tagName)
 	s.skipSpace()
+	s.t.init(tagName, s.line)
 	for {
 		if s.isSpace() || s.c == '%' {
 			if s.c == '%' {
@@ -262,8 +268,8 @@ func (s *scanner) readTagName() bool {
 }
 
 func (s *scanner) readTagContents() bool {
-	s.t.init(tagContents)
 	s.skipSpace()
+	s.t.init(tagContents, s.line)
 	for {
 		if s.c != '%' {
 			s.appendByte()
@@ -386,5 +392,5 @@ func (s *scanner) Context() string {
 }
 
 func (s *scanner) WriteLineComment(w io.Writer) {
-	fmt.Fprintf(w, "//line %s:%d\n", s.filePath, s.line+1)
+	fmt.Fprintf(w, "//line %s:%d\n", s.filePath, s.t.line+1)
 }

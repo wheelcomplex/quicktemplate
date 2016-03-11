@@ -123,7 +123,7 @@ func TestParserSuccess(t *testing.T) {
 				break
 			}
 		}
-		return }
+		return
 	%}{%endfunc%}`)
 
 	// break inside for loop
