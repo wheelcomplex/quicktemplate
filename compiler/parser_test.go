@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"io/ioutil"
 	"os"
 	"testing"
 
@@ -172,6 +173,15 @@ func TestParseFile(t *testing.T) {
 		t.Fatalf("unexpected error: %s", err)
 	}
 
-	t.Fatalf("result\n%s\n", w.B)
+	expectedFilename := filename + ".compiled"
+	data, err := ioutil.ReadFile(expectedFilename)
+	if err != nil {
+		t.Fatalf("unexpected error: %s", err)
+	}
+
+	if !bytes.Equal(w.B, data) {
+		t.Fatalf("unexpected output: %q. Expecting %q", w.B, data)
+	}
+
 	quicktemplate.ReleaseByteBuffer(w)
 }

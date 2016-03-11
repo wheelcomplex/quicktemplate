@@ -1,0 +1,412 @@
+//line parser_test_template.tpl:1
+package compiler
+
+//line parser_test_template.tpl:1
+import (
+	"io"
+
+	"github.com/valyala/quicktemplate"
+)
+
+//line parser_test_template.tpl:5
+import (
+	"fmt"
+	"strconv"
+)
+
+//line parser_test_template.tpl:12
+var (
+	_ = io.Copy
+	_ = quicktemplate.AcquireByteBuffer
+)
+
+//line parser_test_template.tpl:13
+type FooArgs struct {
+	S string
+	N int	
+}
+
+//line parser_test_template.tpl:20
+func streamFoo(qw *quicktemplate.Writer, a []FooArgs) {
+	//line parser_test_template.tpl:20
+	qw.N().S(`
+	<h1>Hello, I'm Foo!</h1>
+	<div>
+		My args are:
+		`)
+	//line parser_test_template.tpl:24
+	if len(a) == 0 {
+		//line parser_test_template.tpl:24
+		qw.N().S(`
+			no args!
+		`)
+	//line parser_test_template.tpl:26
+	} else if len(a) == 1 {
+		//line parser_test_template.tpl:26
+		qw.N().S(`
+			a single arg: `)
+		//line parser_test_template.tpl:27
+		streamprintArgs(qw, 0, &a[0])
+		//line parser_test_template.tpl:27
+		qw.N().S(`
+		`)
+	//line parser_test_template.tpl:28
+	} else {
+		//line parser_test_template.tpl:28
+		qw.N().S(`
+			<ul>
+			`)
+		//line parser_test_template.tpl:30
+		for i, aa := range a {
+			//line parser_test_template.tpl:30
+			qw.N().S(`
+				`)
+			//line parser_test_template.tpl:31
+			if i >= 42 {
+				//line parser_test_template.tpl:31
+				qw.N().S(`
+					There are other args, but only the first 42 of them are shown
+					`)
+				//line parser_test_template.tpl:33
+				break
+			//line parser_test_template.tpl:35
+			}
+			//line parser_test_template.tpl:35
+			qw.N().S(`
+				`)
+			//line parser_test_template.tpl:36
+			streamprintArgs(qw, i, &aa)
+			//line parser_test_template.tpl:36
+			qw.N().S(`
+				Arbitrary Go code may be inserted here: `)
+			//line parser_test_template.tpl:37
+			str := strconv.Itoa(i+42)
+
+			//line parser_test_template.tpl:37
+			qw.N().S(`
+				str = `)
+			//line parser_test_template.tpl:38
+			qw.E().S(fmt.Sprintf("this html will be escaped <b>%s</b>", str))
+			//line parser_test_template.tpl:38
+			qw.N().S(`
+			`)
+		//line parser_test_template.tpl:39
+		}
+		//line parser_test_template.tpl:39
+		qw.N().S(`
+			</ul>
+		`)
+	//line parser_test_template.tpl:41
+	}
+	//line parser_test_template.tpl:41
+	qw.N().S(`
+	</div>
+	`)
+	//line parser_test_template.tpl:43
+	qw.N().S(`
+		Arbitrary tags are treated as plaintext inside plain.
+		For instance, {% foo %} {% bar %} {% for %}
+		{% func %} {% code %} {% return %} {% break %} {% comment %}
+		and even {% unclosed tag
+	`)
+	//line parser_test_template.tpl:48
+	qw.N().S(`
+	`)
+	//line parser_test_template.tpl:49
+	qw.N().S(`Leading and trailing space between template tags is collapsed on each line inside collapsespace unless `)
+	//line parser_test_template.tpl:51
+	qw.N().S(` `)
+	//line parser_test_template.tpl:51
+	qw.N().S(`or `)
+	//line parser_test_template.tpl:51
+	qw.N().S(`
+`)
+	//line parser_test_template.tpl:51
+	qw.N().S(`is used `)
+	//line parser_test_template.tpl:52
+	qw.N().S(`
+`)
+//line parser_test_template.tpl:53
+}
+
+//line parser_test_template.tpl:53
+func WriteFoo(w io.Writer, a []FooArgs) {
+	//line parser_test_template.tpl:53
+	qw := quicktemplate.AcquireWriter(w)
+	//line parser_test_template.tpl:53
+	streamFoo(qw, a)
+	//line parser_test_template.tpl:53
+	quicktemplate.ReleaseWriter(qw)
+//line parser_test_template.tpl:53
+}
+
+//line parser_test_template.tpl:53
+func Foo(a []FooArgs) string {
+	//line parser_test_template.tpl:53
+	bb := quicktemplate.AcquireByteBuffer()
+	//line parser_test_template.tpl:53
+	WriteFoo(bb, a)
+	//line parser_test_template.tpl:53
+	s := string(bb.B)
+	//line parser_test_template.tpl:53
+	quicktemplate.ReleaseByteBuffer(bb)
+	//line parser_test_template.tpl:53
+	return s
+//line parser_test_template.tpl:53
+}
+
+//line parser_test_template.tpl:58
+func streamprintArgs(qw *quicktemplate.Writer, i int, a *FooArgs) {
+	//line parser_test_template.tpl:58
+	qw.N().S(`
+	`)
+	//line parser_test_template.tpl:59
+	if i == 0 {
+		//line parser_test_template.tpl:59
+		qw.N().S(`
+		Hide args for i = 0
+		`)
+		//line parser_test_template.tpl:61
+		return
+	//line parser_test_template.tpl:65
+	}
+	//line parser_test_template.tpl:65
+	qw.N().S(`
+	<li>
+		a[`)
+	//line parser_test_template.tpl:67
+	qw.N().D(i)
+	//line parser_test_template.tpl:67
+	qw.N().S(`] = {S: `)
+	//line parser_test_template.tpl:67
+	qw.E().Q(a.S)
+	//line parser_test_template.tpl:67
+	qw.N().S(`, N: `)
+	//line parser_test_template.tpl:67
+	qw.N().D(a.N)
+	//line parser_test_template.tpl:67
+	qw.N().S(`}<br>
+	</li>
+`)
+//line parser_test_template.tpl:69
+}
+
+//line parser_test_template.tpl:69
+func writeprintArgs(w io.Writer, i int, a *FooArgs) {
+	//line parser_test_template.tpl:69
+	qw := quicktemplate.AcquireWriter(w)
+	//line parser_test_template.tpl:69
+	streamprintArgs(qw, i, a)
+	//line parser_test_template.tpl:69
+	quicktemplate.ReleaseWriter(qw)
+//line parser_test_template.tpl:69
+}
+
+//line parser_test_template.tpl:69
+func printArgs(i int, a *FooArgs) string {
+	//line parser_test_template.tpl:69
+	bb := quicktemplate.AcquireByteBuffer()
+	//line parser_test_template.tpl:69
+	writeprintArgs(bb, i, a)
+	//line parser_test_template.tpl:69
+	s := string(bb.B)
+	//line parser_test_template.tpl:69
+	quicktemplate.ReleaseByteBuffer(bb)
+	//line parser_test_template.tpl:69
+	return s
+//line parser_test_template.tpl:69
+}
+
+//line parser_test_template.tpl:73
+type Base struct {}
+
+//line parser_test_template.tpl:75
+func (b *Base) streamRun(qw *quicktemplate.Writer) {
+	//line parser_test_template.tpl:75
+	qw.N().S(`
+	<html>
+		<head>`)
+	//line parser_test_template.tpl:77
+	b.streamHead(qw)
+	//line parser_test_template.tpl:77
+	qw.N().S(`</head>
+		<body>`)
+	//line parser_test_template.tpl:78
+	b.streamBody(qw)
+	//line parser_test_template.tpl:78
+	qw.N().S(`</body>
+	</html>
+`)
+//line parser_test_template.tpl:80
+}
+
+//line parser_test_template.tpl:80
+func (b *Base) WriteRun(w io.Writer) {
+	//line parser_test_template.tpl:80
+	qw := quicktemplate.AcquireWriter(w)
+	//line parser_test_template.tpl:80
+	b.streamRun(qw)
+	//line parser_test_template.tpl:80
+	quicktemplate.ReleaseWriter(qw)
+//line parser_test_template.tpl:80
+}
+
+//line parser_test_template.tpl:80
+func (b *Base) Run() string {
+	//line parser_test_template.tpl:80
+	bb := quicktemplate.AcquireByteBuffer()
+	//line parser_test_template.tpl:80
+	b.WriteRun(bb)
+	//line parser_test_template.tpl:80
+	s := string(bb.B)
+	//line parser_test_template.tpl:80
+	quicktemplate.ReleaseByteBuffer(bb)
+	//line parser_test_template.tpl:80
+	return s
+//line parser_test_template.tpl:80
+}
+
+//line parser_test_template.tpl:82
+func (b *Base) streamHead(qw *quicktemplate.Writer) {
+	//line parser_test_template.tpl:82
+	qw.N().S(`<title>Base title. Override it!</title>`)
+//line parser_test_template.tpl:82
+}
+
+//line parser_test_template.tpl:82
+func (b *Base) WriteHead(w io.Writer) {
+	//line parser_test_template.tpl:82
+	qw := quicktemplate.AcquireWriter(w)
+	//line parser_test_template.tpl:82
+	b.streamHead(qw)
+	//line parser_test_template.tpl:82
+	quicktemplate.ReleaseWriter(qw)
+//line parser_test_template.tpl:82
+}
+
+//line parser_test_template.tpl:82
+func (b *Base) Head() string {
+	//line parser_test_template.tpl:82
+	bb := quicktemplate.AcquireByteBuffer()
+	//line parser_test_template.tpl:82
+	b.WriteHead(bb)
+	//line parser_test_template.tpl:82
+	s := string(bb.B)
+	//line parser_test_template.tpl:82
+	quicktemplate.ReleaseByteBuffer(bb)
+	//line parser_test_template.tpl:82
+	return s
+//line parser_test_template.tpl:82
+}
+
+//line parser_test_template.tpl:83
+func (b *Base) streamBody(qw *quicktemplate.Writer) {
+	//line parser_test_template.tpl:83
+	qw.N().S(`Base body. Override it!`)
+//line parser_test_template.tpl:83
+}
+
+//line parser_test_template.tpl:83
+func (b *Base) WriteBody(w io.Writer) {
+	//line parser_test_template.tpl:83
+	qw := quicktemplate.AcquireWriter(w)
+	//line parser_test_template.tpl:83
+	b.streamBody(qw)
+	//line parser_test_template.tpl:83
+	quicktemplate.ReleaseWriter(qw)
+//line parser_test_template.tpl:83
+}
+
+//line parser_test_template.tpl:83
+func (b *Base) Body() string {
+	//line parser_test_template.tpl:83
+	bb := quicktemplate.AcquireByteBuffer()
+	//line parser_test_template.tpl:83
+	b.WriteBody(bb)
+	//line parser_test_template.tpl:83
+	s := string(bb.B)
+	//line parser_test_template.tpl:83
+	quicktemplate.ReleaseByteBuffer(bb)
+	//line parser_test_template.tpl:83
+	return s
+//line parser_test_template.tpl:83
+}
+
+//line parser_test_template.tpl:87
+type Homepage struct {
+	Base
+}
+
+//line parser_test_template.tpl:92
+func (h *Homepage) streamHead(qw *quicktemplate.Writer) {
+	//line parser_test_template.tpl:92
+	qw.N().S(`<title>Homepage</title>`)
+//line parser_test_template.tpl:92
+}
+
+//line parser_test_template.tpl:92
+func (h *Homepage) WriteHead(w io.Writer) {
+	//line parser_test_template.tpl:92
+	qw := quicktemplate.AcquireWriter(w)
+	//line parser_test_template.tpl:92
+	h.streamHead(qw)
+	//line parser_test_template.tpl:92
+	quicktemplate.ReleaseWriter(qw)
+//line parser_test_template.tpl:92
+}
+
+//line parser_test_template.tpl:92
+func (h *Homepage) Head() string {
+	//line parser_test_template.tpl:92
+	bb := quicktemplate.AcquireByteBuffer()
+	//line parser_test_template.tpl:92
+	h.WriteHead(bb)
+	//line parser_test_template.tpl:92
+	s := string(bb.B)
+	//line parser_test_template.tpl:92
+	quicktemplate.ReleaseByteBuffer(bb)
+	//line parser_test_template.tpl:92
+	return s
+//line parser_test_template.tpl:92
+}
+
+//line parser_test_template.tpl:93
+func (h *Homepage) streamBody(qw *quicktemplate.Writer) {
+	//line parser_test_template.tpl:93
+	qw.N().S(`
+	Homepage body.
+	And this is base body: `)
+	//line parser_test_template.tpl:95
+	h.Base.streamBody(qw)
+	//line parser_test_template.tpl:95
+	qw.N().S(`
+`)
+//line parser_test_template.tpl:96
+}
+
+//line parser_test_template.tpl:96
+func (h *Homepage) WriteBody(w io.Writer) {
+	//line parser_test_template.tpl:96
+	qw := quicktemplate.AcquireWriter(w)
+	//line parser_test_template.tpl:96
+	h.streamBody(qw)
+	//line parser_test_template.tpl:96
+	quicktemplate.ReleaseWriter(qw)
+//line parser_test_template.tpl:96
+}
+
+//line parser_test_template.tpl:96
+func (h *Homepage) Body() string {
+	//line parser_test_template.tpl:96
+	bb := quicktemplate.AcquireByteBuffer()
+	//line parser_test_template.tpl:96
+	h.WriteBody(bb)
+	//line parser_test_template.tpl:96
+	s := string(bb.B)
+	//line parser_test_template.tpl:96
+	quicktemplate.ReleaseByteBuffer(bb)
+	//line parser_test_template.tpl:96
+	return s
+//line parser_test_template.tpl:96
+}
+
