@@ -156,7 +156,7 @@ func testParseSuccess(t *testing.T, str string) {
 }
 
 func TestParseFile(t *testing.T) {
-	filename := "parser_test_template.tpl"
+	filename := "templates/test.qtpl"
 	f, err := os.Open(filename)
 	if err != nil {
 		t.Fatalf("cannot open file %q: %s", filename, err)

@@ -3,9 +3,7 @@ package main
 import (
 	"bytes"
 	"path/filepath"
-	"reflect"
 	"unicode"
-	"unsafe"
 )
 
 func stripLeadingSpace(b []byte) []byte {
@@ -60,16 +58,6 @@ func isSpace(c byte) bool {
 
 func isUpper(c byte) bool {
 	return unicode.IsUpper(rune(c))
-}
-
-func unsafeStrToBytes(s string) []byte {
-	sh := (*reflect.StringHeader)(unsafe.Pointer(&s))
-	bh := reflect.SliceHeader{
-		Data: sh.Data,
-		Len:  sh.Len,
-		Cap:  sh.Len,
-	}
-	return *(*[]byte)(unsafe.Pointer(&bh))
 }
 
 func getPackageName(filename string) (string, error) {
