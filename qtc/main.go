@@ -92,7 +92,7 @@ func compileFile(infile string) {
 		logger.Fatalf("cannot open file %q: %s", infile, err)
 	}
 
-	tmpfile := outfile + ".dirty"
+	tmpfile := outfile + ".tmp"
 	outf, err := os.Create(tmpfile)
 	if err != nil {
 		logger.Fatalf("cannot create file %q: %s", tmpfile, err)
@@ -113,11 +113,11 @@ func compileFile(infile string) {
 	}
 
 	// prettify the output file
-	dirtyCode, err := ioutil.ReadFile(tmpfile)
+	uglyCode, err := ioutil.ReadFile(tmpfile)
 	if err != nil {
 		logger.Fatalf("cannot read file %q: %s", tmpfile, err)
 	}
-	prettyCode, err := format.Source(dirtyCode)
+	prettyCode, err := format.Source(uglyCode)
 	if err != nil {
 		logger.Fatalf("error when formatting compiled code for %q: %s. See %q for details", infile, err, tmpfile)
 	}
