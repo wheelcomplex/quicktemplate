@@ -90,7 +90,7 @@ This function prints arbitrary page.
 Implement contacts page
 {% code type ContactsPage struct {} %}
 {% func (b *ContactsPage) Head() %}<title>Contacts!</title>{% endfunc %}
-{% func (b *ContactsPage) Body(_ string) %}Put here contact info{% endfunc Body %}
+{% func (b *ContactsPage) Body(title string) %}Put here contact info{% endfunc Body %}
 
 Implement HomePage
 {% code type Homepage struct {} %}
