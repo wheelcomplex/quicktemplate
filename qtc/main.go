@@ -125,7 +125,7 @@ func compileFile(infile string) {
 	}
 	prettyCode, err := format.Source(dirtyCode)
 	if err != nil {
-		logger.Fatalf("error when formatting compiled code for %q: %s", infile, err)
+		logger.Fatalf("error when formatting compiled code for %q: %s. See %q for details", infile, err, tmpfile)
 	}
 	if err = ioutil.WriteFile(outfile, prettyCode, 0666); err != nil {
 		logger.Fatalf("error when writing file %q: %s", outfile, err)
