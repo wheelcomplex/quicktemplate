@@ -9,7 +9,7 @@ func TestParseFuncCallSuccess(t *testing.T) {
 	testParseFuncCallSuccess(t, "f()", "streamf(qw)")
 
 	// func with args
-	testParseFuncCallSuccess(t, "Foo(a, b)", "streamFoo(qw, a, b)")
+	testParseFuncCallSuccess(t, "Foo(a, b)", "StreamFoo(qw, a, b)")
 
 	// method without args
 	testParseFuncCallSuccess(t, "a.f()", "a.streamf(qw)")
@@ -18,7 +18,7 @@ func TestParseFuncCallSuccess(t *testing.T) {
 	testParseFuncCallSuccess(t, "a.f(xx)", "a.streamf(qw, xx)")
 
 	// chained method
-	testParseFuncCallSuccess(t, "foo.bar.Baz(x, y)", "foo.bar.streamBaz(qw, x, y)")
+	testParseFuncCallSuccess(t, "foo.bar.Baz(x, y)", "foo.bar.StreamBaz(qw, x, y)")
 
 	// complex args
 	testParseFuncCallSuccess(t, `as.ffs.SS(
@@ -30,7 +30,7 @@ func TestParseFuncCallSuccess(t *testing.T) {
 			"bar":2,
 		},
 		qwe)`,
-		`as.ffs.streamSS(qw, 
+		`as.ffs.StreamSS(qw, 
 		func(x int, y string) {
 			panic("foobar")
 		},
@@ -87,12 +87,12 @@ func TestParseFuncDefSuccess(t *testing.T) {
 
 	// public func with a single arg
 	testParseFuncDefSuccess(t, "F(a int)", "F(a int) string",
-		"streamF(qw *quicktemplate.Writer, a int)", "streamF(qw, a)",
+		"StreamF(qw *quicktemplate.Writer, a int)", "StreamF(qw, a)",
 		"WriteF(qww io.Writer, a int)", "WriteF(qww, a)")
 
 	// public method without args
 	testParseFuncDefSuccess(t, "(f *foo) M()", "(f *foo) M() string",
-		"(f *foo) streamM(qw *quicktemplate.Writer)", "f.streamM(qw)",
+		"(f *foo) StreamM(qw *quicktemplate.Writer)", "f.StreamM(qw)",
 		"(f *foo) WriteM(qww io.Writer)", "f.WriteM(qww)")
 
 	// private method with three args
@@ -102,7 +102,7 @@ func TestParseFuncDefSuccess(t *testing.T) {
 
 	// method with complex args
 	testParseFuncDefSuccess(t, "(t TPL) Head(h1, h2 func(x, y int), h3 map[int]struct{})", "(t TPL) Head(h1, h2 func(x, y int), h3 map[int]struct{}) string",
-		"(t TPL) streamHead(qw *quicktemplate.Writer, h1, h2 func(x, y int), h3 map[int]struct{})", "t.streamHead(qw, h1, h2, h3)",
+		"(t TPL) StreamHead(qw *quicktemplate.Writer, h1, h2 func(x, y int), h3 map[int]struct{})", "t.StreamHead(qw, h1, h2, h3)",
 		"(t TPL) WriteHead(qww io.Writer, h1, h2 func(x, y int), h3 map[int]struct{})", "t.WriteHead(qww, h1, h2, h3)")
 }
 

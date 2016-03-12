@@ -141,11 +141,11 @@ func parseFuncCall(b []byte) (*funcType, error) {
 }
 
 func (f *funcType) DefStream(dst string) string {
-	return fmt.Sprintf("%sstream%s(%s *quicktemplate.Writer%s)", f.defPrefix, f.name, dst, f.args)
+	return fmt.Sprintf("%s%s%s(%s *quicktemplate.Writer%s)", f.defPrefix, f.prefixStream(), f.name, dst, f.args)
 }
 
 func (f *funcType) CallStream(dst string) string {
-	return fmt.Sprintf("%sstream%s(%s%s)", f.callPrefix, f.name, dst, f.argNames)
+	return fmt.Sprintf("%s%s%s(%s%s)", f.callPrefix, f.prefixStream(), f.name, dst, f.argNames)
 }
 
 func (f *funcType) DefWrite(dst string) string {
@@ -169,6 +169,14 @@ func (f *funcType) prefixWrite() string {
 	s := "write"
 	if isUpper(f.name[0]) {
 		s = "Write"
+	}
+	return s
+}
+
+func (f *funcType) prefixStream() string {
+	s := "stream"
+	if isUpper(f.name[0]) {
+		s = "Stream"
 	}
 	return s
 }
