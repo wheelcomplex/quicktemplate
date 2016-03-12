@@ -199,5 +199,5 @@ func getCallName(ce *ast.CallExpr) (string, string, error) {
 }
 
 func isReservedArgName(name string) bool {
-	return name == "w" || name == "qw" || name == "bb"
+	return name == "qww" || name == "qw" || name == "qb" || name == "qs"
 }

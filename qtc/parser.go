@@ -409,9 +409,9 @@ func (p *parser) emitFuncEnd(f *funcType) {
 	p.prefix = ""
 	p.Printf("}\n")
 
-	p.Printf("func %s {", f.DefWrite("w"))
+	p.Printf("func %s {", f.DefWrite("qww"))
 	p.prefix = "\t"
-	p.Printf("qw := quicktemplate.AcquireWriter(w)")
+	p.Printf("qw := quicktemplate.AcquireWriter(qww)")
 	p.Printf("%s", f.CallStream("qw"))
 	p.Printf("quicktemplate.ReleaseWriter(qw)")
 	p.prefix = ""
@@ -419,11 +419,11 @@ func (p *parser) emitFuncEnd(f *funcType) {
 
 	p.Printf("func %s {", f.DefString())
 	p.prefix = "\t"
-	p.Printf("bb := quicktemplate.AcquireByteBuffer()")
-	p.Printf("%s", f.CallWrite("bb"))
-	p.Printf("s := string(bb.B)")
-	p.Printf("quicktemplate.ReleaseByteBuffer(bb)")
-	p.Printf("return s")
+	p.Printf("qb := quicktemplate.AcquireByteBuffer()")
+	p.Printf("%s", f.CallWrite("qb"))
+	p.Printf("qs := string(qb.B)")
+	p.Printf("quicktemplate.ReleaseByteBuffer(qb)")
+	p.Printf("return qs")
 	p.prefix = ""
 	p.Printf("}\n")
 }

@@ -83,27 +83,27 @@ func TestParseFuncDefSuccess(t *testing.T) {
 	// private func without args
 	testParseFuncDefSuccess(t, "xx()", "xx() string",
 		"streamxx(qw *quicktemplate.Writer)", "streamxx(qw)",
-		"writexx(w io.Writer)", "writexx(w)")
+		"writexx(qww io.Writer)", "writexx(qww)")
 
 	// public func with a single arg
 	testParseFuncDefSuccess(t, "F(a int)", "F(a int) string",
 		"streamF(qw *quicktemplate.Writer, a int)", "streamF(qw, a)",
-		"WriteF(w io.Writer, a int)", "WriteF(w, a)")
+		"WriteF(qww io.Writer, a int)", "WriteF(qww, a)")
 
 	// public method without args
 	testParseFuncDefSuccess(t, "(f *foo) M()", "(f *foo) M() string",
 		"(f *foo) streamM(qw *quicktemplate.Writer)", "f.streamM(qw)",
-		"(f *foo) WriteM(w io.Writer)", "f.WriteM(w)")
+		"(f *foo) WriteM(qww io.Writer)", "f.WriteM(qww)")
 
 	// private method with three args
 	testParseFuncDefSuccess(t, "(f *Foo) bar(x, y string, z int)", "(f *Foo) bar(x, y string, z int) string",
 		"(f *Foo) streambar(qw *quicktemplate.Writer, x, y string, z int)", "f.streambar(qw, x, y, z)",
-		"(f *Foo) writebar(w io.Writer, x, y string, z int)", "f.writebar(w, x, y, z)")
+		"(f *Foo) writebar(qww io.Writer, x, y string, z int)", "f.writebar(qww, x, y, z)")
 
 	// method with complex args
 	testParseFuncDefSuccess(t, "(t TPL) Head(h1, h2 func(x, y int), h3 map[int]struct{})", "(t TPL) Head(h1, h2 func(x, y int), h3 map[int]struct{}) string",
 		"(t TPL) streamHead(qw *quicktemplate.Writer, h1, h2 func(x, y int), h3 map[int]struct{})", "t.streamHead(qw, h1, h2, h3)",
-		"(t TPL) WriteHead(w io.Writer, h1, h2 func(x, y int), h3 map[int]struct{})", "t.WriteHead(w, h1, h2, h3)")
+		"(t TPL) WriteHead(qww io.Writer, h1, h2 func(x, y int), h3 map[int]struct{})", "t.WriteHead(qww, h1, h2, h3)")
 }
 
 func TestParseFuncDefFailure(t *testing.T) {
@@ -123,11 +123,11 @@ func TestParseFuncDefFailure(t *testing.T) {
 	testParseFuncDefFailure(t, "(x XX) (y, z string)")
 
 	// reserved variable name
-	testParseFuncDefFailure(t, "f(w []byte)")
+	testParseFuncDefFailure(t, "f(qww []byte)")
 	testParseFuncDefFailure(t, "f(qw int)")
-	testParseFuncDefFailure(t, "(w *Woo) ()")
-	testParseFuncDefFailure(t, "(bb Boo) ()")
-	testParseFuncDefFailure(t, "(x XX) (w int, qw string)")
+	testParseFuncDefFailure(t, "(qs *Soo) f()")
+	testParseFuncDefFailure(t, "(qb Boo) f()")
+	testParseFuncDefFailure(t, "(x XX) f(qww int, qw string)")
 
 	// func with return values
 	testParseFuncDefFailure(t, "f() string")
@@ -160,11 +160,11 @@ func testParseFuncDefSuccess(t *testing.T, s, defString, defStream, callStream, 
 	if cs != callStream {
 		t.Fatalf("unexpected CallStream: %q. Expecting %q. s=%q", cs, callStream, s)
 	}
-	dw := f.DefWrite("w")
+	dw := f.DefWrite("qww")
 	if dw != defWrite {
 		t.Fatalf("unexpected DefWrite: %q. Expecting %q. s=%q", dw, defWrite, s)
 	}
-	cw := f.CallWrite("w")
+	cw := f.CallWrite("qww")
 	if cw != callWrite {
 		t.Fatalf("unexpected CallWrite: %q. Expecting %q. s=%q", cw, callWrite, s)
 	}
