@@ -69,31 +69,33 @@ Now define private printArgs, which is used in Foo via {%= %} tag
 {% endfunc %}
 
 
-// Now create base template struct.
-{% code type Base struct {} %}
+Now create page template interface.
+{% interface {
+	// Must print template head
+	Head()
 
-{% func (b *Base) Run() %}
-	<html>
-		<head>{%= b.Head() %}</head>
-		<body>{%= b.Body() %}</body>
-	</html>
-{% endfunc %}
-
-{% func (b *Base) Head() %}<title>Base title. Override it!</title>{% endfunc %}
-{% func (b *Base) Body() %}Base body. Override it!{% endfunc Body %}
-
-// Now create derived template struct.
-{% code
-type Homepage struct {
-	Base
+	// Must print template body
+	Body()
 }
 %}
 
-{% func (h *Homepage) Head() %}<title>Homepage</title>{% endfunc %}
-{% func (h *Homepage) Body() %}
-	Homepage body.
-	And this is base body: {%= h.Base.Body() %}
+This function prints arbitrary page.
+{% func PrintPage(p Page) %}
+	<html>
+		<head>{%= p.Head() %}</head>
+		<body>{%= p.Body() %}</body>
+	</html>
 {% endfunc %}
+
+Implement contacts page
+{% code type ContactsPage struct {} %}
+{% func (b *ContactsPage) Head() %}<title>Contacts!</title>{% endfunc %}
+{% func (b *ContactsPage) Body() %}Put here contact info{% endfunc Body %}
+
+Implement HomePage
+{% code type Homepage struct {} %}
+{% func (h *Homepage) Head() %}<title>Homepage</title>{% endfunc %}
+{% func (h *Homepage) Body() %}Homepage body{% endfunc %}
 
 unused code may be commented:
 {% comment %}
