@@ -126,7 +126,7 @@ func TestParseFuncDefFailure(t *testing.T) {
 	testParseFuncDefFailure(t, "f(w []byte)")
 	testParseFuncDefFailure(t, "f(qw int)")
 	testParseFuncDefFailure(t, "(w *Woo) ()")
-	testParseFuncDefFailure(t, "(qw qwriter) ()")
+	testParseFuncDefFailure(t, "(bb Boo) ()")
 	testParseFuncDefFailure(t, "(x XX) (w int, qw string)")
 
 	// func with return values
