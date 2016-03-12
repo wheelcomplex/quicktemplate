@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"go/ast"
 	goparser "go/parser"
 	"io"
 	"strings"
@@ -41,35 +42,37 @@ func (p *parser) parseTemplate() error {
 	"github.com/valyala/quicktemplate"
 )
 `)
-	nonimportEmitted := false
 	for s.Next() {
 		t := s.Token()
 		switch t.ID {
 		case text:
 			// just skip top-level text
 		case tagName:
-			switch string(t.Value) {
-			case "import":
-				if nonimportEmitted {
+			if string(t.Value) == "import" {
+				if p.importsUseEmitted {
 					return fmt.Errorf("imports must be at the top of the template. Found at %s", s.Context())
 				}
 				if err := p.parseImport(); err != nil {
 					return err
 				}
-			case "code":
+			} else {
 				p.emitImportsUse()
-				if err := p.parseTemplateCode(); err != nil {
-					return err
+				switch string(t.Value) {
+				case "interface":
+					if err := p.parseInterface(); err != nil {
+						return err
+					}
+				case "code":
+					if err := p.parseTemplateCode(); err != nil {
+						return err
+					}
+				case "func":
+					if err := p.parseFunc(); err != nil {
+						return err
+					}
+				default:
+					return fmt.Errorf("unexpected tag found outside func: %q at %s", t.Value, s.Context())
 				}
-				nonimportEmitted = true
-			case "func":
-				p.emitImportsUse()
-				if err := p.parseFunc(); err != nil {
-					return err
-				}
-				nonimportEmitted = true
-			default:
-				return fmt.Errorf("unexpected tag found outside func: %q at %s", t.Value, s.Context())
 			}
 		default:
 			return fmt.Errorf("unexpected token found %s outside func at %s", t, s.Context())
@@ -357,6 +360,54 @@ func (p *parser) skipAfterTag(tagStr string) error {
 		return fmt.Errorf("cannot parse contents after %q: %s", tagStr, err)
 	}
 	return fmt.Errorf("cannot find closing tag after %q at %s", tagStr, s.Context())
+}
+
+func (p *parser) parseInterface() error {
+	s := p.s
+	t, err := expectTagContents(s)
+	if err != nil {
+		return err
+	}
+
+	n := bytes.IndexByte(t.Value, '{')
+	if n < 0 {
+		return fmt.Errorf("missing '{' in interface at %s", s.Context())
+	}
+	ifname := string(stripTrailingSpace(t.Value[:n]))
+	if len(ifname) == 0 {
+		return fmt.Errorf("missing interface name at %s", s.Context())
+	}
+	p.Printf("type %s interface {", ifname)
+	p.prefix = "\t"
+
+	tail := t.Value[n:]
+	exprStr := fmt.Sprintf("interface %s", tail)
+	expr, err := goparser.ParseExpr(exprStr)
+	if err != nil {
+		return fmt.Errorf("error when parsing interface at %s: %s", s.Context(), err)
+	}
+	it, ok := expr.(*ast.InterfaceType)
+	if !ok {
+		return fmt.Errorf("unexpected interface type at %s: %T", s.Context(), expr)
+	}
+	methods := it.Methods.List
+	if len(methods) == 0 {
+		return fmt.Errorf("interface must contain at least one method at %s", s.Context())
+	}
+
+	for _, m := range it.Methods.List {
+		methodStr := exprStr[m.Pos()-1 : m.End()-1]
+		f, err := parseFuncDef([]byte(methodStr))
+		if err != nil {
+			return fmt.Errorf("when when parsing %q at %s: %s", methodStr, s.Context(), err)
+		}
+		p.Printf("%s", methodStr)
+		p.Printf("%s", f.DefStream("qw"))
+		p.Printf("%s", f.DefWrite("qww"))
+	}
+	p.prefix = ""
+	p.Printf("}")
+	return nil
 }
 
 func (p *parser) parseImport() error {

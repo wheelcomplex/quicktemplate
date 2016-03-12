@@ -67,6 +67,26 @@ func TestParseFailure(t *testing.T) {
 	// invalid code inside func
 	testParseFailure(t, "{%func f()%}{%code } %}{%endfunc%}")
 	testParseFailure(t, "{%func f()%}{%code { %}{%endfunc%}")
+
+	// interface inside func
+	testParseFailure(t, "{%func f()%}{%interface A { Foo() } %}{%endfunc%}")
+
+	// interface without name
+	testParseFailure(t, "{%interface  { Foo() } %}")
+
+	// invalid interface
+	testParseFailure(t, "{%interface aaaa %}")
+	testParseFailure(t, "{%interface aa { Foo() %}")
+
+	// unnamed method
+	testParseFailure(t, "{%func (s *S) () %}{%endfunc%}")
+
+	// empty method arguments
+	testParseFailure(t, "{%func (s *S) Foo %}{%endfunc %}")
+
+	// method with return values
+	testParseFailure(t, "{%func (s *S) Foo() string %}{%endfunc%}")
+	testParseFailure(t, "{%func (s *S) Bar() (int, string) %}{%endfunc%}")
 }
 
 func TestParserSuccess(t *testing.T) {
@@ -138,6 +158,12 @@ func TestParserSuccess(t *testing.T) {
 			return
 		}
 	%}{%endfor%}{%endfunc%}`)
+
+	// interface
+	testParseSuccess(t, "{%interface Foo { Bar()\nBaz() } %}")
+
+	// method
+	testParseSuccess(t, "{%func (s *S) Foo(bar, baz string) %}{%endfunc%}")
 }
 
 func testParseFailure(t *testing.T, str string) {
