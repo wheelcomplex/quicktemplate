@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"go/format"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -172,16 +173,20 @@ func TestParseFile(t *testing.T) {
 	if err := parse(w, f, filename, packageName); err != nil {
 		t.Fatalf("unexpected error: %s", err)
 	}
+	code, err := format.Source(w.B)
+	if err != nil {
+		t.Fatalf("unexpected error: %s", err)
+	}
+	quicktemplate.ReleaseByteBuffer(w)
 
 	expectedFilename := filename + ".compiled"
-	data, err := ioutil.ReadFile(expectedFilename)
+	expectedCode, err := ioutil.ReadFile(expectedFilename)
 	if err != nil {
 		t.Fatalf("unexpected error: %s", err)
 	}
 
-	if !bytes.Equal(w.B, data) {
-		t.Fatalf("unexpected output: %q. Expecting %q", w.B, data)
+	if !bytes.Equal(code, expectedCode) {
+		t.Fatalf("unexpected code: %q\nExpecting %q", code, expectedCode)
 	}
 
-	quicktemplate.ReleaseByteBuffer(w)
 }

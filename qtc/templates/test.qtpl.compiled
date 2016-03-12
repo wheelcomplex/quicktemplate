@@ -23,7 +23,7 @@ var (
 //line templates/test.qtpl:13
 type FooArgs struct {
 	S string
-	N int	
+	N int
 }
 
 //line templates/test.qtpl:20
@@ -40,7 +40,7 @@ func streamFoo(qw *quicktemplate.Writer, a []FooArgs) {
 		qw.N().S(`
 			no args!
 		`)
-	//line templates/test.qtpl:26
+		//line templates/test.qtpl:26
 	} else if len(a) == 1 {
 		//line templates/test.qtpl:26
 		qw.N().S(`
@@ -50,7 +50,7 @@ func streamFoo(qw *quicktemplate.Writer, a []FooArgs) {
 		//line templates/test.qtpl:27
 		qw.N().S(`
 		`)
-	//line templates/test.qtpl:28
+		//line templates/test.qtpl:28
 	} else {
 		//line templates/test.qtpl:28
 		qw.N().S(`
@@ -69,7 +69,7 @@ func streamFoo(qw *quicktemplate.Writer, a []FooArgs) {
 					`)
 				//line templates/test.qtpl:33
 				break
-			//line templates/test.qtpl:35
+				//line templates/test.qtpl:35
 			}
 			//line templates/test.qtpl:35
 			qw.N().S(`
@@ -80,7 +80,7 @@ func streamFoo(qw *quicktemplate.Writer, a []FooArgs) {
 			qw.N().S(`
 				Arbitrary Go code may be inserted here: `)
 			//line templates/test.qtpl:37
-			str := strconv.Itoa(i+42)
+			str := strconv.Itoa(i + 42)
 
 			//line templates/test.qtpl:37
 			qw.N().S(`
@@ -90,13 +90,13 @@ func streamFoo(qw *quicktemplate.Writer, a []FooArgs) {
 			//line templates/test.qtpl:38
 			qw.N().S(`
 			`)
-		//line templates/test.qtpl:39
+			//line templates/test.qtpl:39
 		}
 		//line templates/test.qtpl:39
 		qw.N().S(`
 			</ul>
 		`)
-	//line templates/test.qtpl:41
+		//line templates/test.qtpl:41
 	}
 	//line templates/test.qtpl:41
 	qw.N().S(`
@@ -130,9 +130,9 @@ func streamFoo(qw *quicktemplate.Writer, a []FooArgs) {
 }
 
 //line templates/test.qtpl:53
-func WriteFoo(w io.Writer, a []FooArgs) {
+func WriteFoo(qww io.Writer, a []FooArgs) {
 	//line templates/test.qtpl:53
-	qw := quicktemplate.AcquireWriter(w)
+	qw := quicktemplate.AcquireWriter(qww)
 	//line templates/test.qtpl:53
 	streamFoo(qw, a)
 	//line templates/test.qtpl:53
@@ -143,15 +143,15 @@ func WriteFoo(w io.Writer, a []FooArgs) {
 //line templates/test.qtpl:53
 func Foo(a []FooArgs) string {
 	//line templates/test.qtpl:53
-	bb := quicktemplate.AcquireByteBuffer()
+	qb := quicktemplate.AcquireByteBuffer()
 	//line templates/test.qtpl:53
-	WriteFoo(bb, a)
+	WriteFoo(qb, a)
 	//line templates/test.qtpl:53
-	s := string(bb.B)
+	qs := string(qb.B)
 	//line templates/test.qtpl:53
-	quicktemplate.ReleaseByteBuffer(bb)
+	quicktemplate.ReleaseByteBuffer(qb)
 	//line templates/test.qtpl:53
-	return s
+	return qs
 //line templates/test.qtpl:53
 }
 
@@ -168,7 +168,7 @@ func streamprintArgs(qw *quicktemplate.Writer, i int, a *FooArgs) {
 		`)
 		//line templates/test.qtpl:61
 		return
-	//line templates/test.qtpl:65
+		//line templates/test.qtpl:65
 	}
 	//line templates/test.qtpl:65
 	qw.N().S(`
@@ -192,9 +192,9 @@ func streamprintArgs(qw *quicktemplate.Writer, i int, a *FooArgs) {
 }
 
 //line templates/test.qtpl:69
-func writeprintArgs(w io.Writer, i int, a *FooArgs) {
+func writeprintArgs(qww io.Writer, i int, a *FooArgs) {
 	//line templates/test.qtpl:69
-	qw := quicktemplate.AcquireWriter(w)
+	qw := quicktemplate.AcquireWriter(qww)
 	//line templates/test.qtpl:69
 	streamprintArgs(qw, i, a)
 	//line templates/test.qtpl:69
@@ -205,20 +205,20 @@ func writeprintArgs(w io.Writer, i int, a *FooArgs) {
 //line templates/test.qtpl:69
 func printArgs(i int, a *FooArgs) string {
 	//line templates/test.qtpl:69
-	bb := quicktemplate.AcquireByteBuffer()
+	qb := quicktemplate.AcquireByteBuffer()
 	//line templates/test.qtpl:69
-	writeprintArgs(bb, i, a)
+	writeprintArgs(qb, i, a)
 	//line templates/test.qtpl:69
-	s := string(bb.B)
+	qs := string(qb.B)
 	//line templates/test.qtpl:69
-	quicktemplate.ReleaseByteBuffer(bb)
+	quicktemplate.ReleaseByteBuffer(qb)
 	//line templates/test.qtpl:69
-	return s
+	return qs
 //line templates/test.qtpl:69
 }
 
 //line templates/test.qtpl:73
-type Base struct {}
+type Base struct{}
 
 //line templates/test.qtpl:75
 func (b *Base) streamRun(qw *quicktemplate.Writer) {
@@ -241,9 +241,9 @@ func (b *Base) streamRun(qw *quicktemplate.Writer) {
 }
 
 //line templates/test.qtpl:80
-func (b *Base) WriteRun(w io.Writer) {
+func (b *Base) WriteRun(qww io.Writer) {
 	//line templates/test.qtpl:80
-	qw := quicktemplate.AcquireWriter(w)
+	qw := quicktemplate.AcquireWriter(qww)
 	//line templates/test.qtpl:80
 	b.streamRun(qw)
 	//line templates/test.qtpl:80
@@ -254,15 +254,15 @@ func (b *Base) WriteRun(w io.Writer) {
 //line templates/test.qtpl:80
 func (b *Base) Run() string {
 	//line templates/test.qtpl:80
-	bb := quicktemplate.AcquireByteBuffer()
+	qb := quicktemplate.AcquireByteBuffer()
 	//line templates/test.qtpl:80
-	b.WriteRun(bb)
+	b.WriteRun(qb)
 	//line templates/test.qtpl:80
-	s := string(bb.B)
+	qs := string(qb.B)
 	//line templates/test.qtpl:80
-	quicktemplate.ReleaseByteBuffer(bb)
+	quicktemplate.ReleaseByteBuffer(qb)
 	//line templates/test.qtpl:80
-	return s
+	return qs
 //line templates/test.qtpl:80
 }
 
@@ -274,9 +274,9 @@ func (b *Base) streamHead(qw *quicktemplate.Writer) {
 }
 
 //line templates/test.qtpl:82
-func (b *Base) WriteHead(w io.Writer) {
+func (b *Base) WriteHead(qww io.Writer) {
 	//line templates/test.qtpl:82
-	qw := quicktemplate.AcquireWriter(w)
+	qw := quicktemplate.AcquireWriter(qww)
 	//line templates/test.qtpl:82
 	b.streamHead(qw)
 	//line templates/test.qtpl:82
@@ -287,29 +287,28 @@ func (b *Base) WriteHead(w io.Writer) {
 //line templates/test.qtpl:82
 func (b *Base) Head() string {
 	//line templates/test.qtpl:82
-	bb := quicktemplate.AcquireByteBuffer()
+	qb := quicktemplate.AcquireByteBuffer()
 	//line templates/test.qtpl:82
-	b.WriteHead(bb)
+	b.WriteHead(qb)
 	//line templates/test.qtpl:82
-	s := string(bb.B)
+	qs := string(qb.B)
 	//line templates/test.qtpl:82
-	quicktemplate.ReleaseByteBuffer(bb)
+	quicktemplate.ReleaseByteBuffer(qb)
 	//line templates/test.qtpl:82
-	return s
+	return qs
 //line templates/test.qtpl:82
 }
 
 //line templates/test.qtpl:83
 func (b *Base) streamBody(qw *quicktemplate.Writer) {
-	//line templates/test.qtpl:83
-	qw.N().S(`Base body. Override it!`)
 //line templates/test.qtpl:83
-}
+qw.N().S(`Base body. Override it!`) }
 
 //line templates/test.qtpl:83
-func (b *Base) WriteBody(w io.Writer) {
+//line templates/test.qtpl:83
+func (b *Base) WriteBody(qww io.Writer) {
 	//line templates/test.qtpl:83
-	qw := quicktemplate.AcquireWriter(w)
+	qw := quicktemplate.AcquireWriter(qww)
 	//line templates/test.qtpl:83
 	b.streamBody(qw)
 	//line templates/test.qtpl:83
@@ -320,15 +319,15 @@ func (b *Base) WriteBody(w io.Writer) {
 //line templates/test.qtpl:83
 func (b *Base) Body() string {
 	//line templates/test.qtpl:83
-	bb := quicktemplate.AcquireByteBuffer()
+	qb := quicktemplate.AcquireByteBuffer()
 	//line templates/test.qtpl:83
-	b.WriteBody(bb)
+	b.WriteBody(qb)
 	//line templates/test.qtpl:83
-	s := string(bb.B)
+	qs := string(qb.B)
 	//line templates/test.qtpl:83
-	quicktemplate.ReleaseByteBuffer(bb)
+	quicktemplate.ReleaseByteBuffer(qb)
 	//line templates/test.qtpl:83
-	return s
+	return qs
 //line templates/test.qtpl:83
 }
 
@@ -339,15 +338,14 @@ type Homepage struct {
 
 //line templates/test.qtpl:92
 func (h *Homepage) streamHead(qw *quicktemplate.Writer) {
-	//line templates/test.qtpl:92
-	qw.N().S(`<title>Homepage</title>`)
 //line templates/test.qtpl:92
-}
+qw.N().S(`<title>Homepage</title>`) }
 
 //line templates/test.qtpl:92
-func (h *Homepage) WriteHead(w io.Writer) {
+//line templates/test.qtpl:92
+func (h *Homepage) WriteHead(qww io.Writer) {
 	//line templates/test.qtpl:92
-	qw := quicktemplate.AcquireWriter(w)
+	qw := quicktemplate.AcquireWriter(qww)
 	//line templates/test.qtpl:92
 	h.streamHead(qw)
 	//line templates/test.qtpl:92
@@ -358,15 +356,15 @@ func (h *Homepage) WriteHead(w io.Writer) {
 //line templates/test.qtpl:92
 func (h *Homepage) Head() string {
 	//line templates/test.qtpl:92
-	bb := quicktemplate.AcquireByteBuffer()
+	qb := quicktemplate.AcquireByteBuffer()
 	//line templates/test.qtpl:92
-	h.WriteHead(bb)
+	h.WriteHead(qb)
 	//line templates/test.qtpl:92
-	s := string(bb.B)
+	qs := string(qb.B)
 	//line templates/test.qtpl:92
-	quicktemplate.ReleaseByteBuffer(bb)
+	quicktemplate.ReleaseByteBuffer(qb)
 	//line templates/test.qtpl:92
-	return s
+	return qs
 //line templates/test.qtpl:92
 }
 
@@ -385,9 +383,9 @@ func (h *Homepage) streamBody(qw *quicktemplate.Writer) {
 }
 
 //line templates/test.qtpl:96
-func (h *Homepage) WriteBody(w io.Writer) {
+func (h *Homepage) WriteBody(qww io.Writer) {
 	//line templates/test.qtpl:96
-	qw := quicktemplate.AcquireWriter(w)
+	qw := quicktemplate.AcquireWriter(qww)
 	//line templates/test.qtpl:96
 	h.streamBody(qw)
 	//line templates/test.qtpl:96
@@ -398,15 +396,14 @@ func (h *Homepage) WriteBody(w io.Writer) {
 //line templates/test.qtpl:96
 func (h *Homepage) Body() string {
 	//line templates/test.qtpl:96
-	bb := quicktemplate.AcquireByteBuffer()
+	qb := quicktemplate.AcquireByteBuffer()
 	//line templates/test.qtpl:96
-	h.WriteBody(bb)
+	h.WriteBody(qb)
 	//line templates/test.qtpl:96
-	s := string(bb.B)
+	qs := string(qb.B)
 	//line templates/test.qtpl:96
-	quicktemplate.ReleaseByteBuffer(bb)
+	quicktemplate.ReleaseByteBuffer(qb)
 	//line templates/test.qtpl:96
-	return s
+	return qs
 //line templates/test.qtpl:96
 }
-
