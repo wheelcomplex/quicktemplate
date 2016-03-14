@@ -16,7 +16,7 @@ import (
 
 	"github.com/valyala/fasthttp"
 
-	"./templates"
+	"github.com/valyala/quicktemplate/examples/basic/templates"
 )
 
 func main() {
