@@ -74,6 +74,9 @@ func TestParseFailure(t *testing.T) {
 	// interface without name
 	testParseFailure(t, "{%interface  { Foo() } %}")
 
+	// empty interface
+	testParseFailure(t, "{% interface Foo {} %}")
+
 	// invalid interface
 	testParseFailure(t, "{%interface aaaa %}")
 	testParseFailure(t, "{%interface aa { Foo() %}")
