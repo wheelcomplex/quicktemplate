@@ -457,6 +457,9 @@ func (p *parser) parseTemplateCode() error {
 	if err != nil {
 		return err
 	}
+	if err = validateTemplateCode(t.Value); err != nil {
+		return fmt.Errorf("invalid code at %s: %s", p.s.Context(), err)
+	}
 	p.Printf("%s\n", t.Value)
 	return nil
 }
@@ -564,10 +567,17 @@ func validateFuncCode(code []byte) error {
 	return err
 }
 
-func validateImport(code []byte) error {
-	str := fmt.Sprintf("package foo\nimport %s", code)
+func validateTemplateCode(code []byte) error {
+	codeStr := fmt.Sprintf("package foo\nvar _ = a\n%s", code)
 	fset := gotoken.NewFileSet()
-	f, err := goparser.ParseFile(fset, "", str, 0)
+	_, err := goparser.ParseFile(fset, "", codeStr, 0)
+	return err
+}
+
+func validateImport(code []byte) error {
+	codeStr := fmt.Sprintf("package foo\nimport %s", code)
+	fset := gotoken.NewFileSet()
+	f, err := goparser.ParseFile(fset, "", codeStr, 0)
 	if err != nil {
 		return err
 	}

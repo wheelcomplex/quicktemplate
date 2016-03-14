@@ -10,6 +10,40 @@ import (
 	"github.com/valyala/quicktemplate"
 )
 
+func TestParseTemplateCodeSuccess(t *testing.T) {
+	// empty code
+	testParseSuccess(t, "{% code %}")
+
+	// declarations
+	testParseSuccess(t, `{%code
+		// comment
+		type Foo struct {}
+		var b = &Foo{}
+
+		func (f *Foo) Bar() {}
+
+		// yet another comment
+		func Bar(baz int) string {
+			return fmt.Sprintf("%d", baz)
+		}
+	%}`)
+}
+
+func TestParseTemplateCodeFailure(t *testing.T) {
+	// import inside the code
+	testParseFailure(t, `{% code import "foo" %}`)
+
+	// incomplete code
+	testParseFailure(t, `{% code type A struct { %}`)
+	testParseFailure(t, `{% code func F() { %}`)
+
+	// invalid code
+	testParseFailure(t, `{%code { %}`)
+	testParseFailure(t, `{%code {} %}`)
+	testParseFailure(t, `{%code ( %}`)
+	testParseFailure(t, `{%code () %}`)
+}
+
 func TestParseImportSuccess(t *testing.T) {
 	// single line import
 	testParseSuccess(t, `{% import "github.com/foo/bar" %}`)
