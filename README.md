@@ -3,12 +3,13 @@ Fast, powerful, yet easy to use html template engine for Go.
 
 # Features
 
-  * Extremely fast. Templates are converted into Go code and then compiled.
-  * Easy to use. See [examples](https://github.com/valyala/quicktemplate/tree/master/examples)
+  * [Extremely fast](#performance-comparison-with-htmltemplate).
+    Templates are converted into Go code and then compiled.
+  * Easy to use. See [quickstart](#quick-start) and [examples](https://github.com/valyala/quicktemplate/tree/master/examples)
     for details.
   * Powerful. Arbitrary Go code may be embedded into and mixed with templates.
     Be careful with this power - do not query db and/or external resources from
-    templates.
+    templates :)
   * Templates are compiled into a single binary, so there is no need in copying
     template files to the server.
 
