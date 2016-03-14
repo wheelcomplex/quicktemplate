@@ -434,7 +434,7 @@ func (p *parser) parseInterface() error {
 		if err != nil {
 			return fmt.Errorf("when when parsing %q at %s: %s", methodStr, s.Context(), err)
 		}
-		p.Printf("%s", methodStr)
+		p.Printf("%s string", methodStr)
 		p.Printf("%s", f.DefStream("qw"))
 		p.Printf("%s", f.DefWrite("qww"))
 	}
