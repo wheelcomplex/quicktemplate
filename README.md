@@ -109,11 +109,16 @@ It also greets John differently comparing to others.
 			I'm tired to greet so many people...
 			{% break %}
 		{% elseif name == "John" %}
-			Hi, John
+			{%= sayHi("John") %}
 		{% else %}
 			{%= Hello(name) %}
 		{% endif %}
 	{% endfor %}
+{% endfunc %}
+
+sayHi is unexported, since it starts with lowercase letter.
+{% func sayHi(name string) %}
+	Hi, {%s name %}
 {% endfunc %}
 ```
 
@@ -161,6 +166,19 @@ the tag. For example: `{%s= "<h1>This h1 won't be escaped</h1>" }`.
 As you may notice `{%= F() }` and `{%s= F() }` produce the same output for `{% func F() %}`.
 But the first one is optimized for speed - it avoids memory allocations and copy.
 So stick to it when embedding template function calls.
+
+All the ouptut tags except `{%= F() %}` may contain arbitrary valid
+Go expression instead of just identifier. For example:
+
+```qtpl
+Import fmt for fmt.Sprintf()
+{% import "fmt" %}
+
+FmtFunc uses fmt.Sprintf() inside output tag
+{% func FmtFunc(s string) %}
+	{%s fmt.Sprintf("FmtFunc accepted %q string", s) %}
+{% endfunc %}
+```
 
 There are other useful tags supported by quicktemplate:
 
