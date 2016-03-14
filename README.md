@@ -167,7 +167,7 @@ As you may notice `{%= F() }` and `{%s= F() }` produce the same output for `{% f
 But the first one is optimized for speed - it avoids memory allocations and copy.
 So stick to it when embedding template function calls.
 
-All the ouptut tags except `{%= F() %}` may contain arbitrary valid
+All the ouptut tags except of `{%= F() %}` may contain arbitrary valid
 Go expression instead of just identifier. For example:
 
 ```qtpl
