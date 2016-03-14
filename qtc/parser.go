@@ -94,6 +94,12 @@ func (p *parser) emitComment(comment []byte) {
 			n = len(comment)
 		}
 		line := stripTrailingSpace(comment[:n])
+		if bytes.HasPrefix(line, []byte("//")) {
+			line = line[2:]
+			if len(line) > 0 && isSpace(line[0]) {
+				line = line[1:]
+			}
+		}
 		if len(line) == 0 {
 			if isFirstNonemptyLine {
 				fmt.Fprintf(p.w, "//\n")
