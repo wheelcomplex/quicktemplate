@@ -186,7 +186,8 @@ There are other useful tags supported by quicktemplate:
   * `{% plain %}This will {% trap into %} {% the %} output {% unmodified %}{% endplain %}`
   * `{% collapsespace %}   Space between   {%s " tags " %}   will be collapsed.  {% endcollapsespace %}`
   * `{% collapsespace %}{% space %}{% newline %}This is prepended with space and newline   {% endcollapsespace %}`
-  * ```qtpl
+  *
+    ```qtpl
     {% code
         // arbitrary Go code may be embedded here!
 	type FooArg struct {
@@ -195,7 +196,8 @@ There are other useful tags supported by quicktemplate:
 	}
     %}
     ```
-  * ```qtpl
+  *
+    ```qtpl
     Import external packages.
     {% import "foo/bar" %}
     {% import (
@@ -203,7 +205,8 @@ There are other useful tags supported by quicktemplate:
 	bar "baz/baa"
     ) %}
     ```
-  * ```qtpl
+  *
+    ```qtpl
     Interfaces allow powerful templates' inheritance.
     {%
     interface Page {
