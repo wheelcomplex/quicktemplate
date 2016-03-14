@@ -46,7 +46,7 @@ func (p *parser) parseTemplate() error {
 		t := s.Token()
 		switch t.ID {
 		case text:
-			// just skip top-level text
+			p.emitComment(t.Value)
 		case tagName:
 			if string(t.Value) == "import" {
 				if p.importsUseEmitted {
@@ -83,6 +83,32 @@ func (p *parser) parseTemplate() error {
 		return fmt.Errorf("cannot parse template: %s", err)
 	}
 	return nil
+}
+
+func (p *parser) emitComment(comment []byte) {
+	isFirstNonemptyLine := false
+	for len(comment) > 0 {
+		n := bytes.IndexByte(comment, '\n')
+		if n < 0 {
+			n = len(comment)
+		}
+		line := comment[:n]
+		if len(line) == 0 {
+			if isFirstNonemptyLine {
+				fmt.Fprintf(p.w, "//\n")
+			}
+		} else {
+			fmt.Fprintf(p.w, "// %s\n", line)
+			isFirstNonemptyLine = true
+		}
+
+		if n < len(comment) {
+			comment = comment[n+1:]
+		} else {
+			comment = comment[n:]
+		}
+	}
+	fmt.Fprintf(p.w, "\n")
 }
 
 func (p *parser) emitImportsUse() {

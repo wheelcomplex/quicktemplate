@@ -11,11 +11,18 @@ import (
 	"github.com/valyala/quicktemplate"
 )
 
+// This is a test template file.
+// All the lines outside func and code are just comments.
+//
+// Optional imports must be at the top of template
+
 //line templates/test.qtpl:5
 import (
 	"fmt"
 	"strconv"
 )
+
+// Arbitrary go code may be inserted here. For instance, type definition:
 
 //line templates/test.qtpl:12
 var (
@@ -28,6 +35,8 @@ type FooArgs struct {
 	S string
 	N int
 }
+
+// Now define an exported function template
 
 //line templates/test.qtpl:20
 func StreamFoo(qw *quicktemplate.Writer, a []FooArgs) {
@@ -158,6 +167,8 @@ func Foo(a []FooArgs) string {
 //line templates/test.qtpl:53
 }
 
+// Now define private printArgs, which is used in Foo via {%= %} tag
+
 //line templates/test.qtpl:58
 func streamprintArgs(qw *quicktemplate.Writer, i int, a *FooArgs) {
 	//line templates/test.qtpl:58
@@ -220,6 +231,8 @@ func printArgs(i int, a *FooArgs) string {
 //line templates/test.qtpl:69
 }
 
+// Now create page template interface.
+
 //line templates/test.qtpl:73
 type Page interface {
 	//line templates/test.qtpl:73
@@ -236,6 +249,8 @@ type Page interface {
 	WriteBody(qww io.Writer, title string)
 //line templates/test.qtpl:73
 }
+
+// This function prints arbitrary page.
 
 //line templates/test.qtpl:83
 func StreamPrintPage(qw *quicktemplate.Writer, p Page, title string) {
@@ -282,6 +297,8 @@ func PrintPage(p Page, title string) string {
 	return qs
 //line templates/test.qtpl:88
 }
+
+// Implement contacts page
 
 //line templates/test.qtpl:91
 type ContactsPage struct{}
@@ -350,6 +367,8 @@ func (b *ContactsPage) Body(title string) string {
 	return qs
 //line templates/test.qtpl:93
 }
+
+// Implement HomePage
 
 //line templates/test.qtpl:96
 type Homepage struct{}
@@ -425,3 +444,5 @@ func (h *Homepage) Body(title string) string {
 	return qs
 //line templates/test.qtpl:101
 }
+
+// unused code may be commented:
