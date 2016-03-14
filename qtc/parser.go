@@ -7,6 +7,7 @@ import (
 	goparser "go/parser"
 	gotoken "go/token"
 	"io"
+	"path/filepath"
 	"strings"
 )
 
@@ -35,7 +36,7 @@ func (p *parser) parseTemplate() error {
 // See https://github.com/valyala/quicktemplate for details.
 
 `,
-		s.filePath)
+		filepath.Base(s.filePath))
 	p.Printf("package %s\n", p.packageName)
 	p.Printf(`import (
 	"io"
