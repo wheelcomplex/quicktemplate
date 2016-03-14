@@ -10,6 +10,45 @@ import (
 	"github.com/valyala/quicktemplate"
 )
 
+func TestParseImportSuccess(t *testing.T) {
+	// single line import
+	testParseSuccess(t, `{% import "github.com/foo/bar" %}`)
+
+	// multiline import
+	testParseSuccess(t, `{% import (
+		"foo"
+		xxx "bar/baz/aaa"
+
+		"yyy.com/zzz"
+	) %}`)
+
+	// multiple imports
+	testParseSuccess(t, `{% import "foo" %}
+		baaas
+		{% import (
+			"bar"
+			"baasd"
+		)
+		%}
+		sddf
+	`)
+}
+
+func TestParseImportFailure(t *testing.T) {
+	// empty import
+	testParseFailure(t, `{%import %}`)
+
+	// invalid import
+	testParseFailure(t, `{%import foo %}`)
+
+	// non-import code
+	testParseFailure(t, `{%import {"foo"} %}`)
+	testParseFailure(t, `{%import "foo"
+		type A struct {}
+	%}`)
+	testParseFailure(t, `{%import type a struct{} %}`)
+}
+
 func TestParseFailure(t *testing.T) {
 	// unknown tag
 	testParseFailure(t, "{% foobar %}")

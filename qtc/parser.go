@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"go/ast"
 	goparser "go/parser"
+	gotoken "go/token"
 	"io"
 	"strings"
 )
@@ -444,6 +445,9 @@ func (p *parser) parseImport() error {
 	if len(t.Value) == 0 {
 		return fmt.Errorf("empty import found at %s", p.s.Context())
 	}
+	if err = validateImport(t.Value); err != nil {
+		return fmt.Errorf("invalid import found at %s: %s", p.s.Context(), err)
+	}
 	p.Printf("import %s\n", t.Value)
 	return nil
 }
@@ -558,4 +562,25 @@ func validateFuncCode(code []byte) error {
 	exprStr := fmt.Sprintf("func () { for { %s } }", code)
 	_, err := goparser.ParseExpr(exprStr)
 	return err
+}
+
+func validateImport(code []byte) error {
+	str := fmt.Sprintf("package foo\nimport %s", code)
+	fset := gotoken.NewFileSet()
+	f, err := goparser.ParseFile(fset, "", str, 0)
+	if err != nil {
+		return err
+	}
+	for _, d := range f.Decls {
+		gd, ok := d.(*ast.GenDecl)
+		if !ok {
+			return fmt.Errorf("unexpected code found: %T. Expecting ast.GenDecl", d)
+		}
+		for _, s := range gd.Specs {
+			if _, ok := s.(*ast.ImportSpec); !ok {
+				return fmt.Errorf("unexpected code found: %T. Expecting ast.ImportSpec", s)
+			}
+		}
+	}
+	return nil
 }
