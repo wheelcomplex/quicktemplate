@@ -25,7 +25,6 @@ func collapseSpace(b []byte) []byte {
 		return b
 	}
 
-	tailSpace := isSpace(b[len(b)-1])
 	var dst []byte
 	for len(b) > 0 {
 		n := bytes.IndexByte(b, '\n')
@@ -46,7 +45,7 @@ func collapseSpace(b []byte) []byte {
 		dst = append(dst, z...)
 		dst = append(dst, ' ')
 	}
-	if !tailSpace && len(dst) > 0 {
+	if len(dst) > 0 {
 		dst = dst[:len(dst)-1]
 	}
 	return dst
