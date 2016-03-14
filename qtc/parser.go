@@ -93,7 +93,7 @@ func (p *parser) emitComment(comment []byte) {
 		if n < 0 {
 			n = len(comment)
 		}
-		line := comment[:n]
+		line := stripTrailingSpace(comment[:n])
 		if len(line) == 0 {
 			if isFirstNonemptyLine {
 				fmt.Fprintf(p.w, "//\n")
