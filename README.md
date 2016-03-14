@@ -191,11 +191,11 @@ There are other useful tags supported by quicktemplate:
 
     ```qtpl
     {% code
-        // arbitrary Go code may be embedded here!
-	type FooArg struct {
-		Name string
-		Age int
-	}
+    // arbitrary Go code may be embedded here!
+    type FooArg struct {
+        Name string
+        Age int
+    }
     %}
     ```
 
@@ -205,8 +205,8 @@ There are other useful tags supported by quicktemplate:
     Import external packages.
     {% import "foo/bar" %}
     {% import (
-	"foo"
-	bar "baz/baa"
+        "foo"
+        bar "baz/baa"
     ) %}
     ```
 
@@ -218,7 +218,7 @@ There are other useful tags supported by quicktemplate:
     interface Page {
         Title()
         Body(s string, n int)
-	Footer()
+        Footer()
     }
     %}
     ```
