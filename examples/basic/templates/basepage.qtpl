@@ -1,0 +1,25 @@
+This is a base page template. All the other template pages are inherited
+from this one.
+
+{% interface
+BasePage {
+	Title()
+	Body()
+}
+%}
+
+
+// Page prints a page implementing BasePage interface.
+{% func Page(p BasePage) %}
+<html>
+	<head>
+		<title>{%= p.Title() %}</title>
+	</head>
+	<body>
+		<div>
+			<a href="/">return to main page</a>
+		</div>
+		{%= p.Body() %}
+	</body>
+</html>
+{% endfunc %}

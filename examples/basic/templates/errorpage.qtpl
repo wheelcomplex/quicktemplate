@@ -1,0 +1,21 @@
+// Error page template. Implements BasePage methods.
+
+{% code
+type ErrorPage struct {
+	// error path
+	Path []byte
+}
+%}
+
+
+{% func (p *ErrorPage) Title() %}
+	Error
+{% endfunc %}
+
+
+{% func (p *ErrorPage) Body() %}
+	<h1>Error page</h1>
+	</div>
+		Unsupported path <b>{%z p.Path %}</b>.
+	</div>
+{% endfunc %}
