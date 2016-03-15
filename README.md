@@ -162,9 +162,9 @@ other output tags:
 
 All these output tags produce html-safe output, i.e. they escape `<` to `&lt;`,
 `>` to `&gt;`, etc. If you don't want html-safe output, then just put `=` after
-the tag. For example: `{%s= "<h1>This h1 won't be escaped</h1>" }`.
+the tag. For example: `{%s= "<h1>This h1 won't be escaped</h1>" %}`.
 
-As you may notice `{%= F() }` and `{%s= F() }` produce the same output for `{% func F() %}`.
+As you may notice `{%= F() %}` and `{%s= F() %}` produce the same output for `{% func F() %}`.
 But the first one is optimized for speed - it avoids memory allocations and copy.
 So stick to it when embedding template function calls.
 
