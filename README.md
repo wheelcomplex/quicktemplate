@@ -90,10 +90,10 @@ Then run `go run`. If all went ok, you'll see something like this:
 
 ```
 
-	Hello, Foo
+	Hello, Foo!
 
 
-	Hello, Bar
+	Hello, Bar!
 
 ```
 
