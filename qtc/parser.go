@@ -306,6 +306,9 @@ func (p *parser) tryParseCommonTags(tagBytes []byte) (bool, error) {
 		if err != nil {
 			return false, err
 		}
+		if err = validateOutputTagValue(t.Value); err != nil {
+			return false, fmt.Errorf("invalid output tag value at %s: %s", s.Context(), err)
+		}
 		filter := "N()."
 		if len(tagNameStr) == 1 {
 			switch tagNameStr {
@@ -554,6 +557,12 @@ func expectToken(s *scanner, id int) (*token, error) {
 		return nil, fmt.Errorf("unexpected token found %s. Expecting %s at %s", t, tokenIDToStr(id), s.Context())
 	}
 	return t, nil
+}
+
+func validateOutputTagValue(stmt []byte) error {
+	exprStr := string(stmt)
+	_, err := goparser.ParseExpr(exprStr)
+	return err
 }
 
 func validateForStmt(stmt []byte) error {

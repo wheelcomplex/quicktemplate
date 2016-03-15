@@ -10,6 +10,36 @@ import (
 	"github.com/valyala/quicktemplate"
 )
 
+func TestParseOutputTagSuccess(t *testing.T) {
+	// identifier
+	testParseSuccess(t, "{%func a()%}{%s foobar %}{%endfunc%}")
+
+	// method call
+	testParseSuccess(t, "{%func a()%}{%s foo.bar.baz(a, b, &A{d:e}) %}{%endfunc%}")
+
+	// inline function call
+	testParseSuccess(t, "{%func f()%}{%s func() string { return foo.bar(baz, aaa) }() %}{%endfunc%}")
+
+	// map
+	testParseSuccess(t, `{%func f()%}{%v map[int]string{1:"foo", 2:"bar"} %}{%endfunc%}`)
+}
+
+func TestParseOutputTagFailure(t *testing.T) {
+	// empty tag
+	testParseFailure(t, "{%func f()%}{%s %}{%endfunc%}")
+
+	// multiple arguments
+	testParseFailure(t, "{%func f()%}{%s a, b %}{%endfunc%}")
+
+	// invalid code
+	testParseFailure(t, "{%func f()%}{%s f(a, %}{%endfunc%}")
+	testParseFailure(t, "{%func f()%}{%s Foo{Bar:1 %}{%endfunc%}")
+
+	// unsupported code
+	testParseFailure(t, "{%func f()%}{%s if (a) {} %}{%endfunc%}")
+	testParseFailure(t, "{%func f()%}{%s for {} %}{%endfunc%}")
+}
+
 func TestParseTemplateCodeSuccess(t *testing.T) {
 	// empty code
 	testParseSuccess(t, "{% code %}")
