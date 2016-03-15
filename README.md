@@ -20,7 +20,13 @@ Fast, powerful, yet easy to use html template engine for Go.
 
 # Performance comparison with html/template
 
-Quicktemplate is more than 20x faster than [html/template](https://golang.org/pkg/html/template/):
+Quicktemplate is more than 20x faster than [html/template](https://golang.org/pkg/html/template/).
+The following simple template is used:
+
+  * [html/template version](https://github.com/valyala/quicktemplate/blob/master/templates/bench.tpl)
+  * [quicktemplate version](https://github.com/valyala/quicktemplate/blob/master/templates/bench.qtpl)
+
+Benchmark results:
 
 ```
 $ go test -bench=Template -benchmem
