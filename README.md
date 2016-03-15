@@ -129,7 +129,7 @@ sayHi is unexported, since it starts with lowercase letter.
 {% endfunc %}
 ```
 
-Run `qtc` inside `template` folder - it should create `greetings.qtpl.go`.
+Run `qtc` inside `templates` folder - it should create `greetings.qtpl.go`.
 Now put the following code into `main.go`:
 
 ```go
@@ -154,7 +154,7 @@ func main() {
 }
 ```
 
-Attentive readers may notice different output tags were used in these
+Careful readers may notice different output tags were used in these
 templates: `{%s name %}` and `{%= Hello(name) %}`. What's the difference?
 The `{%s x %}` is used for printing html-safe strings, while `{%= F() %}`
 is used for embedding template function calls. Quicktemplate supports also
