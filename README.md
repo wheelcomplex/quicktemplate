@@ -234,5 +234,5 @@ There are other useful tags supported by quicktemplate:
     %}
     ```
 
-    See [basic example](https://github.com/valyala/quicktemplate/tree/master/examples/basic)
+    See [basicserver example](https://github.com/valyala/quicktemplate/tree/master/examples/basicserver)
     for details.
