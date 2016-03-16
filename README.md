@@ -263,7 +263,7 @@ There are other useful tags supported by quicktemplate:
   * `{% interface %}`:
 
     ```qtpl
-    Interfaces allow powerful templates' inheritance.
+    Interfaces allow powerful templates' inheritance
     {%
     interface Page {
         Title()
@@ -283,7 +283,7 @@ There are other useful tags supported by quicktemplate:
         </html>
     {% endfunc %}
 
-    Base page implementatin
+    Base page implementation
     {% code
     type BasePage struct {
         Title string
@@ -344,10 +344,10 @@ There are other useful tags supported by quicktemplate:
       * Combining arbitrary Go files with template files in template packages.
       * Performance optimizations.
 
-  * *What's the difference between quicktemplate and [razor](https://github.com/mgutz/razor)?*
+  * *What's the difference between quicktemplate and [gorazor](https://github.com/sipin/gorazor)?*
 
-    `Razor` is similar to `quicktemplate` in the sense it converts templates into Go code.
+    `Gorazor` is similar to `quicktemplate` in the sense it converts templates into Go code.
     But it mises the following useful features:
 
-      * Clear syntax insead of hard-to-understand `magic` stuff.
+      * Clear syntax insead of hard-to-understand magic stuff.
       * Performance optimizations.
