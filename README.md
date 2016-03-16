@@ -347,7 +347,7 @@ There are other useful tags supported by quicktemplate:
   * *What's the difference between quicktemplate and [gorazor](https://github.com/sipin/gorazor)?*
 
     `Gorazor` is similar to `quicktemplate` in the sense it converts templates into Go code.
-    But it mises the following useful features:
+    But it misses the following useful features:
 
       * Clear syntax insead of hard-to-understand magic stuff.
       * Performance optimizations.
