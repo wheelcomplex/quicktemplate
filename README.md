@@ -233,7 +233,7 @@ There are other useful tags supported by quicktemplate:
         will be collapsed
         unless
         {% space %} or {% newline %} is used
-           for explicit whitspace and newline chars.
+           for explicit whitespace and newline chars.
     {% endcollapsespace %}
     ```
 
