@@ -143,9 +143,11 @@ functions.
 Run `qtc` inside `templates` folder. Now the folder should contain
 two files with Go code: `hello.qtpl.go` and `greetings.qtpl.go`. These files
 form a single `templates` Go package. Template functions and other template
-stuff is shared between template files in a single folder. So `Hello` template
-function may be used inside `greetings.qtpl` while it is defined
-in `hello.qtpl`.
+stuff is shared between template files located in the same folder.
+So `Hello` template function may be used inside `greetings.qtpl` while
+it is defined in `hello.qtpl`.
+Moreover, the folder may contain ordinary Go files and its' contents may
+be used inside templates.
 
 Now put the following code into `main.go`:
 
