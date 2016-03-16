@@ -5,7 +5,7 @@
 
 # quicktemplate
 
-Fast, powerful, yet easy to use html template engine for Go.
+Fast, powerful, yet easy to use template engine for Go.
 Inspired by [mako templates](http://www.makotemplates.org/) philosophy.
 
 
