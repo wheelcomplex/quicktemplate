@@ -351,5 +351,6 @@ There are other useful tags supported by quicktemplate:
     `Gorazor` is similar to `quicktemplate` in the sense it converts templates into Go code.
     But it misses the following useful features:
 
-      * Clear syntax insead of hard-to-understand magic stuff.
+      * Clear syntax insead of hard-to-understand magic stuff related
+        to template arguments and inheritance.
       * Performance optimizations.
