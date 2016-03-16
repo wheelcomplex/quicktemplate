@@ -140,8 +140,8 @@ of template functions. For instance, this file contains Greetings and sayHi
 functions.
 ```
 
-Run `qtc` inside `templates` folder. Now `templates` folder should contain
-two files with Go code: `hello.qtpl.go' and 'greetings.qtpl.go`. These files
+Run `qtc` inside `templates` folder. Now the folder should contain
+two files with Go code: `hello.qtpl.go` and `greetings.qtpl.go`. These files
 form a single `templates` Go package. Template functions and other template
 stuff is shared between template files in a single folder. So `Hello` template
 function may be used inside `greetings.qtpl` while it is defined
