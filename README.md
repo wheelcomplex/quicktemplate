@@ -4,7 +4,10 @@
 [![Go Report](http://goreportcard.com/badge/valyala/quicktemplate)](http://goreportcard.com/report/valyala/quicktemplate)
 
 # quicktemplate
+
 Fast, powerful, yet easy to use html template engine for Go.
+Inspired by [mako templates](http://www.makotemplates.org/) philosophy.
+
 
 # Features
 
@@ -14,7 +17,9 @@ Fast, powerful, yet easy to use html template engine for Go.
     for details.
   * Powerful. Arbitrary Go code may be embedded into and mixed with templates.
     Be careful with this power - do not query db and/or external resources from
-    templates :)
+    templates unless you miss php way in Go :)
+  * Easy to understand template inheritance powered by [Go interfaces](https://golang.org/doc/effective_go.html#interfaces).
+    See [this example](https://github.com/valyala/quicktemplate/tree/master/examples/basicserver) for details.
   * Templates are compiled into a single binary, so there is no need in copying
     template files to the server.
 
