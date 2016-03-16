@@ -1,5 +1,5 @@
 /*
-Package quicktemplate provides fast and powerful html template engine.
+Package quicktemplate provides fast and powerful template engine.
 
 See https://github.com/valyala/quicktemplate for details.
 */
