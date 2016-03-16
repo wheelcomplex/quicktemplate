@@ -61,9 +61,10 @@ See [examples](https://github.com/valyala/quicktemplate/tree/master/examples).
 Let's start with a minimal template example:
 
 ```qtpl
-Hello is a simple template function.
 All the text outside function templates is treated as comments,
 i.e. it is just ignored by quicktemplate compiler (qtc). It is for humans.
+
+Hello is a simple template function.
 {% func Hello(name string) %}
 	Hello, {%s name %}!
 {% endfunc %}
