@@ -211,7 +211,7 @@ There are other useful tags supported by quicktemplate:
     ```qtpl
     {% comment %}
         This is a comment. It won't trap into the output.
-        It may contain {% arbirary tags %}. They are just ignored.
+        It may contain {% arbitrary tags %}. They are just ignored.
     {% endcomment %}
     ```
 
