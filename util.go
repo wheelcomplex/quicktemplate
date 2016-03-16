@@ -1,3 +1,4 @@
+//go:generate qtc -dir=testdata/templates
 package quicktemplate
 
 import (

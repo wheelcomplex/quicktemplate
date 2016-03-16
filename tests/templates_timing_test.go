@@ -1,5 +1,4 @@
-//go:generate qtc -dir=testdata/templates
-package quicktemplate
+package tests
 
 import (
 	"bytes"
@@ -9,11 +8,10 @@ import (
 	"testing"
 
 	"github.com/valyala/quicktemplate"
-
-	"./testdata/templates"
+	"github.com/valyala/quicktemplate/testdata/templates"
 )
 
-var tpl = template.Must(template.ParseFiles("testdata/templates/bench.tpl"))
+var tpl = template.Must(template.ParseFiles("../testdata/templates/bench.tpl"))
 
 func init() {
 	// make sure that both template engines generate the same result
