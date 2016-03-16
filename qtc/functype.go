@@ -44,7 +44,7 @@ func parseFuncDef(b []byte) (*funcType, error) {
 		}
 		ft := expr.(*ast.FuncType)
 		if len(ft.Params.List) != 1 || len(ft.Params.List[0].Names) != 1 {
-			// method reciever must contain only one param
+			// method receiver must contain only one param
 			return nil, fmt.Errorf("missing func or method name")
 		}
 		recvName := ft.Params.List[0].Names[0].Name
