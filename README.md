@@ -27,6 +27,8 @@ Inspired by [mako templates](http://www.makotemplates.org/) philosophy.
 
   * Templates cannot be updated on the fly on the server, since they
     are compiled into a single binary.
+    Take a look at [fasttemplate](https://github.com/valyala/fasttemplate)
+    if you need fast template engine for simple dynamically updated templates.
 
 # Performance comparison with html/template
 
