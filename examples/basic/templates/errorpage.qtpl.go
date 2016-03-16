@@ -22,83 +22,56 @@ var (
 
 //line templates/errorpage.qtpl:4
 type ErrorPage struct {
+	// inherit from base page, so its' title is used in error page.
+	BasePage
+
 	// error path
 	Path []byte
 }
 
-//line templates/errorpage.qtpl:11
-func (p *ErrorPage) StreamTitle(qw *quicktemplate.Writer) {
-	//line templates/errorpage.qtpl:11
-	qw.N().S(`
-	Error
-`)
-//line templates/errorpage.qtpl:13
-}
-
-//line templates/errorpage.qtpl:13
-func (p *ErrorPage) WriteTitle(qww io.Writer) {
-	//line templates/errorpage.qtpl:13
-	qw := quicktemplate.AcquireWriter(qww)
-	//line templates/errorpage.qtpl:13
-	p.StreamTitle(qw)
-	//line templates/errorpage.qtpl:13
-	quicktemplate.ReleaseWriter(qw)
-//line templates/errorpage.qtpl:13
-}
-
-//line templates/errorpage.qtpl:13
-func (p *ErrorPage) Title() string {
-	//line templates/errorpage.qtpl:13
-	qb := quicktemplate.AcquireByteBuffer()
-	//line templates/errorpage.qtpl:13
-	p.WriteTitle(qb)
-	//line templates/errorpage.qtpl:13
-	qs := string(qb.B)
-	//line templates/errorpage.qtpl:13
-	quicktemplate.ReleaseByteBuffer(qb)
-	//line templates/errorpage.qtpl:13
-	return qs
-//line templates/errorpage.qtpl:13
-}
-
-//line templates/errorpage.qtpl:16
+//line templates/errorpage.qtpl:14
 func (p *ErrorPage) StreamBody(qw *quicktemplate.Writer) {
-	//line templates/errorpage.qtpl:16
+	//line templates/errorpage.qtpl:14
 	qw.N().S(`
 	<h1>Error page</h1>
 	</div>
 		Unsupported path <b>`)
-	//line templates/errorpage.qtpl:19
+	//line templates/errorpage.qtpl:17
 	qw.E().Z(p.Path)
-	//line templates/errorpage.qtpl:19
+	//line templates/errorpage.qtpl:17
 	qw.N().S(`</b>.
 	</div>
+	Base page body: `)
+	//line templates/errorpage.qtpl:19
+	p.BasePage.StreamBody(qw)
+	//line templates/errorpage.qtpl:19
+	qw.N().S(`
 `)
-//line templates/errorpage.qtpl:21
+//line templates/errorpage.qtpl:20
 }
 
-//line templates/errorpage.qtpl:21
+//line templates/errorpage.qtpl:20
 func (p *ErrorPage) WriteBody(qww io.Writer) {
-	//line templates/errorpage.qtpl:21
+	//line templates/errorpage.qtpl:20
 	qw := quicktemplate.AcquireWriter(qww)
-	//line templates/errorpage.qtpl:21
+	//line templates/errorpage.qtpl:20
 	p.StreamBody(qw)
-	//line templates/errorpage.qtpl:21
+	//line templates/errorpage.qtpl:20
 	quicktemplate.ReleaseWriter(qw)
-//line templates/errorpage.qtpl:21
+//line templates/errorpage.qtpl:20
 }
 
-//line templates/errorpage.qtpl:21
+//line templates/errorpage.qtpl:20
 func (p *ErrorPage) Body() string {
-	//line templates/errorpage.qtpl:21
+	//line templates/errorpage.qtpl:20
 	qb := quicktemplate.AcquireByteBuffer()
-	//line templates/errorpage.qtpl:21
+	//line templates/errorpage.qtpl:20
 	p.WriteBody(qb)
-	//line templates/errorpage.qtpl:21
+	//line templates/errorpage.qtpl:20
 	qs := string(qb.B)
-	//line templates/errorpage.qtpl:21
+	//line templates/errorpage.qtpl:20
 	quicktemplate.ReleaseByteBuffer(qb)
-	//line templates/errorpage.qtpl:21
+	//line templates/errorpage.qtpl:20
 	return qs
-//line templates/errorpage.qtpl:21
+//line templates/errorpage.qtpl:20
 }

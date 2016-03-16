@@ -62,7 +62,7 @@ and run [qtc](https://github.com/valyala/quicktemplate/tree/master/qtc)
 inside this folder. `qtc` may be installed by issuing:
 
 ```
-go get -u github.com/valyala/quicktemplate/...
+go get -u github.com/valyala/quicktemplate/qtc
 ```
 
 If all went ok, `hello.qtpl.go` file must appear in the `templates` folder.

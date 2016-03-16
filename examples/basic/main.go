@@ -6,7 +6,7 @@
 //
 //     go get -u github.com/valyala/quicktemplate/qtc
 //
-//go:generate qtc
+//go:generate qtc -dir=templates
 package main
 
 import (
@@ -16,7 +16,7 @@ import (
 
 	"github.com/valyala/fasthttp"
 
-	"github.com/valyala/quicktemplate/examples/basic/templates"
+	"./templates"
 )
 
 func main() {
@@ -43,7 +43,7 @@ func mainPageHandler(ctx *fasthttp.RequestCtx) {
 	p := &templates.MainPage{
 		CTX: ctx,
 	}
-	templates.WritePage(ctx, p)
+	templates.WritePageTemplate(ctx, p)
 }
 
 func tablePageHandler(ctx *fasthttp.RequestCtx) {
@@ -54,14 +54,14 @@ func tablePageHandler(ctx *fasthttp.RequestCtx) {
 	p := &templates.TablePage{
 		Rows: generateRows(rowsCount),
 	}
-	templates.WritePage(ctx, p)
+	templates.WritePageTemplate(ctx, p)
 }
 
 func errorPageHandler(ctx *fasthttp.RequestCtx) {
 	p := &templates.ErrorPage{
 		Path: ctx.Path(),
 	}
-	templates.WritePage(ctx, p)
+	templates.WritePageTemplate(ctx, p)
 	ctx.SetStatusCode(fasthttp.StatusBadRequest)
 }
 

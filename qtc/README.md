@@ -7,6 +7,6 @@ have `.qtpl` extension.
 # Usage
 
 ```
-$ go get -u github.com/valyala/quicktemplate/...
+$ go get -u github.com/valyala/quicktemplate/qtc
 $ qtc -h
 ```
