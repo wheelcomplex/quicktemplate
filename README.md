@@ -57,6 +57,8 @@ Let's start with a minimal template example:
 
 ```qtpl
 Hello is a simple template function.
+All the text outside function templates is treated as comments,
+i.e. it is just ignored by quicktemplate compiler (qtc). It is for humans.
 {% func Hello(name string) %}
 	Hello, {%s name %}!
 {% endfunc %}
@@ -121,7 +123,7 @@ It also greets John differently comparing to others.
 			I'm tired to greet so many people...
 			{% break %}
 		{% elseif name == "John" %}
-			{%= sayHi("John") %}
+			{%= sayHi("Mr. " + name) %}
 		{% else %}
 			{%= Hello(name) %}
 		{% endif %}
@@ -132,9 +134,19 @@ sayHi is unexported, since it starts with lowercase letter.
 {% func sayHi(name string) %}
 	Hi, {%s name %}
 {% endfunc %}
+
+Note that every template file may contain arbitrary number
+of template functions. For instance, this file contains Greetings and sayHi
+functions.
 ```
 
-Run `qtc` inside `templates` folder - it should create `greetings.qtpl.go`.
+Run `qtc` inside `templates` folder. Now `templates` folder should contain
+two files with Go code: `hello.qtpl.go' and 'greetings.qtpl.go`. These files
+form a single `templates` Go package. Template functions and other template
+stuff is shared between template files in a single folder. So `Hello` template
+function may be used inside `greetings.qtpl` while it is defined
+in `hello.qtpl`.
+
 Now put the following code into `main.go`:
 
 ```go
@@ -194,10 +206,37 @@ FmtFunc uses fmt.Sprintf() inside output tag
 
 There are other useful tags supported by quicktemplate:
 
-  * `{% comment %}This is a comment and won't trap into the output{% endcomment %}`
-  * `{% plain %}This will {% trap into %} {% the %} output {% unmodified %}{% endplain %}`
-  * `{% collapsespace %}   Space between   {%s " tags " %}   will be collapsed.  {% endcollapsespace %}`
-  * `{% collapsespace %}{% space %}{% newline %}This is prepended with space and newline   {% endcollapsespace %}`
+  * `{% comment %}`
+
+    ```qtpl
+    {% comment %}
+        This is a comment and won't trap into the output.
+        It may contain {% arbirary tags %}. They are just ignored.
+    {% endcomment %}
+    ```
+
+  * `{% plain %}`
+
+  ```qtpl
+      {% plain %}
+          Tags will {% trap into %} the output {% unmodified %}.
+          Plain block may contain invalid and {% incomplete tags.
+      {% endplain %}
+    ```
+
+  * `{% collapsespace %}`
+
+    ```qtpl
+    {% collapsespace %}
+        Space between
+                {%s " tags " %}
+        will be collapsed
+        unless
+        {% space %} or {% newline %} is used
+           for explicit whitspace and newline chars.
+    {% endcollapsespace %}
+    ```
+
   * `{% code %}`:
 
     ```qtpl
@@ -232,7 +271,83 @@ There are other useful tags supported by quicktemplate:
         Footer()
     }
     %}
+
+    PrintPage prints Page
+    {% func PrintPage(p Page) %}
+        <html>
+            <head><title>{%= p.Title() %}</title></head>
+            <body>
+                <div>{%= p.Body("foo", 42) %}</div>
+                <div>{%= p.Footer() %}</div>
+            </body>
+        </html>
+    {% endfunc %}
+
+    Base page implementatin
+    {% code
+    type BasePage struct {
+        Title string
+        Footer string
+    }
+    %}
+    {% func (bp *BasePage) Title() %}{%s bp.Title %}{% endfunc %}
+    {% func (bp *BasePage) Body(s string, n int) %}
+        <b>s={%q s %}, n={%d n %}</b>
+    {% endfunc %}
+    {% func (bp *BasePage) Footer() %}{%s bp.Footer %}{% endfunc %}
+
+    Main page implementation
+    {% code
+    type MainPage struct {
+        // inherit from BasePage
+        BasePage
+
+        // real body for main page
+        Body string
+    }
+
+    Override only Body
+    Title and Footer are used from BasePage.
+    {% func (mp *MainPage) Body(s string, n int) %}
+        <div>
+            main body: {%s mp.Body %}
+        </div>
+        <div>
+            base body: {%= mp.BasePage.Body(s, n) %}
+        </div>
+    {% endfunc %}
     ```
 
     See [basicserver example](https://github.com/valyala/quicktemplate/tree/master/examples/basicserver)
-    for details.
+    for more details.
+
+
+# FAQ
+
+  * *Why quicktemplate syntax is incompatible with [html/template](https://golang.org/pkg/html/template/)?*
+
+    Because `html/template` syntax isn't expressive enough for `quicktemplate`.
+
+  * *What's the difference between quicktemplate and [ego](https://github.com/benbjohnson/ego)?*
+
+    `Ego` is similar to `quicktemplate` in the sense it converts templates into Go code.
+    But it misses the following stuff, which makes `quicktemplate` so powerful
+    and easy to use:
+
+      * Defining multiple function templates in a single template file.
+      * Embedding function templates inside other function templates.
+      * Template interfaces, inheritance and overriding.
+        See [this example](https://github.com/valyala/quicktemplate/tree/master/examples/basicserver)
+        for details.
+      * Top-level comments outside function templates.
+      * Template packages.
+      * Combining arbitrary Go files with template files in template packages.
+      * Performance optimizations.
+
+  * *What's the difference between quicktemplate and [razor](https://github.com/mgutz/razor)?*
+
+    `Razor` is similar to `quicktemplate` in the sense it converts templates into Go code.
+    But it mises the following useful features:
+
+      * Clear syntax insead of hard-to-understand `magic` stuff.
+      * Performance optimizations.
