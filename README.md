@@ -238,13 +238,39 @@ There are other useful tags supported by quicktemplate:
 
     ```qtpl
     {% collapsespace %}
-        Space between
-                {%s " tags " %}
-        will be collapsed
-        unless
-        {% space %} or {% newline %} is used
-           for explicit whitespace and newline chars.
+        <div>
+            <div>space between lines</div>
+               and {%s " tags" %}
+             <div>is collapsed into a single space
+             unless{% newline %}or{% space %}is used</div>
+        </div>
     {% endcollapsespace %}
+    ```
+
+    Is converted into
+
+    ```
+    <div> <div>space between lines</div> and tags<div>is collapsed into a single space unless
+    or is used</div> </div>
+    ```
+
+  * `{% stripspace %}`
+
+    ```qtpl
+    {% stripspace %}
+         <div>
+             <div>space between lines</div>
+                and {%s " tags" %}
+             <div>is removed unless{% newline %}or{% space %}is used</div>
+         </div>
+    {% endstripspace %}
+    ```
+
+    Is converted into
+
+    ```
+    <div><div>space between lines</div>and tags<div>is removed unless
+    or is used</div></div>
     ```
 
   * `{% code %}`:

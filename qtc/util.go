@@ -21,6 +21,14 @@ func stripTrailingSpace(b []byte) []byte {
 }
 
 func collapseSpace(b []byte) []byte {
+	return stripSpaceExt(b, true)
+}
+
+func stripSpace(b []byte) []byte {
+	return stripSpaceExt(b, false)
+}
+
+func stripSpaceExt(b []byte, isCollapse bool) []byte {
 	if len(b) == 0 {
 		return b
 	}
@@ -43,9 +51,11 @@ func collapseSpace(b []byte) []byte {
 			continue
 		}
 		dst = append(dst, z...)
-		dst = append(dst, ' ')
+		if isCollapse {
+			dst = append(dst, ' ')
+		}
 	}
-	if len(dst) > 0 {
+	if isCollapse && len(dst) > 0 {
 		dst = dst[:len(dst)-1]
 	}
 	return dst

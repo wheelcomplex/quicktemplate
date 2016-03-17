@@ -6,6 +6,43 @@ import (
 	"testing"
 )
 
+func TestScannerStripspaceSuccess(t *testing.T) {
+	testScannerSuccess(t, "  aa\n\t {%stripspace%} \t\n  f\too \n   b  ar \n\r\t {%  bar baz  asd %}\n\nbaz \n\t \taaa  \n{%endstripspace%} bb  ", []tt{
+		{ID: text, Value: "  aa\n\t "},
+		{ID: text, Value: "f\toob  ar"},
+		{ID: tagName, Value: "bar"},
+		{ID: tagContents, Value: "baz  asd"},
+		{ID: text, Value: "bazaaa"},
+		{ID: text, Value: " bb  "},
+	})
+	testScannerSuccess(t, "{%stripspace  %}{% stripspace fobar %} {%space%}  a\taa\n\r\t bb  b  {%endstripspace  %}  {%endstripspace  baz%}", []tt{
+		{ID: text, Value: " "},
+		{ID: text, Value: "a\taabb  b"},
+	})
+
+	// sripspace wins over collapsespace
+	testScannerSuccess(t, "{%stripspace%} {%collapsespace%}foo\n\t bar{%endcollapsespace%} \r\n\t {%endstripspace%}", []tt{
+		{ID: text, Value: "foobar"},
+	})
+}
+
+func TestScannerStripspaceFailure(t *testing.T) {
+	// incomplete stripspace tag
+	testScannerFailure(t, "{%stripspace   ")
+
+	// incomplete endstripspace tag
+	testScannerFailure(t, "{%stripspace%}aaa{%endstripspace")
+
+	// missing endstripspace
+	testScannerFailure(t, "{%stripspace%} foobar")
+
+	// missing stripspace
+	testScannerFailure(t, "aaa{%endstripspace%}")
+
+	// missing the second endstripspace
+	testScannerFailure(t, "{%stripspace%}{%stripspace%}aaaa{%endstripspace%}")
+}
+
 func TestScannerCollapsespaceSuccess(t *testing.T) {
 	testScannerSuccess(t, "  aa\n\t {%collapsespace%} \t\n  foo \n   bar{%  bar baz  asd %}\n\nbaz \n   \n{%endcollapsespace%} bb  ", []tt{
 		{ID: text, Value: "  aa\n\t "},
