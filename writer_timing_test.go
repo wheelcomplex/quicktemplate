@@ -46,6 +46,20 @@ func BenchmarkQWriterQ(b *testing.B) {
 	})
 }
 
+func BenchmarkQWriterJ(b *testing.B) {
+	s := createTestS(100)
+	b.RunParallel(func(pb *testing.PB) {
+		var w QWriter
+		bb := AcquireByteBuffer()
+		w.w = bb
+		for pb.Next() {
+			w.J(s)
+			bb.Reset()
+		}
+		ReleaseByteBuffer(bb)
+	})
+}
+
 func BenchmarkQWriterF(b *testing.B) {
 	f := 123.456
 	b.RunParallel(func(pb *testing.PB) {

@@ -301,7 +301,7 @@ func (p *parser) tryParseCommonTags(tagBytes []byte) (bool, error) {
 	s := p.s
 	tagNameStr := string(tagBytes)
 	switch tagNameStr {
-	case "s", "v", "d", "f", "q", "z", "s=", "v=", "d=", "f=", "q=", "z=":
+	case "s", "v", "d", "f", "q", "z", "j", "s=", "v=", "d=", "f=", "q=", "z=", "j=":
 		t, err := expectTagContents(s)
 		if err != nil {
 			return false, err
@@ -312,7 +312,7 @@ func (p *parser) tryParseCommonTags(tagBytes []byte) (bool, error) {
 		filter := "N()."
 		if len(tagNameStr) == 1 {
 			switch tagNameStr {
-			case "s", "v", "q", "z":
+			case "s", "v", "q", "z", "j":
 				filter = "E()."
 			}
 		} else {

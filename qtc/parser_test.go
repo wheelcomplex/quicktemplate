@@ -22,6 +22,9 @@ func TestParseOutputTagSuccess(t *testing.T) {
 
 	// map
 	testParseSuccess(t, `{%func f()%}{%v map[int]string{1:"foo", 2:"bar"} %}{%endfunc%}`)
+
+	// jsons-safe string
+	testParseSuccess(t, `{% func f() %}{%j "foo\nbar" %}{%endfunc%}`)
 }
 
 func TestParseOutputTagFailure(t *testing.T) {
