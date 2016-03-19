@@ -15,5 +15,4 @@ script:
   - gox -os="freebsd"
 
   # run tests on a standard platform
-  - go test -v .
-  - go test -v ./qtc
+  - go test -v ./...
