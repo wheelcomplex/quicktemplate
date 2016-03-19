@@ -8,7 +8,7 @@ import (
 )
 
 func TestIntegration(t *testing.T) {
-	expectedS, err := ioutil.ReadFile("testdata/templates/integration.qtpl.out")
+	expectedS, err := ioutil.ReadFile("../testdata/templates/integration.qtpl.out")
 	if err != nil {
 		t.Fatalf("unexpected error: %s", err)
 	}
