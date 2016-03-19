@@ -48,9 +48,6 @@ func parseFuncDef(b []byte) (*funcType, error) {
 			return nil, fmt.Errorf("missing func or method name")
 		}
 		recvName := ft.Params.List[0].Names[0].Name
-		if isReservedArgName(recvName) {
-			return nil, fmt.Errorf("arg name %q is reserved. Use another name", recvName)
-		}
 		defPrefix = fmt.Sprintf("(%s) ", recvStr)
 		callPrefix = recvName + "."
 
@@ -90,9 +87,6 @@ func parseFuncDef(b []byte) (*funcType, error) {
 		for _, n := range f.Names {
 			if n == nil {
 				return nil, fmt.Errorf("func cannot contain untyped arguments")
-			}
-			if isReservedArgName(n.Name) {
-				return nil, fmt.Errorf("arg name %q is reserved. Use other name", n.Name)
 			}
 			tmp = append(tmp, n.Name)
 		}
@@ -204,8 +198,4 @@ func getCallName(ce *ast.CallExpr) (string, string, error) {
 			return "", "", fmt.Errorf("unexpected function name")
 		}
 	}
-}
-
-func isReservedArgName(name string) bool {
-	return name == "qww" || name == "qw" || name == "qb" || name == "qs"
 }

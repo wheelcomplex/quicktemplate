@@ -320,7 +320,7 @@ func (p *parser) tryParseCommonTags(tagBytes []byte) (bool, error) {
 			tagNameStr = tagNameStr[:len(tagNameStr)-1]
 		}
 		tagNameStr = strings.ToUpper(tagNameStr)
-		p.Printf("qw.%s%s(%s)", filter, tagNameStr, t.Value)
+		p.Printf("qw422016.%s%s(%s)", filter, tagNameStr, t.Value)
 	case "=":
 		t, err := expectTagContents(s)
 		if err != nil {
@@ -330,7 +330,7 @@ func (p *parser) tryParseCommonTags(tagBytes []byte) (bool, error) {
 		if err != nil {
 			return false, fmt.Errorf("error at %s: %s", s.Context(), err)
 		}
-		p.Printf("%s", f.CallStream("qw"))
+		p.Printf("%s", f.CallStream("qw422016"))
 	case "return":
 		if err := p.skipAfterTag("return"); err != nil {
 			return false, err
@@ -440,8 +440,8 @@ func (p *parser) parseInterface() error {
 			return fmt.Errorf("when when parsing %q at %s: %s", methodStr, s.Context(), err)
 		}
 		p.Printf("%s string", methodStr)
-		p.Printf("%s", f.DefStream("qw"))
-		p.Printf("%s", f.DefWrite("qww"))
+		p.Printf("%s", f.DefStream("qw422016"))
+		p.Printf("%s", f.DefWrite("qq422016"))
 	}
 	p.prefix = ""
 	p.Printf("}")
@@ -491,17 +491,17 @@ func (p *parser) emitText(text []byte) {
 	for len(text) > 0 {
 		n := bytes.IndexByte(text, '`')
 		if n < 0 {
-			p.Printf("qw.N().S(`%s`)", text)
+			p.Printf("qw422016.N().S(`%s`)", text)
 			return
 		}
-		p.Printf("qw.N().S(`%s`)", text[:n])
-		p.Printf("qw.N().S(\"`\")")
+		p.Printf("qw422016.N().S(`%s`)", text[:n])
+		p.Printf("qw422016.N().S(\"`\")")
 		text = text[n+1:]
 	}
 }
 
 func (p *parser) emitFuncStart(f *funcType) {
-	p.Printf("func %s {", f.DefStream("qw"))
+	p.Printf("func %s {", f.DefStream("qw422016"))
 	p.prefix = "\t"
 }
 
@@ -509,21 +509,21 @@ func (p *parser) emitFuncEnd(f *funcType) {
 	p.prefix = ""
 	p.Printf("}\n")
 
-	p.Printf("func %s {", f.DefWrite("qww"))
+	p.Printf("func %s {", f.DefWrite("qq422016"))
 	p.prefix = "\t"
-	p.Printf("qw := qt422016.AcquireWriter(qww)")
-	p.Printf("%s", f.CallStream("qw"))
-	p.Printf("qt422016.ReleaseWriter(qw)")
+	p.Printf("qw422016 := qt422016.AcquireWriter(qq422016)")
+	p.Printf("%s", f.CallStream("qw422016"))
+	p.Printf("qt422016.ReleaseWriter(qw422016)")
 	p.prefix = ""
 	p.Printf("}\n")
 
 	p.Printf("func %s {", f.DefString())
 	p.prefix = "\t"
-	p.Printf("qb := qt422016.AcquireByteBuffer()")
-	p.Printf("%s", f.CallWrite("qb"))
-	p.Printf("qs := string(qb.B)")
-	p.Printf("qt422016.ReleaseByteBuffer(qb)")
-	p.Printf("return qs")
+	p.Printf("qb422016 := qt422016.AcquireByteBuffer()")
+	p.Printf("%s", f.CallWrite("qb422016"))
+	p.Printf("qs422016 := string(qb422016.B)")
+	p.Printf("qt422016.ReleaseByteBuffer(qb422016)")
+	p.Printf("return qs422016")
 	p.prefix = ""
 	p.Printf("}\n")
 }

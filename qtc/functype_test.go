@@ -6,19 +6,19 @@ import (
 
 func TestParseFuncCallSuccess(t *testing.T) {
 	// func without args
-	testParseFuncCallSuccess(t, "f()", "streamf(qw)")
+	testParseFuncCallSuccess(t, "f()", "streamf(qw422016)")
 
 	// func with args
-	testParseFuncCallSuccess(t, "Foo(a, b)", "StreamFoo(qw, a, b)")
+	testParseFuncCallSuccess(t, "Foo(a, b)", "StreamFoo(qw422016, a, b)")
 
 	// method without args
-	testParseFuncCallSuccess(t, "a.f()", "a.streamf(qw)")
+	testParseFuncCallSuccess(t, "a.f()", "a.streamf(qw422016)")
 
 	// method with args
-	testParseFuncCallSuccess(t, "a.f(xx)", "a.streamf(qw, xx)")
+	testParseFuncCallSuccess(t, "a.f(xx)", "a.streamf(qw422016, xx)")
 
 	// chained method
-	testParseFuncCallSuccess(t, "foo.bar.Baz(x, y)", "foo.bar.StreamBaz(qw, x, y)")
+	testParseFuncCallSuccess(t, "foo.bar.Baz(x, y)", "foo.bar.StreamBaz(qw422016, x, y)")
 
 	// complex args
 	testParseFuncCallSuccess(t, `as.ffs.SS(
@@ -29,8 +29,8 @@ func TestParseFuncCallSuccess(t *testing.T) {
 			"foo":1,
 			"bar":2,
 		},
-		qwe)`,
-		`as.ffs.StreamSS(qw, 
+		qawe)`,
+		`as.ffs.StreamSS(qw422016, 
 		func(x int, y string) {
 			panic("foobar")
 		},
@@ -38,7 +38,7 @@ func TestParseFuncCallSuccess(t *testing.T) {
 			"foo":1,
 			"bar":2,
 		},
-		qwe)`)
+		qawe)`)
 }
 
 func TestParseFuncCallFailure(t *testing.T) {
@@ -73,7 +73,7 @@ func testParseFuncCallSuccess(t *testing.T, s, callStream string) {
 	if err != nil {
 		t.Fatalf("unexpected error when parsing %q: %s", s, err)
 	}
-	cs := f.CallStream("qw")
+	cs := f.CallStream("qw422016")
 	if cs != callStream {
 		t.Fatalf("unexpected CallStream: %q. Expecting %q. s=%q", cs, callStream, s)
 	}
@@ -82,28 +82,28 @@ func testParseFuncCallSuccess(t *testing.T, s, callStream string) {
 func TestParseFuncDefSuccess(t *testing.T) {
 	// private func without args
 	testParseFuncDefSuccess(t, "xx()", "xx() string",
-		"streamxx(qw *qt422016.Writer)", "streamxx(qw)",
-		"writexx(qww qtio422016.Writer)", "writexx(qww)")
+		"streamxx(qw422016 *qt422016.Writer)", "streamxx(qw422016)",
+		"writexx(qq422016 qtio422016.Writer)", "writexx(qq422016)")
 
 	// public func with a single arg
 	testParseFuncDefSuccess(t, "F(a int)", "F(a int) string",
-		"StreamF(qw *qt422016.Writer, a int)", "StreamF(qw, a)",
-		"WriteF(qww qtio422016.Writer, a int)", "WriteF(qww, a)")
+		"StreamF(qw422016 *qt422016.Writer, a int)", "StreamF(qw422016, a)",
+		"WriteF(qq422016 qtio422016.Writer, a int)", "WriteF(qq422016, a)")
 
 	// public method without args
 	testParseFuncDefSuccess(t, "(f *foo) M()", "(f *foo) M() string",
-		"(f *foo) StreamM(qw *qt422016.Writer)", "f.StreamM(qw)",
-		"(f *foo) WriteM(qww qtio422016.Writer)", "f.WriteM(qww)")
+		"(f *foo) StreamM(qw422016 *qt422016.Writer)", "f.StreamM(qw422016)",
+		"(f *foo) WriteM(qq422016 qtio422016.Writer)", "f.WriteM(qq422016)")
 
 	// private method with three args
 	testParseFuncDefSuccess(t, "(f *Foo) bar(x, y string, z int)", "(f *Foo) bar(x, y string, z int) string",
-		"(f *Foo) streambar(qw *qt422016.Writer, x, y string, z int)", "f.streambar(qw, x, y, z)",
-		"(f *Foo) writebar(qww qtio422016.Writer, x, y string, z int)", "f.writebar(qww, x, y, z)")
+		"(f *Foo) streambar(qw422016 *qt422016.Writer, x, y string, z int)", "f.streambar(qw422016, x, y, z)",
+		"(f *Foo) writebar(qq422016 qtio422016.Writer, x, y string, z int)", "f.writebar(qq422016, x, y, z)")
 
 	// method with complex args
 	testParseFuncDefSuccess(t, "(t TPL) Head(h1, h2 func(x, y int), h3 map[int]struct{})", "(t TPL) Head(h1, h2 func(x, y int), h3 map[int]struct{}) string",
-		"(t TPL) StreamHead(qw *qt422016.Writer, h1, h2 func(x, y int), h3 map[int]struct{})", "t.StreamHead(qw, h1, h2, h3)",
-		"(t TPL) WriteHead(qww qtio422016.Writer, h1, h2 func(x, y int), h3 map[int]struct{})", "t.WriteHead(qww, h1, h2, h3)")
+		"(t TPL) StreamHead(qw422016 *qt422016.Writer, h1, h2 func(x, y int), h3 map[int]struct{})", "t.StreamHead(qw422016, h1, h2, h3)",
+		"(t TPL) WriteHead(qq422016 qtio422016.Writer, h1, h2 func(x, y int), h3 map[int]struct{})", "t.WriteHead(qq422016, h1, h2, h3)")
 }
 
 func TestParseFuncDefFailure(t *testing.T) {
@@ -121,13 +121,6 @@ func TestParseFuncDefFailure(t *testing.T) {
 	// missing method name
 	testParseFuncDefFailure(t, "(x XX) ()")
 	testParseFuncDefFailure(t, "(x XX) (y, z string)")
-
-	// reserved variable name
-	testParseFuncDefFailure(t, "f(qww []byte)")
-	testParseFuncDefFailure(t, "f(qw int)")
-	testParseFuncDefFailure(t, "(qs *Soo) f()")
-	testParseFuncDefFailure(t, "(qb Boo) f()")
-	testParseFuncDefFailure(t, "(x XX) f(qww int, qw string)")
 
 	// func with return values
 	testParseFuncDefFailure(t, "f() string")
@@ -152,19 +145,19 @@ func testParseFuncDefSuccess(t *testing.T, s, defString, defStream, callStream, 
 	if ds != defString {
 		t.Fatalf("unexpected DefString: %q. Expecting %q. s=%q", ds, defString, s)
 	}
-	ds = f.DefStream("qw")
+	ds = f.DefStream("qw422016")
 	if ds != defStream {
 		t.Fatalf("unexpected DefStream: %q. Expecting %q. s=%q", ds, defStream, s)
 	}
-	cs := f.CallStream("qw")
+	cs := f.CallStream("qw422016")
 	if cs != callStream {
 		t.Fatalf("unexpected CallStream: %q. Expecting %q. s=%q", cs, callStream, s)
 	}
-	dw := f.DefWrite("qww")
+	dw := f.DefWrite("qq422016")
 	if dw != defWrite {
 		t.Fatalf("unexpected DefWrite: %q. Expecting %q. s=%q", dw, defWrite, s)
 	}
-	cw := f.CallWrite("qww")
+	cw := f.CallWrite("qq422016")
 	if cw != callWrite {
 		t.Fatalf("unexpected CallWrite: %q. Expecting %q. s=%q", cw, callWrite, s)
 	}
