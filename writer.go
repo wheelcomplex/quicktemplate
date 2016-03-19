@@ -91,7 +91,7 @@ func (w *QWriter) F(f float64) {
 // Q writes quoted json-safe s to w.
 func (w *QWriter) Q(s string) {
 	bb := AcquireByteBuffer()
-	bb.B = strconv.AppendQuote(bb.B, s)
+	bb.B = appendJSONString(bb.B, s)
 	w.w.Write(bb.B)
 	ReleaseByteBuffer(bb)
 }
@@ -101,7 +101,7 @@ func (w *QWriter) Q(s string) {
 // Unlike Q it doesn't qoute resulting s.
 func (w *QWriter) J(s string) {
 	bb := AcquireByteBuffer()
-	bb.B = strconv.AppendQuote(bb.B, s)
+	bb.B = appendJSONString(bb.B, s)
 	w.w.Write(bb.B[1 : len(bb.B)-1])
 	ReleaseByteBuffer(bb)
 }
