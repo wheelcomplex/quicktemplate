@@ -25,6 +25,7 @@ func TestWriter(t *testing.T) {
 	wn.Q("foo")
 	wn.J("ds")
 	wn.F(1.23)
+	wn.U("абв")
 	we.V(struct{}{})
 
 	we.S("<a></a>")
@@ -33,11 +34,12 @@ func TestWriter(t *testing.T) {
 	we.Q("foo")
 	we.J("ds")
 	we.F(1.23)
+	we.U("абв")
 	we.V(struct{}{})
 
 	ReleaseWriter(qw)
 
-	expectedS := `<a></a>123'"foo"ds1.23{}&lt;a&gt;&lt;/a&gt;321&#39;&quot;foo&quot;ds1.23{}`
+	expectedS := `<a></a>123'"foo"ds1.23%D0%B0%D0%B1%D0%B2{}&lt;a&gt;&lt;/a&gt;321&#39;&quot;foo&quot;ds1.23%D0%B0%D0%B1%D0%B2{}`
 	if string(bb.B) != expectedS {
 		t.Fatalf("unexpected output: %q. Expecting %q", bb.B, expectedS)
 	}
