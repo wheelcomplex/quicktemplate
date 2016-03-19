@@ -144,26 +144,26 @@ func StreamIntegration(qw *quicktemplate.Writer) {
 
 	`)
 	//line testdata/templates/integration.qtpl:49
-	qw.N().S(`Collapse space`)
+	qw.N().S(`Collapse space `)
 	//line testdata/templates/integration.qtpl:50
 	qw.N().S(` `)
 	//line testdata/templates/integration.qtpl:50
-	qw.N().S(`between`)
+	qw.N().S(`between `)
 	//line testdata/templates/integration.qtpl:51
 	qw.N().S(`
 `)
 	//line testdata/templates/integration.qtpl:51
-	qw.N().S(`lines and tags`)
+	qw.N().S(`lines and tags `)
 	//line testdata/templates/integration.qtpl:57
 	for _, s := range []string{"foo", "bar", "baz"} {
 		//line testdata/templates/integration.qtpl:58
 		if s == "bar" {
 			//line testdata/templates/integration.qtpl:58
-			qw.N().S(`Bar`)
+			qw.N().S(`Bar `)
 			//line testdata/templates/integration.qtpl:60
 		} else if s == "baz" {
 			//line testdata/templates/integration.qtpl:60
-			qw.N().S(`Baz`)
+			qw.N().S(`Baz `)
 			//line testdata/templates/integration.qtpl:62
 			break
 			//line testdata/templates/integration.qtpl:63
@@ -175,7 +175,7 @@ func StreamIntegration(qw *quicktemplate.Writer) {
 				//line testdata/templates/integration.qtpl:66
 			}
 			//line testdata/templates/integration.qtpl:66
-			qw.N().S(`s =`)
+			qw.N().S(`s = `)
 			//line testdata/templates/integration.qtpl:67
 			qw.E().S(s)
 			//line testdata/templates/integration.qtpl:68

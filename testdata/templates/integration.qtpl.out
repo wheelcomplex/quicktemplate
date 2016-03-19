@@ -15,8 +15,8 @@
 		<li>&lt;b&gt;html-escaped `byte slice&lt;/b&gt;</li>
 		<li>Int: 42</li>
 		<li>Float: 3.14</li>
-		<li>&quot;&lt;quoted&gt; \&quot;json\&quot;\n\t\t\t\tstring&quot;</li>
-		<li>alert("foo \&quot;json\&quot;-safe\n\t\t\t\t&lt;string&gt; aa")</li>
+		<li>&quot;\u003cquoted&gt; \&quot;json\&quot;\n\t\t\t\tstring&quot;</li>
+		<li>alert("foo \&quot;json\&quot;-safe\n\t\t\t\t\u003cstring&gt; aa")</li>
 		<li>{&lt;b&gt;foobar`&lt;/b&gt;}</li>
 	</ul>
 
@@ -26,8 +26,8 @@
 		<li><b>html-escaped `byte slice</b></li>
 		<li>Int: 42</li>
 		<li>Float: 3.14</li>
-		<li>"<quoted> \"json\"\n\t\t\t\tstring"</li>
-		<li>alert("foo \"json\"-safe\n\t\t\t\t<string> aa")</li>
+		<li>"\u003cquoted> \"json\"\n\t\t\t\tstring"</li>
+		<li>alert("foo \"json\"-safe\n\t\t\t\t\u003cstring> aa")</li>
 		<li>{<b>foobar`</b>}</li>
 	</ul>
 
