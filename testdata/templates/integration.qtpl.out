@@ -5,7 +5,7 @@
 	Embedded func template: 
 	Page's header: Header
 	Body: 
-	S=&quot;foobar&quot;
+	S=<b>&quot;foobar&quot;</b>
 
 
 

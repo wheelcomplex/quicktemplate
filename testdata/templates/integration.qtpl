@@ -1,6 +1,8 @@
 This is a template for integration test.
 It should contains all the quicktemplate stuff.
 
+{% import "fmt" %}
+
 {% func Integration() %}
 	Output tags` verification.
 
@@ -83,7 +85,7 @@ interface Page {
 
 {% func embeddedFunc(p Page) %}
 	Page's header: {%= p.Header() %}
-	Body: {%s= p.Body() %}
+	Body: {%s= fmt.Sprintf("<b>%s</b>", p.Body()) %}
 {% endfunc %}
 
 {% code
