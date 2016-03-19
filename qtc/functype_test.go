@@ -82,28 +82,28 @@ func testParseFuncCallSuccess(t *testing.T, s, callStream string) {
 func TestParseFuncDefSuccess(t *testing.T) {
 	// private func without args
 	testParseFuncDefSuccess(t, "xx()", "xx() string",
-		"streamxx(qw *quicktemplate.Writer)", "streamxx(qw)",
-		"writexx(qww io.Writer)", "writexx(qww)")
+		"streamxx(qw *qt422016.Writer)", "streamxx(qw)",
+		"writexx(qww qtio422016.Writer)", "writexx(qww)")
 
 	// public func with a single arg
 	testParseFuncDefSuccess(t, "F(a int)", "F(a int) string",
-		"StreamF(qw *quicktemplate.Writer, a int)", "StreamF(qw, a)",
-		"WriteF(qww io.Writer, a int)", "WriteF(qww, a)")
+		"StreamF(qw *qt422016.Writer, a int)", "StreamF(qw, a)",
+		"WriteF(qww qtio422016.Writer, a int)", "WriteF(qww, a)")
 
 	// public method without args
 	testParseFuncDefSuccess(t, "(f *foo) M()", "(f *foo) M() string",
-		"(f *foo) StreamM(qw *quicktemplate.Writer)", "f.StreamM(qw)",
-		"(f *foo) WriteM(qww io.Writer)", "f.WriteM(qww)")
+		"(f *foo) StreamM(qw *qt422016.Writer)", "f.StreamM(qw)",
+		"(f *foo) WriteM(qww qtio422016.Writer)", "f.WriteM(qww)")
 
 	// private method with three args
 	testParseFuncDefSuccess(t, "(f *Foo) bar(x, y string, z int)", "(f *Foo) bar(x, y string, z int) string",
-		"(f *Foo) streambar(qw *quicktemplate.Writer, x, y string, z int)", "f.streambar(qw, x, y, z)",
-		"(f *Foo) writebar(qww io.Writer, x, y string, z int)", "f.writebar(qww, x, y, z)")
+		"(f *Foo) streambar(qw *qt422016.Writer, x, y string, z int)", "f.streambar(qw, x, y, z)",
+		"(f *Foo) writebar(qww qtio422016.Writer, x, y string, z int)", "f.writebar(qww, x, y, z)")
 
 	// method with complex args
 	testParseFuncDefSuccess(t, "(t TPL) Head(h1, h2 func(x, y int), h3 map[int]struct{})", "(t TPL) Head(h1, h2 func(x, y int), h3 map[int]struct{}) string",
-		"(t TPL) StreamHead(qw *quicktemplate.Writer, h1, h2 func(x, y int), h3 map[int]struct{})", "t.StreamHead(qw, h1, h2, h3)",
-		"(t TPL) WriteHead(qww io.Writer, h1, h2 func(x, y int), h3 map[int]struct{})", "t.WriteHead(qww, h1, h2, h3)")
+		"(t TPL) StreamHead(qw *qt422016.Writer, h1, h2 func(x, y int), h3 map[int]struct{})", "t.StreamHead(qw, h1, h2, h3)",
+		"(t TPL) WriteHead(qww qtio422016.Writer, h1, h2 func(x, y int), h3 map[int]struct{})", "t.WriteHead(qww, h1, h2, h3)")
 }
 
 func TestParseFuncDefFailure(t *testing.T) {

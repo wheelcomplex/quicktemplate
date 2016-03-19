@@ -6,9 +6,9 @@ package testdata
 
 //line testdata/test.qtpl:1
 import (
-	"io"
+	qtio422016 "io"
 
-	"github.com/valyala/quicktemplate"
+	qt422016 "github.com/valyala/quicktemplate"
 )
 
 // This is a test template file.
@@ -26,8 +26,8 @@ import (
 
 //line testdata/test.qtpl:12
 var (
-	_ = io.Copy
-	_ = quicktemplate.AcquireByteBuffer
+	_ = qtio422016.Copy
+	_ = qt422016.AcquireByteBuffer
 )
 
 //line testdata/test.qtpl:13
@@ -39,7 +39,7 @@ type FooArgs struct {
 // Now define an exported function template
 
 //line testdata/test.qtpl:20
-func StreamFoo(qw *quicktemplate.Writer, a []FooArgs) {
+func StreamFoo(qw *qt422016.Writer, a []FooArgs) {
 	//line testdata/test.qtpl:20
 	qw.N().S(`
 	<h1>Hello, I'm Foo!</h1>
@@ -156,26 +156,26 @@ func StreamFoo(qw *quicktemplate.Writer, a []FooArgs) {
 }
 
 //line testdata/test.qtpl:57
-func WriteFoo(qww io.Writer, a []FooArgs) {
+func WriteFoo(qww qtio422016.Writer, a []FooArgs) {
 	//line testdata/test.qtpl:57
-	qw := quicktemplate.AcquireWriter(qww)
+	qw := qt422016.AcquireWriter(qww)
 	//line testdata/test.qtpl:57
 	StreamFoo(qw, a)
 	//line testdata/test.qtpl:57
-	quicktemplate.ReleaseWriter(qw)
+	qt422016.ReleaseWriter(qw)
 //line testdata/test.qtpl:57
 }
 
 //line testdata/test.qtpl:57
 func Foo(a []FooArgs) string {
 	//line testdata/test.qtpl:57
-	qb := quicktemplate.AcquireByteBuffer()
+	qb := qt422016.AcquireByteBuffer()
 	//line testdata/test.qtpl:57
 	WriteFoo(qb, a)
 	//line testdata/test.qtpl:57
 	qs := string(qb.B)
 	//line testdata/test.qtpl:57
-	quicktemplate.ReleaseByteBuffer(qb)
+	qt422016.ReleaseByteBuffer(qb)
 	//line testdata/test.qtpl:57
 	return qs
 //line testdata/test.qtpl:57
@@ -184,7 +184,7 @@ func Foo(a []FooArgs) string {
 // Now define private printArgs, which is used in Foo via {%= %} tag
 
 //line testdata/test.qtpl:62
-func streamprintArgs(qw *quicktemplate.Writer, i int, a *FooArgs) {
+func streamprintArgs(qw *qt422016.Writer, i int, a *FooArgs) {
 	//line testdata/test.qtpl:62
 	qw.N().S(`
 	`)
@@ -234,26 +234,26 @@ func streamprintArgs(qw *quicktemplate.Writer, i int, a *FooArgs) {
 }
 
 //line testdata/test.qtpl:75
-func writeprintArgs(qww io.Writer, i int, a *FooArgs) {
+func writeprintArgs(qww qtio422016.Writer, i int, a *FooArgs) {
 	//line testdata/test.qtpl:75
-	qw := quicktemplate.AcquireWriter(qww)
+	qw := qt422016.AcquireWriter(qww)
 	//line testdata/test.qtpl:75
 	streamprintArgs(qw, i, a)
 	//line testdata/test.qtpl:75
-	quicktemplate.ReleaseWriter(qw)
+	qt422016.ReleaseWriter(qw)
 //line testdata/test.qtpl:75
 }
 
 //line testdata/test.qtpl:75
 func printArgs(i int, a *FooArgs) string {
 	//line testdata/test.qtpl:75
-	qb := quicktemplate.AcquireByteBuffer()
+	qb := qt422016.AcquireByteBuffer()
 	//line testdata/test.qtpl:75
 	writeprintArgs(qb, i, a)
 	//line testdata/test.qtpl:75
 	qs := string(qb.B)
 	//line testdata/test.qtpl:75
-	quicktemplate.ReleaseByteBuffer(qb)
+	qt422016.ReleaseByteBuffer(qb)
 	//line testdata/test.qtpl:75
 	return qs
 //line testdata/test.qtpl:75
@@ -266,22 +266,22 @@ type Page interface {
 	//line testdata/test.qtpl:79
 	Head() string
 	//line testdata/test.qtpl:79
-	StreamHead(qw *quicktemplate.Writer)
+	StreamHead(qw *qt422016.Writer)
 	//line testdata/test.qtpl:79
-	WriteHead(qww io.Writer)
+	WriteHead(qww qtio422016.Writer)
 	//line testdata/test.qtpl:79
 	Body(title string) string
 	//line testdata/test.qtpl:79
-	StreamBody(qw *quicktemplate.Writer, title string)
+	StreamBody(qw *qt422016.Writer, title string)
 	//line testdata/test.qtpl:79
-	WriteBody(qww io.Writer, title string)
+	WriteBody(qww qtio422016.Writer, title string)
 //line testdata/test.qtpl:79
 }
 
 // This function prints arbitrary page.
 
 //line testdata/test.qtpl:89
-func StreamPrintPage(qw *quicktemplate.Writer, p Page, title string) {
+func StreamPrintPage(qw *qt422016.Writer, p Page, title string) {
 	//line testdata/test.qtpl:89
 	qw.N().S(`
 	<html>
@@ -301,26 +301,26 @@ func StreamPrintPage(qw *quicktemplate.Writer, p Page, title string) {
 }
 
 //line testdata/test.qtpl:94
-func WritePrintPage(qww io.Writer, p Page, title string) {
+func WritePrintPage(qww qtio422016.Writer, p Page, title string) {
 	//line testdata/test.qtpl:94
-	qw := quicktemplate.AcquireWriter(qww)
+	qw := qt422016.AcquireWriter(qww)
 	//line testdata/test.qtpl:94
 	StreamPrintPage(qw, p, title)
 	//line testdata/test.qtpl:94
-	quicktemplate.ReleaseWriter(qw)
+	qt422016.ReleaseWriter(qw)
 //line testdata/test.qtpl:94
 }
 
 //line testdata/test.qtpl:94
 func PrintPage(p Page, title string) string {
 	//line testdata/test.qtpl:94
-	qb := quicktemplate.AcquireByteBuffer()
+	qb := qt422016.AcquireByteBuffer()
 	//line testdata/test.qtpl:94
 	WritePrintPage(qb, p, title)
 	//line testdata/test.qtpl:94
 	qs := string(qb.B)
 	//line testdata/test.qtpl:94
-	quicktemplate.ReleaseByteBuffer(qb)
+	qt422016.ReleaseByteBuffer(qb)
 	//line testdata/test.qtpl:94
 	return qs
 //line testdata/test.qtpl:94
@@ -332,65 +332,65 @@ func PrintPage(p Page, title string) string {
 type ContactsPage struct{}
 
 //line testdata/test.qtpl:98
-func (b *ContactsPage) StreamHead(qw *quicktemplate.Writer) {
+func (b *ContactsPage) StreamHead(qw *qt422016.Writer) {
 //line testdata/test.qtpl:98
 qw.N().S(`<title>Contacts!</title>`) }
 
 //line testdata/test.qtpl:98
 //line testdata/test.qtpl:98
-func (b *ContactsPage) WriteHead(qww io.Writer) {
+func (b *ContactsPage) WriteHead(qww qtio422016.Writer) {
 	//line testdata/test.qtpl:98
-	qw := quicktemplate.AcquireWriter(qww)
+	qw := qt422016.AcquireWriter(qww)
 	//line testdata/test.qtpl:98
 	b.StreamHead(qw)
 	//line testdata/test.qtpl:98
-	quicktemplate.ReleaseWriter(qw)
+	qt422016.ReleaseWriter(qw)
 //line testdata/test.qtpl:98
 }
 
 //line testdata/test.qtpl:98
 func (b *ContactsPage) Head() string {
 	//line testdata/test.qtpl:98
-	qb := quicktemplate.AcquireByteBuffer()
+	qb := qt422016.AcquireByteBuffer()
 	//line testdata/test.qtpl:98
 	b.WriteHead(qb)
 	//line testdata/test.qtpl:98
 	qs := string(qb.B)
 	//line testdata/test.qtpl:98
-	quicktemplate.ReleaseByteBuffer(qb)
+	qt422016.ReleaseByteBuffer(qb)
 	//line testdata/test.qtpl:98
 	return qs
 //line testdata/test.qtpl:98
 }
 
 //line testdata/test.qtpl:99
-func (b *ContactsPage) StreamBody(qw *quicktemplate.Writer, title string) {
+func (b *ContactsPage) StreamBody(qw *qt422016.Writer, title string) {
 	//line testdata/test.qtpl:99
 	qw.N().S(`Put here contact info`)
 //line testdata/test.qtpl:99
 }
 
 //line testdata/test.qtpl:99
-func (b *ContactsPage) WriteBody(qww io.Writer, title string) {
+func (b *ContactsPage) WriteBody(qww qtio422016.Writer, title string) {
 	//line testdata/test.qtpl:99
-	qw := quicktemplate.AcquireWriter(qww)
+	qw := qt422016.AcquireWriter(qww)
 	//line testdata/test.qtpl:99
 	b.StreamBody(qw, title)
 	//line testdata/test.qtpl:99
-	quicktemplate.ReleaseWriter(qw)
+	qt422016.ReleaseWriter(qw)
 //line testdata/test.qtpl:99
 }
 
 //line testdata/test.qtpl:99
 func (b *ContactsPage) Body(title string) string {
 	//line testdata/test.qtpl:99
-	qb := quicktemplate.AcquireByteBuffer()
+	qb := qt422016.AcquireByteBuffer()
 	//line testdata/test.qtpl:99
 	b.WriteBody(qb, title)
 	//line testdata/test.qtpl:99
 	qs := string(qb.B)
 	//line testdata/test.qtpl:99
-	quicktemplate.ReleaseByteBuffer(qb)
+	qt422016.ReleaseByteBuffer(qb)
 	//line testdata/test.qtpl:99
 	return qs
 //line testdata/test.qtpl:99
@@ -402,39 +402,39 @@ func (b *ContactsPage) Body(title string) string {
 type Homepage struct{}
 
 //line testdata/test.qtpl:103
-func (h *Homepage) StreamHead(qw *quicktemplate.Writer) {
+func (h *Homepage) StreamHead(qw *qt422016.Writer) {
 //line testdata/test.qtpl:103
 qw.N().S(`<title>Homepage</title>`) }
 
 //line testdata/test.qtpl:103
 //line testdata/test.qtpl:103
-func (h *Homepage) WriteHead(qww io.Writer) {
+func (h *Homepage) WriteHead(qww qtio422016.Writer) {
 	//line testdata/test.qtpl:103
-	qw := quicktemplate.AcquireWriter(qww)
+	qw := qt422016.AcquireWriter(qww)
 	//line testdata/test.qtpl:103
 	h.StreamHead(qw)
 	//line testdata/test.qtpl:103
-	quicktemplate.ReleaseWriter(qw)
+	qt422016.ReleaseWriter(qw)
 //line testdata/test.qtpl:103
 }
 
 //line testdata/test.qtpl:103
 func (h *Homepage) Head() string {
 	//line testdata/test.qtpl:103
-	qb := quicktemplate.AcquireByteBuffer()
+	qb := qt422016.AcquireByteBuffer()
 	//line testdata/test.qtpl:103
 	h.WriteHead(qb)
 	//line testdata/test.qtpl:103
 	qs := string(qb.B)
 	//line testdata/test.qtpl:103
-	quicktemplate.ReleaseByteBuffer(qb)
+	qt422016.ReleaseByteBuffer(qb)
 	//line testdata/test.qtpl:103
 	return qs
 //line testdata/test.qtpl:103
 }
 
 //line testdata/test.qtpl:104
-func (h *Homepage) StreamBody(qw *quicktemplate.Writer, title string) {
+func (h *Homepage) StreamBody(qw *qt422016.Writer, title string) {
 	//line testdata/test.qtpl:104
 	qw.N().S(`
 	Title: `)
@@ -448,26 +448,26 @@ func (h *Homepage) StreamBody(qw *quicktemplate.Writer, title string) {
 }
 
 //line testdata/test.qtpl:107
-func (h *Homepage) WriteBody(qww io.Writer, title string) {
+func (h *Homepage) WriteBody(qww qtio422016.Writer, title string) {
 	//line testdata/test.qtpl:107
-	qw := quicktemplate.AcquireWriter(qww)
+	qw := qt422016.AcquireWriter(qww)
 	//line testdata/test.qtpl:107
 	h.StreamBody(qw, title)
 	//line testdata/test.qtpl:107
-	quicktemplate.ReleaseWriter(qw)
+	qt422016.ReleaseWriter(qw)
 //line testdata/test.qtpl:107
 }
 
 //line testdata/test.qtpl:107
 func (h *Homepage) Body(title string) string {
 	//line testdata/test.qtpl:107
-	qb := quicktemplate.AcquireByteBuffer()
+	qb := qt422016.AcquireByteBuffer()
 	//line testdata/test.qtpl:107
 	h.WriteBody(qb, title)
 	//line testdata/test.qtpl:107
 	qs := string(qb.B)
 	//line testdata/test.qtpl:107
-	quicktemplate.ReleaseByteBuffer(qb)
+	qt422016.ReleaseByteBuffer(qb)
 	//line testdata/test.qtpl:107
 	return qs
 //line testdata/test.qtpl:107

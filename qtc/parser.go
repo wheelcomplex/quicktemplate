@@ -39,9 +39,9 @@ func (p *parser) parseTemplate() error {
 		filepath.Base(s.filePath))
 	p.Printf("package %s\n", p.packageName)
 	p.Printf(`import (
-	"io"
+	qtio422016 "io"
 
-	"github.com/valyala/quicktemplate"
+	qt422016 "github.com/valyala/quicktemplate"
 )
 `)
 	for s.Next() {
@@ -124,8 +124,8 @@ func (p *parser) emitImportsUse() {
 		return
 	}
 	p.Printf(`var (
-	_ = io.Copy
-	_ = quicktemplate.AcquireByteBuffer
+	_ = qtio422016.Copy
+	_ = qt422016.AcquireByteBuffer
 )
 `)
 	p.importsUseEmitted = true
@@ -511,18 +511,18 @@ func (p *parser) emitFuncEnd(f *funcType) {
 
 	p.Printf("func %s {", f.DefWrite("qww"))
 	p.prefix = "\t"
-	p.Printf("qw := quicktemplate.AcquireWriter(qww)")
+	p.Printf("qw := qt422016.AcquireWriter(qww)")
 	p.Printf("%s", f.CallStream("qw"))
-	p.Printf("quicktemplate.ReleaseWriter(qw)")
+	p.Printf("qt422016.ReleaseWriter(qw)")
 	p.prefix = ""
 	p.Printf("}\n")
 
 	p.Printf("func %s {", f.DefString())
 	p.prefix = "\t"
-	p.Printf("qb := quicktemplate.AcquireByteBuffer()")
+	p.Printf("qb := qt422016.AcquireByteBuffer()")
 	p.Printf("%s", f.CallWrite("qb"))
 	p.Printf("qs := string(qb.B)")
-	p.Printf("quicktemplate.ReleaseByteBuffer(qb)")
+	p.Printf("qt422016.ReleaseByteBuffer(qb)")
 	p.Printf("return qs")
 	p.prefix = ""
 	p.Printf("}\n")
