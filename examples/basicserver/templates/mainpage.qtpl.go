@@ -6,9 +6,9 @@ package templates
 
 //line templates/mainpage.qtpl:1
 import (
-	"io"
+	qtio422016 "io"
 
-	"github.com/valyala/quicktemplate"
+	qt422016 "github.com/valyala/quicktemplate"
 )
 
 // Main page template. Implements BasePage methods.
@@ -19,8 +19,8 @@ import "github.com/valyala/fasthttp"
 
 //line templates/mainpage.qtpl:5
 var (
-	_ = io.Copy
-	_ = quicktemplate.AcquireByteBuffer
+	_ = qtio422016.Copy
+	_ = qt422016.AcquireByteBuffer
 )
 
 //line templates/mainpage.qtpl:6
@@ -29,44 +29,44 @@ type MainPage struct {
 }
 
 //line templates/mainpage.qtpl:12
-func (p *MainPage) StreamTitle(qw *quicktemplate.Writer) {
+func (p *MainPage) StreamTitle(qw422016 *qt422016.Writer) {
 	//line templates/mainpage.qtpl:12
-	qw.N().S(`
+	qw422016.N().S(`
 	This is the main page
 `)
 //line templates/mainpage.qtpl:14
 }
 
 //line templates/mainpage.qtpl:14
-func (p *MainPage) WriteTitle(qww io.Writer) {
+func (p *MainPage) WriteTitle(qq422016 qtio422016.Writer) {
 	//line templates/mainpage.qtpl:14
-	qw := quicktemplate.AcquireWriter(qww)
+	qw422016 := qt422016.AcquireWriter(qq422016)
 	//line templates/mainpage.qtpl:14
-	p.StreamTitle(qw)
+	p.StreamTitle(qw422016)
 	//line templates/mainpage.qtpl:14
-	quicktemplate.ReleaseWriter(qw)
+	qt422016.ReleaseWriter(qw422016)
 //line templates/mainpage.qtpl:14
 }
 
 //line templates/mainpage.qtpl:14
 func (p *MainPage) Title() string {
 	//line templates/mainpage.qtpl:14
-	qb := quicktemplate.AcquireByteBuffer()
+	qb422016 := qt422016.AcquireByteBuffer()
 	//line templates/mainpage.qtpl:14
-	p.WriteTitle(qb)
+	p.WriteTitle(qb422016)
 	//line templates/mainpage.qtpl:14
-	qs := string(qb.B)
+	qs422016 := string(qb422016.B)
 	//line templates/mainpage.qtpl:14
-	quicktemplate.ReleaseByteBuffer(qb)
+	qt422016.ReleaseByteBuffer(qb422016)
 	//line templates/mainpage.qtpl:14
-	return qs
+	return qs422016
 //line templates/mainpage.qtpl:14
 }
 
 //line templates/mainpage.qtpl:17
-func (p *MainPage) StreamBody(qw *quicktemplate.Writer) {
+func (p *MainPage) StreamBody(qw422016 *qt422016.Writer) {
 	//line templates/mainpage.qtpl:17
-	qw.N().S(`
+	qw422016.N().S(`
 	<h1>Main page</h1>
 	<div>
 		Click links below:
@@ -79,41 +79,41 @@ func (p *MainPage) StreamBody(qw *quicktemplate.Writer) {
 		Some info about you:<br/>
 		IP: <b>`)
 	//line templates/mainpage.qtpl:28
-	qw.E().S(p.CTX.RemoteIP().String())
+	qw422016.E().S(p.CTX.RemoteIP().String())
 	//line templates/mainpage.qtpl:28
-	qw.N().S(`</b><br/>
+	qw422016.N().S(`</b><br/>
 		User-Agent: <b>`)
 	//line templates/mainpage.qtpl:29
-	qw.E().Z(p.CTX.UserAgent())
+	qw422016.E().Z(p.CTX.UserAgent())
 	//line templates/mainpage.qtpl:29
-	qw.N().S(`</b><br/>
+	qw422016.N().S(`</b><br/>
 	</div>
 `)
 //line templates/mainpage.qtpl:31
 }
 
 //line templates/mainpage.qtpl:31
-func (p *MainPage) WriteBody(qww io.Writer) {
+func (p *MainPage) WriteBody(qq422016 qtio422016.Writer) {
 	//line templates/mainpage.qtpl:31
-	qw := quicktemplate.AcquireWriter(qww)
+	qw422016 := qt422016.AcquireWriter(qq422016)
 	//line templates/mainpage.qtpl:31
-	p.StreamBody(qw)
+	p.StreamBody(qw422016)
 	//line templates/mainpage.qtpl:31
-	quicktemplate.ReleaseWriter(qw)
+	qt422016.ReleaseWriter(qw422016)
 //line templates/mainpage.qtpl:31
 }
 
 //line templates/mainpage.qtpl:31
 func (p *MainPage) Body() string {
 	//line templates/mainpage.qtpl:31
-	qb := quicktemplate.AcquireByteBuffer()
+	qb422016 := qt422016.AcquireByteBuffer()
 	//line templates/mainpage.qtpl:31
-	p.WriteBody(qb)
+	p.WriteBody(qb422016)
 	//line templates/mainpage.qtpl:31
-	qs := string(qb.B)
+	qs422016 := string(qb422016.B)
 	//line templates/mainpage.qtpl:31
-	quicktemplate.ReleaseByteBuffer(qb)
+	qt422016.ReleaseByteBuffer(qb422016)
 	//line templates/mainpage.qtpl:31
-	return qs
+	return qs422016
 //line templates/mainpage.qtpl:31
 }

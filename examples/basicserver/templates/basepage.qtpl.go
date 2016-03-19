@@ -6,9 +6,9 @@ package templates
 
 //line templates/basepage.qtpl:1
 import (
-	"io"
+	qtio422016 "io"
 
-	"github.com/valyala/quicktemplate"
+	qt422016 "github.com/valyala/quicktemplate"
 )
 
 // This is a base page template. All the other template pages implement this interface.
@@ -16,8 +16,8 @@ import (
 
 //line templates/basepage.qtpl:3
 var (
-	_ = io.Copy
-	_ = quicktemplate.AcquireByteBuffer
+	_ = qtio422016.Copy
+	_ = qt422016.AcquireByteBuffer
 )
 
 //line templates/basepage.qtpl:4
@@ -25,31 +25,31 @@ type Page interface {
 	//line templates/basepage.qtpl:4
 	Title() string
 	//line templates/basepage.qtpl:4
-	StreamTitle(qw *quicktemplate.Writer)
+	StreamTitle(qw422016 *qt422016.Writer)
 	//line templates/basepage.qtpl:4
-	WriteTitle(qww io.Writer)
+	WriteTitle(qq422016 qtio422016.Writer)
 	//line templates/basepage.qtpl:4
 	Body() string
 	//line templates/basepage.qtpl:4
-	StreamBody(qw *quicktemplate.Writer)
+	StreamBody(qw422016 *qt422016.Writer)
 	//line templates/basepage.qtpl:4
-	WriteBody(qww io.Writer)
+	WriteBody(qq422016 qtio422016.Writer)
 //line templates/basepage.qtpl:4
 }
 
 // Page prints a page implementing Page interface.
 
 //line templates/basepage.qtpl:12
-func StreamPageTemplate(qw *quicktemplate.Writer, p Page) {
+func StreamPageTemplate(qw422016 *qt422016.Writer, p Page) {
 	//line templates/basepage.qtpl:12
-	qw.N().S(`
+	qw422016.N().S(`
 <html>
 	<head>
 		<title>`)
 	//line templates/basepage.qtpl:15
-	p.StreamTitle(qw)
+	p.StreamTitle(qw422016)
 	//line templates/basepage.qtpl:15
-	qw.N().S(`</title>
+	qw422016.N().S(`</title>
 	</head>
 	<body>
 		<div>
@@ -57,9 +57,9 @@ func StreamPageTemplate(qw *quicktemplate.Writer, p Page) {
 		</div>
 		`)
 	//line templates/basepage.qtpl:21
-	p.StreamBody(qw)
+	p.StreamBody(qw422016)
 	//line templates/basepage.qtpl:21
-	qw.N().S(`
+	qw422016.N().S(`
 	</body>
 </html>
 `)
@@ -67,28 +67,28 @@ func StreamPageTemplate(qw *quicktemplate.Writer, p Page) {
 }
 
 //line templates/basepage.qtpl:24
-func WritePageTemplate(qww io.Writer, p Page) {
+func WritePageTemplate(qq422016 qtio422016.Writer, p Page) {
 	//line templates/basepage.qtpl:24
-	qw := quicktemplate.AcquireWriter(qww)
+	qw422016 := qt422016.AcquireWriter(qq422016)
 	//line templates/basepage.qtpl:24
-	StreamPageTemplate(qw, p)
+	StreamPageTemplate(qw422016, p)
 	//line templates/basepage.qtpl:24
-	quicktemplate.ReleaseWriter(qw)
+	qt422016.ReleaseWriter(qw422016)
 //line templates/basepage.qtpl:24
 }
 
 //line templates/basepage.qtpl:24
 func PageTemplate(p Page) string {
 	//line templates/basepage.qtpl:24
-	qb := quicktemplate.AcquireByteBuffer()
+	qb422016 := qt422016.AcquireByteBuffer()
 	//line templates/basepage.qtpl:24
-	WritePageTemplate(qb, p)
+	WritePageTemplate(qb422016, p)
 	//line templates/basepage.qtpl:24
-	qs := string(qb.B)
+	qs422016 := string(qb422016.B)
 	//line templates/basepage.qtpl:24
-	quicktemplate.ReleaseByteBuffer(qb)
+	qt422016.ReleaseByteBuffer(qb422016)
 	//line templates/basepage.qtpl:24
-	return qs
+	return qs422016
 //line templates/basepage.qtpl:24
 }
 
@@ -99,65 +99,65 @@ func PageTemplate(p Page) string {
 type BasePage struct{}
 
 //line templates/basepage.qtpl:30
-func (p *BasePage) StreamTitle(qw *quicktemplate.Writer) {
+func (p *BasePage) StreamTitle(qw422016 *qt422016.Writer) {
 //line templates/basepage.qtpl:30
-qw.N().S(`This is a base title`) }
+qw422016.N().S(`This is a base title`) }
 
 //line templates/basepage.qtpl:30
 //line templates/basepage.qtpl:30
-func (p *BasePage) WriteTitle(qww io.Writer) {
+func (p *BasePage) WriteTitle(qq422016 qtio422016.Writer) {
 	//line templates/basepage.qtpl:30
-	qw := quicktemplate.AcquireWriter(qww)
+	qw422016 := qt422016.AcquireWriter(qq422016)
 	//line templates/basepage.qtpl:30
-	p.StreamTitle(qw)
+	p.StreamTitle(qw422016)
 	//line templates/basepage.qtpl:30
-	quicktemplate.ReleaseWriter(qw)
+	qt422016.ReleaseWriter(qw422016)
 //line templates/basepage.qtpl:30
 }
 
 //line templates/basepage.qtpl:30
 func (p *BasePage) Title() string {
 	//line templates/basepage.qtpl:30
-	qb := quicktemplate.AcquireByteBuffer()
+	qb422016 := qt422016.AcquireByteBuffer()
 	//line templates/basepage.qtpl:30
-	p.WriteTitle(qb)
+	p.WriteTitle(qb422016)
 	//line templates/basepage.qtpl:30
-	qs := string(qb.B)
+	qs422016 := string(qb422016.B)
 	//line templates/basepage.qtpl:30
-	quicktemplate.ReleaseByteBuffer(qb)
+	qt422016.ReleaseByteBuffer(qb422016)
 	//line templates/basepage.qtpl:30
-	return qs
+	return qs422016
 //line templates/basepage.qtpl:30
 }
 
 //line templates/basepage.qtpl:31
-func (p *BasePage) StreamBody(qw *quicktemplate.Writer) {
+func (p *BasePage) StreamBody(qw422016 *qt422016.Writer) {
 //line templates/basepage.qtpl:31
-qw.N().S(`This is a base body`) }
+qw422016.N().S(`This is a base body`) }
 
 //line templates/basepage.qtpl:31
 //line templates/basepage.qtpl:31
-func (p *BasePage) WriteBody(qww io.Writer) {
+func (p *BasePage) WriteBody(qq422016 qtio422016.Writer) {
 	//line templates/basepage.qtpl:31
-	qw := quicktemplate.AcquireWriter(qww)
+	qw422016 := qt422016.AcquireWriter(qq422016)
 	//line templates/basepage.qtpl:31
-	p.StreamBody(qw)
+	p.StreamBody(qw422016)
 	//line templates/basepage.qtpl:31
-	quicktemplate.ReleaseWriter(qw)
+	qt422016.ReleaseWriter(qw422016)
 //line templates/basepage.qtpl:31
 }
 
 //line templates/basepage.qtpl:31
 func (p *BasePage) Body() string {
 	//line templates/basepage.qtpl:31
-	qb := quicktemplate.AcquireByteBuffer()
+	qb422016 := qt422016.AcquireByteBuffer()
 	//line templates/basepage.qtpl:31
-	p.WriteBody(qb)
+	p.WriteBody(qb422016)
 	//line templates/basepage.qtpl:31
-	qs := string(qb.B)
+	qs422016 := string(qb422016.B)
 	//line templates/basepage.qtpl:31
-	quicktemplate.ReleaseByteBuffer(qb)
+	qt422016.ReleaseByteBuffer(qb422016)
 	//line templates/basepage.qtpl:31
-	return qs
+	return qs422016
 //line templates/basepage.qtpl:31
 }

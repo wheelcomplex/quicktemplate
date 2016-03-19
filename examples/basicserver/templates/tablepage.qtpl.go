@@ -6,9 +6,9 @@ package templates
 
 //line templates/tablepage.qtpl:1
 import (
-	"io"
+	qtio422016 "io"
 
-	"github.com/valyala/quicktemplate"
+	qt422016 "github.com/valyala/quicktemplate"
 )
 
 // Table page template. Implements BasePage methods.
@@ -16,8 +16,8 @@ import (
 
 //line templates/tablepage.qtpl:3
 var (
-	_ = io.Copy
-	_ = quicktemplate.AcquireByteBuffer
+	_ = qtio422016.Copy
+	_ = qt422016.AcquireByteBuffer
 )
 
 //line templates/tablepage.qtpl:4
@@ -26,109 +26,109 @@ type TablePage struct {
 }
 
 //line templates/tablepage.qtpl:10
-func (p *TablePage) StreamTitle(qw *quicktemplate.Writer) {
+func (p *TablePage) StreamTitle(qw422016 *qt422016.Writer) {
 	//line templates/tablepage.qtpl:10
-	qw.N().S(`
+	qw422016.N().S(`
 	This is table page
 `)
 //line templates/tablepage.qtpl:12
 }
 
 //line templates/tablepage.qtpl:12
-func (p *TablePage) WriteTitle(qww io.Writer) {
+func (p *TablePage) WriteTitle(qq422016 qtio422016.Writer) {
 	//line templates/tablepage.qtpl:12
-	qw := quicktemplate.AcquireWriter(qww)
+	qw422016 := qt422016.AcquireWriter(qq422016)
 	//line templates/tablepage.qtpl:12
-	p.StreamTitle(qw)
+	p.StreamTitle(qw422016)
 	//line templates/tablepage.qtpl:12
-	quicktemplate.ReleaseWriter(qw)
+	qt422016.ReleaseWriter(qw422016)
 //line templates/tablepage.qtpl:12
 }
 
 //line templates/tablepage.qtpl:12
 func (p *TablePage) Title() string {
 	//line templates/tablepage.qtpl:12
-	qb := quicktemplate.AcquireByteBuffer()
+	qb422016 := qt422016.AcquireByteBuffer()
 	//line templates/tablepage.qtpl:12
-	p.WriteTitle(qb)
+	p.WriteTitle(qb422016)
 	//line templates/tablepage.qtpl:12
-	qs := string(qb.B)
+	qs422016 := string(qb422016.B)
 	//line templates/tablepage.qtpl:12
-	quicktemplate.ReleaseByteBuffer(qb)
+	qt422016.ReleaseByteBuffer(qb422016)
 	//line templates/tablepage.qtpl:12
-	return qs
+	return qs422016
 //line templates/tablepage.qtpl:12
 }
 
 //line templates/tablepage.qtpl:15
-func (p *TablePage) StreamBody(qw *quicktemplate.Writer) {
+func (p *TablePage) StreamBody(qw422016 *qt422016.Writer) {
 	//line templates/tablepage.qtpl:15
-	qw.N().S(`
+	qw422016.N().S(`
 	<h1>Table page</h1>
 
 	`)
 	//line templates/tablepage.qtpl:18
-	p.streamform(qw)
+	p.streamform(qw422016)
 	//line templates/tablepage.qtpl:18
-	qw.N().S(`
+	qw422016.N().S(`
 
 	`)
 	//line templates/tablepage.qtpl:20
 	if len(p.Rows) == 0 {
 		//line templates/tablepage.qtpl:20
-		qw.N().S(`
+		qw422016.N().S(`
 		No rows. Click <a href="/table?rowsCount=5">here</a>.
 	`)
 		//line templates/tablepage.qtpl:22
 	} else {
 		//line templates/tablepage.qtpl:22
-		qw.N().S(`
+		qw422016.N().S(`
 		<table>
 			`)
 		//line templates/tablepage.qtpl:24
-		streamemitRows(qw, p.Rows)
+		streamemitRows(qw422016, p.Rows)
 		//line templates/tablepage.qtpl:24
-		qw.N().S(`
+		qw422016.N().S(`
 		</table>
 	`)
 		//line templates/tablepage.qtpl:26
 	}
 	//line templates/tablepage.qtpl:26
-	qw.N().S(`
+	qw422016.N().S(`
 `)
 //line templates/tablepage.qtpl:27
 }
 
 //line templates/tablepage.qtpl:27
-func (p *TablePage) WriteBody(qww io.Writer) {
+func (p *TablePage) WriteBody(qq422016 qtio422016.Writer) {
 	//line templates/tablepage.qtpl:27
-	qw := quicktemplate.AcquireWriter(qww)
+	qw422016 := qt422016.AcquireWriter(qq422016)
 	//line templates/tablepage.qtpl:27
-	p.StreamBody(qw)
+	p.StreamBody(qw422016)
 	//line templates/tablepage.qtpl:27
-	quicktemplate.ReleaseWriter(qw)
+	qt422016.ReleaseWriter(qw422016)
 //line templates/tablepage.qtpl:27
 }
 
 //line templates/tablepage.qtpl:27
 func (p *TablePage) Body() string {
 	//line templates/tablepage.qtpl:27
-	qb := quicktemplate.AcquireByteBuffer()
+	qb422016 := qt422016.AcquireByteBuffer()
 	//line templates/tablepage.qtpl:27
-	p.WriteBody(qb)
+	p.WriteBody(qb422016)
 	//line templates/tablepage.qtpl:27
-	qs := string(qb.B)
+	qs422016 := string(qb422016.B)
 	//line templates/tablepage.qtpl:27
-	quicktemplate.ReleaseByteBuffer(qb)
+	qt422016.ReleaseByteBuffer(qb422016)
 	//line templates/tablepage.qtpl:27
-	return qs
+	return qs422016
 //line templates/tablepage.qtpl:27
 }
 
 //line templates/tablepage.qtpl:29
-func streamemitRows(qw *quicktemplate.Writer, rows []string) {
+func streamemitRows(qw422016 *qt422016.Writer, rows []string) {
 	//line templates/tablepage.qtpl:29
-	qw.N().S(`
+	qw422016.N().S(`
 	<tr>
 		<th>#</th>
 		<th>value</th>
@@ -138,12 +138,12 @@ func streamemitRows(qw *quicktemplate.Writer, rows []string) {
 	//line templates/tablepage.qtpl:35
 	for n, r := range rows {
 		//line templates/tablepage.qtpl:35
-		qw.N().S(`
+		qw422016.N().S(`
 		`)
 		//line templates/tablepage.qtpl:36
 		if r == "bingo" {
 			//line templates/tablepage.qtpl:36
-			qw.N().S(`
+			qw422016.N().S(`
 			<tr><td colspan="2"><h1>BINGO!</h1></td></tr>
 			`)
 			//line templates/tablepage.qtpl:38
@@ -151,7 +151,7 @@ func streamemitRows(qw *quicktemplate.Writer, rows []string) {
 			//line templates/tablepage.qtpl:39
 		} else if n == 42 {
 			//line templates/tablepage.qtpl:39
-			qw.N().S(`
+			qw422016.N().S(`
 			<tr><td colspan="2">42 rows already generated</td></tr>
 			`)
 			//line templates/tablepage.qtpl:41
@@ -159,37 +159,37 @@ func streamemitRows(qw *quicktemplate.Writer, rows []string) {
 			//line templates/tablepage.qtpl:42
 		}
 		//line templates/tablepage.qtpl:42
-		qw.N().S(`
+		qw422016.N().S(`
 
 		<tr style="background: `)
 		//line templates/tablepage.qtpl:44
 		if n&1 == 1 {
 			//line templates/tablepage.qtpl:44
-			qw.N().S(`white`)
+			qw422016.N().S(`white`)
 			//line templates/tablepage.qtpl:44
 		} else {
 			//line templates/tablepage.qtpl:44
-			qw.N().S(`#ddd`)
+			qw422016.N().S(`#ddd`)
 			//line templates/tablepage.qtpl:44
 		}
 		//line templates/tablepage.qtpl:44
-		qw.N().S(`">
+		qw422016.N().S(`">
 			<td>`)
 		//line templates/tablepage.qtpl:45
-		qw.N().D(n + 1)
+		qw422016.N().D(n + 1)
 		//line templates/tablepage.qtpl:45
-		qw.N().S(`</td>
+		qw422016.N().S(`</td>
 			<td>`)
 		//line templates/tablepage.qtpl:46
-		qw.E().S(r)
+		qw422016.E().S(r)
 		//line templates/tablepage.qtpl:46
-		qw.N().S(`</td>
+		qw422016.N().S(`</td>
 		</tr>
 	`)
 		//line templates/tablepage.qtpl:48
 	}
 	//line templates/tablepage.qtpl:48
-	qw.N().S(`
+	qw422016.N().S(`
 
 	<tr><td colspan="2">No bingo found</td></tr>
 `)
@@ -197,41 +197,41 @@ func streamemitRows(qw *quicktemplate.Writer, rows []string) {
 }
 
 //line templates/tablepage.qtpl:51
-func writeemitRows(qww io.Writer, rows []string) {
+func writeemitRows(qq422016 qtio422016.Writer, rows []string) {
 	//line templates/tablepage.qtpl:51
-	qw := quicktemplate.AcquireWriter(qww)
+	qw422016 := qt422016.AcquireWriter(qq422016)
 	//line templates/tablepage.qtpl:51
-	streamemitRows(qw, rows)
+	streamemitRows(qw422016, rows)
 	//line templates/tablepage.qtpl:51
-	quicktemplate.ReleaseWriter(qw)
+	qt422016.ReleaseWriter(qw422016)
 //line templates/tablepage.qtpl:51
 }
 
 //line templates/tablepage.qtpl:51
 func emitRows(rows []string) string {
 	//line templates/tablepage.qtpl:51
-	qb := quicktemplate.AcquireByteBuffer()
+	qb422016 := qt422016.AcquireByteBuffer()
 	//line templates/tablepage.qtpl:51
-	writeemitRows(qb, rows)
+	writeemitRows(qb422016, rows)
 	//line templates/tablepage.qtpl:51
-	qs := string(qb.B)
+	qs422016 := string(qb422016.B)
 	//line templates/tablepage.qtpl:51
-	quicktemplate.ReleaseByteBuffer(qb)
+	qt422016.ReleaseByteBuffer(qb422016)
 	//line templates/tablepage.qtpl:51
-	return qs
+	return qs422016
 //line templates/tablepage.qtpl:51
 }
 
 //line templates/tablepage.qtpl:53
-func (p *TablePage) streamform(qw *quicktemplate.Writer) {
+func (p *TablePage) streamform(qw422016 *qt422016.Writer) {
 	//line templates/tablepage.qtpl:53
-	qw.N().S(`
+	qw422016.N().S(`
 	<form>
 		Rows: <input type="text" name="rowsCount" value="`)
 	//line templates/tablepage.qtpl:55
-	qw.N().D(len(p.Rows))
+	qw422016.N().D(len(p.Rows))
 	//line templates/tablepage.qtpl:55
-	qw.N().S(`"/><br/>
+	qw422016.N().S(`"/><br/>
 		<input type="submit" value="Generate!"/>
 	</form>
 `)
@@ -239,27 +239,27 @@ func (p *TablePage) streamform(qw *quicktemplate.Writer) {
 }
 
 //line templates/tablepage.qtpl:58
-func (p *TablePage) writeform(qww io.Writer) {
+func (p *TablePage) writeform(qq422016 qtio422016.Writer) {
 	//line templates/tablepage.qtpl:58
-	qw := quicktemplate.AcquireWriter(qww)
+	qw422016 := qt422016.AcquireWriter(qq422016)
 	//line templates/tablepage.qtpl:58
-	p.streamform(qw)
+	p.streamform(qw422016)
 	//line templates/tablepage.qtpl:58
-	quicktemplate.ReleaseWriter(qw)
+	qt422016.ReleaseWriter(qw422016)
 //line templates/tablepage.qtpl:58
 }
 
 //line templates/tablepage.qtpl:58
 func (p *TablePage) form() string {
 	//line templates/tablepage.qtpl:58
-	qb := quicktemplate.AcquireByteBuffer()
+	qb422016 := qt422016.AcquireByteBuffer()
 	//line templates/tablepage.qtpl:58
-	p.writeform(qb)
+	p.writeform(qb422016)
 	//line templates/tablepage.qtpl:58
-	qs := string(qb.B)
+	qs422016 := string(qb422016.B)
 	//line templates/tablepage.qtpl:58
-	quicktemplate.ReleaseByteBuffer(qb)
+	qt422016.ReleaseByteBuffer(qb422016)
 	//line templates/tablepage.qtpl:58
-	return qs
+	return qs422016
 //line templates/tablepage.qtpl:58
 }

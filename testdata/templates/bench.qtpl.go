@@ -6,15 +6,15 @@ package templates
 
 //line testdata/templates/bench.qtpl:1
 import (
-	"io"
+	qtio422016 "io"
 
-	"github.com/valyala/quicktemplate"
+	qt422016 "github.com/valyala/quicktemplate"
 )
 
 //line testdata/templates/bench.qtpl:1
 var (
-	_ = io.Copy
-	_ = quicktemplate.AcquireByteBuffer
+	_ = qtio422016.Copy
+	_ = qt422016.AcquireByteBuffer
 )
 
 //line testdata/templates/bench.qtpl:3
@@ -25,9 +25,9 @@ type BenchRow struct {
 }
 
 //line testdata/templates/bench.qtpl:11
-func StreamBenchPage(qw *quicktemplate.Writer, rows []BenchRow) {
+func StreamBenchPage(qw422016 *qt422016.Writer, rows []BenchRow) {
 	//line testdata/templates/bench.qtpl:11
-	qw.N().S(`<html>
+	qw422016.N().S(`<html>
 	<head><title>test</title></head>
 	<body>
 		<ul>
@@ -35,31 +35,31 @@ func StreamBenchPage(qw *quicktemplate.Writer, rows []BenchRow) {
 	//line testdata/templates/bench.qtpl:15
 	for _, row := range rows {
 		//line testdata/templates/bench.qtpl:15
-		qw.N().S(`
+		qw422016.N().S(`
 			`)
 		//line testdata/templates/bench.qtpl:16
 		if row.Print {
 			//line testdata/templates/bench.qtpl:16
-			qw.N().S(`
+			qw422016.N().S(`
 				<li>ID=`)
 			//line testdata/templates/bench.qtpl:17
-			qw.N().D(row.ID)
+			qw422016.N().D(row.ID)
 			//line testdata/templates/bench.qtpl:17
-			qw.N().S(`, Message=`)
+			qw422016.N().S(`, Message=`)
 			//line testdata/templates/bench.qtpl:17
-			qw.E().S(row.Message)
+			qw422016.E().S(row.Message)
 			//line testdata/templates/bench.qtpl:17
-			qw.N().S(`</li>
+			qw422016.N().S(`</li>
 			`)
 			//line testdata/templates/bench.qtpl:18
 		}
 		//line testdata/templates/bench.qtpl:18
-		qw.N().S(`
+		qw422016.N().S(`
 		`)
 		//line testdata/templates/bench.qtpl:19
 	}
 	//line testdata/templates/bench.qtpl:19
-	qw.N().S(`
+	qw422016.N().S(`
 		</ul>
 	</body>
 </html>
@@ -68,27 +68,27 @@ func StreamBenchPage(qw *quicktemplate.Writer, rows []BenchRow) {
 }
 
 //line testdata/templates/bench.qtpl:23
-func WriteBenchPage(qww io.Writer, rows []BenchRow) {
+func WriteBenchPage(qq422016 qtio422016.Writer, rows []BenchRow) {
 	//line testdata/templates/bench.qtpl:23
-	qw := quicktemplate.AcquireWriter(qww)
+	qw422016 := qt422016.AcquireWriter(qq422016)
 	//line testdata/templates/bench.qtpl:23
-	StreamBenchPage(qw, rows)
+	StreamBenchPage(qw422016, rows)
 	//line testdata/templates/bench.qtpl:23
-	quicktemplate.ReleaseWriter(qw)
+	qt422016.ReleaseWriter(qw422016)
 //line testdata/templates/bench.qtpl:23
 }
 
 //line testdata/templates/bench.qtpl:23
 func BenchPage(rows []BenchRow) string {
 	//line testdata/templates/bench.qtpl:23
-	qb := quicktemplate.AcquireByteBuffer()
+	qb422016 := qt422016.AcquireByteBuffer()
 	//line testdata/templates/bench.qtpl:23
-	WriteBenchPage(qb, rows)
+	WriteBenchPage(qb422016, rows)
 	//line testdata/templates/bench.qtpl:23
-	qs := string(qb.B)
+	qs422016 := string(qb422016.B)
 	//line testdata/templates/bench.qtpl:23
-	quicktemplate.ReleaseByteBuffer(qb)
+	qt422016.ReleaseByteBuffer(qb422016)
 	//line testdata/templates/bench.qtpl:23
-	return qs
+	return qs422016
 //line testdata/templates/bench.qtpl:23
 }

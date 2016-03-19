@@ -6,9 +6,9 @@ package templates
 
 //line templates/errorpage.qtpl:1
 import (
-	"io"
+	qtio422016 "io"
 
-	"github.com/valyala/quicktemplate"
+	qt422016 "github.com/valyala/quicktemplate"
 )
 
 // Error page template. Implements BasePage methods.
@@ -16,8 +16,8 @@ import (
 
 //line templates/errorpage.qtpl:3
 var (
-	_ = io.Copy
-	_ = quicktemplate.AcquireByteBuffer
+	_ = qtio422016.Copy
+	_ = qt422016.AcquireByteBuffer
 )
 
 //line templates/errorpage.qtpl:4
@@ -30,48 +30,48 @@ type ErrorPage struct {
 }
 
 //line templates/errorpage.qtpl:14
-func (p *ErrorPage) StreamBody(qw *quicktemplate.Writer) {
+func (p *ErrorPage) StreamBody(qw422016 *qt422016.Writer) {
 	//line templates/errorpage.qtpl:14
-	qw.N().S(`
+	qw422016.N().S(`
 	<h1>Error page</h1>
 	</div>
 		Unsupported path <b>`)
 	//line templates/errorpage.qtpl:17
-	qw.E().Z(p.Path)
+	qw422016.E().Z(p.Path)
 	//line templates/errorpage.qtpl:17
-	qw.N().S(`</b>.
+	qw422016.N().S(`</b>.
 	</div>
 	Base page body: `)
 	//line templates/errorpage.qtpl:19
-	p.BasePage.StreamBody(qw)
+	p.BasePage.StreamBody(qw422016)
 	//line templates/errorpage.qtpl:19
-	qw.N().S(`
+	qw422016.N().S(`
 `)
 //line templates/errorpage.qtpl:20
 }
 
 //line templates/errorpage.qtpl:20
-func (p *ErrorPage) WriteBody(qww io.Writer) {
+func (p *ErrorPage) WriteBody(qq422016 qtio422016.Writer) {
 	//line templates/errorpage.qtpl:20
-	qw := quicktemplate.AcquireWriter(qww)
+	qw422016 := qt422016.AcquireWriter(qq422016)
 	//line templates/errorpage.qtpl:20
-	p.StreamBody(qw)
+	p.StreamBody(qw422016)
 	//line templates/errorpage.qtpl:20
-	quicktemplate.ReleaseWriter(qw)
+	qt422016.ReleaseWriter(qw422016)
 //line templates/errorpage.qtpl:20
 }
 
 //line templates/errorpage.qtpl:20
 func (p *ErrorPage) Body() string {
 	//line templates/errorpage.qtpl:20
-	qb := quicktemplate.AcquireByteBuffer()
+	qb422016 := qt422016.AcquireByteBuffer()
 	//line templates/errorpage.qtpl:20
-	p.WriteBody(qb)
+	p.WriteBody(qb422016)
 	//line templates/errorpage.qtpl:20
-	qs := string(qb.B)
+	qs422016 := string(qb422016.B)
 	//line templates/errorpage.qtpl:20
-	quicktemplate.ReleaseByteBuffer(qb)
+	qt422016.ReleaseByteBuffer(qb422016)
 	//line templates/errorpage.qtpl:20
-	return qs
+	return qs422016
 //line templates/errorpage.qtpl:20
 }
