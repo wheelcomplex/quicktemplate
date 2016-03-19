@@ -49,12 +49,12 @@ func TestScannerCollapsespaceSuccess(t *testing.T) {
 		{ID: text, Value: "foo bar"},
 		{ID: tagName, Value: "bar"},
 		{ID: tagContents, Value: "baz  asd"},
-		{ID: text, Value: "baz"},
+		{ID: text, Value: "baz "},
 		{ID: text, Value: " bb  "},
 	})
 	testScannerSuccess(t, "{%collapsespace  %}{% collapsespace fobar %} {%space%}  aaa\n\r\t bbb  {%endcollapsespace  %}  {%endcollapsespace  baz%}", []tt{
 		{ID: text, Value: " "},
-		{ID: text, Value: "aaa bbb"},
+		{ID: text, Value: "aaa bbb "},
 	})
 }
 

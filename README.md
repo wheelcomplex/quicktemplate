@@ -252,7 +252,7 @@ There are other useful tags supported by quicktemplate:
     Is converted into
 
     ```
-    <div> <div>space between lines</div> and tags<div>is collapsed into a single space unless
+    <div> <div>space between lines</div> and tags <div>is collapsed into a single space unless
     or is used</div> </div>
     ```
 

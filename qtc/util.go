@@ -33,6 +33,7 @@ func stripSpaceExt(b []byte, isCollapse bool) []byte {
 		return b
 	}
 
+	isLastSpace := isSpace(b[len(b)-1])
 	var dst []byte
 	for len(b) > 0 {
 		n := bytes.IndexByte(b, '\n')
@@ -55,7 +56,7 @@ func stripSpaceExt(b []byte, isCollapse bool) []byte {
 			dst = append(dst, ' ')
 		}
 	}
-	if isCollapse && len(dst) > 0 {
+	if isCollapse && !isLastSpace && len(dst) > 0 {
 		dst = dst[:len(dst)-1]
 	}
 	return dst

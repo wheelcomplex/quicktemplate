@@ -47,9 +47,13 @@ Now define an exported function template
 		and even {% unclosed tag
 	{% endplain %}
 	{% collapsespace %}
-		Leading and trailing space between template tags is collapsed
-		on each line inside collapsespace unless {%space%} or {%newline%} is used
+		Leading and trailing space between lines and tags is collapsed
+		inside collapsespace unless {%space%} or {%newline%} is used
 	{% endcollapsespace %}
+	{% stripspace %}
+		Leading and trailing space between lines and tags is completely
+		removed unless {%space%} or {%newline%} is used
+	{% endstripspace %}
 {% endfunc %}
 
 {%plain%}
