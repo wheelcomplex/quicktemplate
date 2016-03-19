@@ -1,4 +1,4 @@
-package quicktemplate
+package tests
 
 import (
 	"io/ioutil"
