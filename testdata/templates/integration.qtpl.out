@@ -4,9 +4,9 @@
 	
 	Embedded func template: 
 	Page's header: Header
-	Body: 
-	S=<b>&quot;foobar&quot;</b>
-
+	Body: <b>
+	S=&quot;foobar&quot;
+</b>
 
 
 	Html-escaped output tags:
