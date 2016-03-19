@@ -33,13 +33,15 @@ type token struct {
 	Value []byte
 
 	line int
+	pos  int
 }
 
-func (t *token) init(id, line int) {
+func (t *token) init(id, line, pos int) {
 	t.ID = id
 	t.Value = t.Value[:0]
 
 	t.line = line
+	t.pos = pos
 }
 
 func (t *token) String() string {
@@ -148,14 +150,14 @@ func (s *scanner) Next() bool {
 				if !s.readTagContents() {
 					return false
 				}
-				s.t.init(text, s.t.line)
+				s.t.init(text, s.t.line, s.t.pos)
 				s.t.Value = append(s.t.Value[:0], ' ')
 				return true
 			case "newline":
 				if !s.readTagContents() {
 					return false
 				}
-				s.t.init(text, s.t.line)
+				s.t.init(text, s.t.line, s.t.pos)
 				s.t.Value = append(s.t.Value[:0], '\n')
 				return true
 			}
@@ -169,10 +171,11 @@ func (s *scanner) readPlain() bool {
 		return false
 	}
 	startLine := s.line
+	startPos := s.pos()
 	s.startCapture()
 	ok := s.skipUntilTag("endplain")
 	v := s.stopCapture()
-	s.t.init(text, startLine)
+	s.t.init(text, startLine, startPos)
 	if ok {
 		n := bytes.LastIndex(v, strTagOpen)
 		v = v[:n]
@@ -237,7 +240,7 @@ func (s *scanner) scanToken() bool {
 }
 
 func (s *scanner) readText() bool {
-	s.t.init(text, s.line)
+	s.t.init(text, s.line, s.pos())
 	ok := false
 	for {
 		if !s.nextByte() {
@@ -271,7 +274,7 @@ func (s *scanner) readText() bool {
 
 func (s *scanner) readTagName() bool {
 	s.skipSpace()
-	s.t.init(tagName, s.line)
+	s.t.init(tagName, s.line, s.pos())
 	for {
 		if s.isSpace() || s.c == '%' {
 			if s.c == '%' {
@@ -295,7 +298,7 @@ func (s *scanner) readTagName() bool {
 
 func (s *scanner) readTagContents() bool {
 	s.skipSpace()
-	s.t.init(tagContents, s.line)
+	s.t.init(tagContents, s.line, s.pos())
 	for {
 		if s.c != '%' {
 			s.appendByte()
@@ -409,17 +412,23 @@ func (s *scanner) unreadByte(c byte) {
 	s.c = c
 }
 
+func (s *scanner) pos() int {
+	return len(s.lineStr)
+}
+
 func (s *scanner) Context() string {
-	var lineStr string
-	v := s.lineStr
-	if len(v) <= 40 {
-		lineStr = fmt.Sprintf("%q", v)
-	} else {
-		lineStr = fmt.Sprintf("%q ... %q", v[:20], v[len(v)-20:])
-	}
-	return fmt.Sprintf("file %q, line %d, pos %d, str %s", s.filePath, s.line+1, len(s.lineStr), lineStr)
+	t := s.Token()
+	return fmt.Sprintf("file %q, line %d, pos %d, token %s, last line %s",
+		s.filePath, t.line+1, t.pos, snippet(t.Value), snippet(s.lineStr))
 }
 
 func (s *scanner) WriteLineComment(w io.Writer) {
 	fmt.Fprintf(w, "//line %s:%d\n", s.filePath, s.t.line+1)
+}
+
+func snippet(s []byte) string {
+	if len(s) <= 40 {
+		return fmt.Sprintf("%q", s)
+	}
+	return fmt.Sprintf("%q ... %q", s[:20], s[len(s)-20:])
 }
