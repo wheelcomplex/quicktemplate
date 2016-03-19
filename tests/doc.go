@@ -1,2 +1,2 @@
-// Package tests contains only benchmark tests for quicktemplate
+// Package tests contains tests for quicktemplate
 package tests
