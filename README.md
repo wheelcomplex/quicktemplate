@@ -191,8 +191,9 @@ other output tags:
   * `{%f float %}` for float64
   * `{%z bytes %}` for byte slices
   * `{%q str %}` for json-compatible quoted strings.
-  * `{%j str %}` for embedding string into json string. Unlike `{%q str %}`
+  * `{%j str %}` for embedding str into json string. Unlike `{%q str %}`
     it doesn't quote the string.
+  * `{%u str %}` for [URL encoding](https://en.wikipedia.org/wiki/Percent-encoding) the given str.
   * `{%v anything %}` is equivalent to `%v` in printf-like functions.
 
 All these output tags produce html-safe output, i.e. they escape `<` to `&lt;`,

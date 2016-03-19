@@ -219,249 +219,258 @@ func streamprintArgs(qw *quicktemplate.Writer, i int, a *FooArgs) {
 	qw.E().J("bar\naaa")
 	//line testdata/test.qtpl:72
 	qw.N().S(` baz")<br/>
+		<a href="?`)
+	//line testdata/test.qtpl:73
+	qw.N().U("аргумент 1")
+	//line testdata/test.qtpl:73
+	qw.N().S(`=`)
+	//line testdata/test.qtpl:73
+	qw.N().U("значение=&1")
+	//line testdata/test.qtpl:73
+	qw.N().S(`">test</a>
 	</li>
 `)
-//line testdata/test.qtpl:74
+//line testdata/test.qtpl:75
 }
 
-//line testdata/test.qtpl:74
+//line testdata/test.qtpl:75
 func writeprintArgs(qww io.Writer, i int, a *FooArgs) {
-	//line testdata/test.qtpl:74
+	//line testdata/test.qtpl:75
 	qw := quicktemplate.AcquireWriter(qww)
-	//line testdata/test.qtpl:74
+	//line testdata/test.qtpl:75
 	streamprintArgs(qw, i, a)
-	//line testdata/test.qtpl:74
+	//line testdata/test.qtpl:75
 	quicktemplate.ReleaseWriter(qw)
-//line testdata/test.qtpl:74
+//line testdata/test.qtpl:75
 }
 
-//line testdata/test.qtpl:74
+//line testdata/test.qtpl:75
 func printArgs(i int, a *FooArgs) string {
-	//line testdata/test.qtpl:74
+	//line testdata/test.qtpl:75
 	qb := quicktemplate.AcquireByteBuffer()
-	//line testdata/test.qtpl:74
+	//line testdata/test.qtpl:75
 	writeprintArgs(qb, i, a)
-	//line testdata/test.qtpl:74
+	//line testdata/test.qtpl:75
 	qs := string(qb.B)
-	//line testdata/test.qtpl:74
+	//line testdata/test.qtpl:75
 	quicktemplate.ReleaseByteBuffer(qb)
-	//line testdata/test.qtpl:74
+	//line testdata/test.qtpl:75
 	return qs
-//line testdata/test.qtpl:74
+//line testdata/test.qtpl:75
 }
 
 // Now create page template interface.
 
-//line testdata/test.qtpl:78
+//line testdata/test.qtpl:79
 type Page interface {
-	//line testdata/test.qtpl:78
+	//line testdata/test.qtpl:79
 	Head() string
-	//line testdata/test.qtpl:78
+	//line testdata/test.qtpl:79
 	StreamHead(qw *quicktemplate.Writer)
-	//line testdata/test.qtpl:78
+	//line testdata/test.qtpl:79
 	WriteHead(qww io.Writer)
-	//line testdata/test.qtpl:78
+	//line testdata/test.qtpl:79
 	Body(title string) string
-	//line testdata/test.qtpl:78
+	//line testdata/test.qtpl:79
 	StreamBody(qw *quicktemplate.Writer, title string)
-	//line testdata/test.qtpl:78
+	//line testdata/test.qtpl:79
 	WriteBody(qww io.Writer, title string)
-//line testdata/test.qtpl:78
+//line testdata/test.qtpl:79
 }
 
 // This function prints arbitrary page.
 
-//line testdata/test.qtpl:88
+//line testdata/test.qtpl:89
 func StreamPrintPage(qw *quicktemplate.Writer, p Page, title string) {
-	//line testdata/test.qtpl:88
+	//line testdata/test.qtpl:89
 	qw.N().S(`
 	<html>
 		<head>`)
-	//line testdata/test.qtpl:90
+	//line testdata/test.qtpl:91
 	p.StreamHead(qw)
-	//line testdata/test.qtpl:90
+	//line testdata/test.qtpl:91
 	qw.N().S(`</head>
 		<body>`)
-	//line testdata/test.qtpl:91
+	//line testdata/test.qtpl:92
 	p.StreamBody(qw, title)
-	//line testdata/test.qtpl:91
+	//line testdata/test.qtpl:92
 	qw.N().S(`</body>
 	</html>
 `)
-//line testdata/test.qtpl:93
+//line testdata/test.qtpl:94
 }
 
-//line testdata/test.qtpl:93
+//line testdata/test.qtpl:94
 func WritePrintPage(qww io.Writer, p Page, title string) {
-	//line testdata/test.qtpl:93
+	//line testdata/test.qtpl:94
 	qw := quicktemplate.AcquireWriter(qww)
-	//line testdata/test.qtpl:93
+	//line testdata/test.qtpl:94
 	StreamPrintPage(qw, p, title)
-	//line testdata/test.qtpl:93
+	//line testdata/test.qtpl:94
 	quicktemplate.ReleaseWriter(qw)
-//line testdata/test.qtpl:93
+//line testdata/test.qtpl:94
 }
 
-//line testdata/test.qtpl:93
+//line testdata/test.qtpl:94
 func PrintPage(p Page, title string) string {
-	//line testdata/test.qtpl:93
+	//line testdata/test.qtpl:94
 	qb := quicktemplate.AcquireByteBuffer()
-	//line testdata/test.qtpl:93
+	//line testdata/test.qtpl:94
 	WritePrintPage(qb, p, title)
-	//line testdata/test.qtpl:93
+	//line testdata/test.qtpl:94
 	qs := string(qb.B)
-	//line testdata/test.qtpl:93
+	//line testdata/test.qtpl:94
 	quicktemplate.ReleaseByteBuffer(qb)
-	//line testdata/test.qtpl:93
+	//line testdata/test.qtpl:94
 	return qs
-//line testdata/test.qtpl:93
+//line testdata/test.qtpl:94
 }
 
 // Implement contacts page
 
-//line testdata/test.qtpl:96
+//line testdata/test.qtpl:97
 type ContactsPage struct{}
 
-//line testdata/test.qtpl:97
+//line testdata/test.qtpl:98
 func (b *ContactsPage) StreamHead(qw *quicktemplate.Writer) {
-//line testdata/test.qtpl:97
+//line testdata/test.qtpl:98
 qw.N().S(`<title>Contacts!</title>`) }
 
-//line testdata/test.qtpl:97
-//line testdata/test.qtpl:97
+//line testdata/test.qtpl:98
+//line testdata/test.qtpl:98
 func (b *ContactsPage) WriteHead(qww io.Writer) {
-	//line testdata/test.qtpl:97
+	//line testdata/test.qtpl:98
 	qw := quicktemplate.AcquireWriter(qww)
-	//line testdata/test.qtpl:97
+	//line testdata/test.qtpl:98
 	b.StreamHead(qw)
-	//line testdata/test.qtpl:97
+	//line testdata/test.qtpl:98
 	quicktemplate.ReleaseWriter(qw)
-//line testdata/test.qtpl:97
+//line testdata/test.qtpl:98
 }
 
-//line testdata/test.qtpl:97
+//line testdata/test.qtpl:98
 func (b *ContactsPage) Head() string {
-	//line testdata/test.qtpl:97
+	//line testdata/test.qtpl:98
 	qb := quicktemplate.AcquireByteBuffer()
-	//line testdata/test.qtpl:97
+	//line testdata/test.qtpl:98
 	b.WriteHead(qb)
-	//line testdata/test.qtpl:97
+	//line testdata/test.qtpl:98
 	qs := string(qb.B)
-	//line testdata/test.qtpl:97
+	//line testdata/test.qtpl:98
 	quicktemplate.ReleaseByteBuffer(qb)
-	//line testdata/test.qtpl:97
+	//line testdata/test.qtpl:98
 	return qs
-//line testdata/test.qtpl:97
+//line testdata/test.qtpl:98
 }
 
-//line testdata/test.qtpl:98
+//line testdata/test.qtpl:99
 func (b *ContactsPage) StreamBody(qw *quicktemplate.Writer, title string) {
-	//line testdata/test.qtpl:98
+	//line testdata/test.qtpl:99
 	qw.N().S(`Put here contact info`)
-//line testdata/test.qtpl:98
+//line testdata/test.qtpl:99
 }
 
-//line testdata/test.qtpl:98
+//line testdata/test.qtpl:99
 func (b *ContactsPage) WriteBody(qww io.Writer, title string) {
-	//line testdata/test.qtpl:98
+	//line testdata/test.qtpl:99
 	qw := quicktemplate.AcquireWriter(qww)
-	//line testdata/test.qtpl:98
+	//line testdata/test.qtpl:99
 	b.StreamBody(qw, title)
-	//line testdata/test.qtpl:98
+	//line testdata/test.qtpl:99
 	quicktemplate.ReleaseWriter(qw)
-//line testdata/test.qtpl:98
+//line testdata/test.qtpl:99
 }
 
-//line testdata/test.qtpl:98
+//line testdata/test.qtpl:99
 func (b *ContactsPage) Body(title string) string {
-	//line testdata/test.qtpl:98
+	//line testdata/test.qtpl:99
 	qb := quicktemplate.AcquireByteBuffer()
-	//line testdata/test.qtpl:98
+	//line testdata/test.qtpl:99
 	b.WriteBody(qb, title)
-	//line testdata/test.qtpl:98
+	//line testdata/test.qtpl:99
 	qs := string(qb.B)
-	//line testdata/test.qtpl:98
+	//line testdata/test.qtpl:99
 	quicktemplate.ReleaseByteBuffer(qb)
-	//line testdata/test.qtpl:98
+	//line testdata/test.qtpl:99
 	return qs
-//line testdata/test.qtpl:98
+//line testdata/test.qtpl:99
 }
 
 // Implement HomePage
 
-//line testdata/test.qtpl:101
+//line testdata/test.qtpl:102
 type Homepage struct{}
 
-//line testdata/test.qtpl:102
+//line testdata/test.qtpl:103
 func (h *Homepage) StreamHead(qw *quicktemplate.Writer) {
-//line testdata/test.qtpl:102
+//line testdata/test.qtpl:103
 qw.N().S(`<title>Homepage</title>`) }
 
-//line testdata/test.qtpl:102
-//line testdata/test.qtpl:102
+//line testdata/test.qtpl:103
+//line testdata/test.qtpl:103
 func (h *Homepage) WriteHead(qww io.Writer) {
-	//line testdata/test.qtpl:102
+	//line testdata/test.qtpl:103
 	qw := quicktemplate.AcquireWriter(qww)
-	//line testdata/test.qtpl:102
+	//line testdata/test.qtpl:103
 	h.StreamHead(qw)
-	//line testdata/test.qtpl:102
+	//line testdata/test.qtpl:103
 	quicktemplate.ReleaseWriter(qw)
-//line testdata/test.qtpl:102
-}
-
-//line testdata/test.qtpl:102
-func (h *Homepage) Head() string {
-	//line testdata/test.qtpl:102
-	qb := quicktemplate.AcquireByteBuffer()
-	//line testdata/test.qtpl:102
-	h.WriteHead(qb)
-	//line testdata/test.qtpl:102
-	qs := string(qb.B)
-	//line testdata/test.qtpl:102
-	quicktemplate.ReleaseByteBuffer(qb)
-	//line testdata/test.qtpl:102
-	return qs
-//line testdata/test.qtpl:102
+//line testdata/test.qtpl:103
 }
 
 //line testdata/test.qtpl:103
-func (h *Homepage) StreamBody(qw *quicktemplate.Writer, title string) {
+func (h *Homepage) Head() string {
 	//line testdata/test.qtpl:103
+	qb := quicktemplate.AcquireByteBuffer()
+	//line testdata/test.qtpl:103
+	h.WriteHead(qb)
+	//line testdata/test.qtpl:103
+	qs := string(qb.B)
+	//line testdata/test.qtpl:103
+	quicktemplate.ReleaseByteBuffer(qb)
+	//line testdata/test.qtpl:103
+	return qs
+//line testdata/test.qtpl:103
+}
+
+//line testdata/test.qtpl:104
+func (h *Homepage) StreamBody(qw *quicktemplate.Writer, title string) {
+	//line testdata/test.qtpl:104
 	qw.N().S(`
 	Title: `)
-	//line testdata/test.qtpl:104
+	//line testdata/test.qtpl:105
 	qw.N().S(title)
-	//line testdata/test.qtpl:104
+	//line testdata/test.qtpl:105
 	qw.N().S(`
 	Homepage body
 `)
-//line testdata/test.qtpl:106
+//line testdata/test.qtpl:107
 }
 
-//line testdata/test.qtpl:106
+//line testdata/test.qtpl:107
 func (h *Homepage) WriteBody(qww io.Writer, title string) {
-	//line testdata/test.qtpl:106
+	//line testdata/test.qtpl:107
 	qw := quicktemplate.AcquireWriter(qww)
-	//line testdata/test.qtpl:106
+	//line testdata/test.qtpl:107
 	h.StreamBody(qw, title)
-	//line testdata/test.qtpl:106
+	//line testdata/test.qtpl:107
 	quicktemplate.ReleaseWriter(qw)
-//line testdata/test.qtpl:106
+//line testdata/test.qtpl:107
 }
 
-//line testdata/test.qtpl:106
+//line testdata/test.qtpl:107
 func (h *Homepage) Body(title string) string {
-	//line testdata/test.qtpl:106
+	//line testdata/test.qtpl:107
 	qb := quicktemplate.AcquireByteBuffer()
-	//line testdata/test.qtpl:106
+	//line testdata/test.qtpl:107
 	h.WriteBody(qb, title)
-	//line testdata/test.qtpl:106
+	//line testdata/test.qtpl:107
 	qs := string(qb.B)
-	//line testdata/test.qtpl:106
+	//line testdata/test.qtpl:107
 	quicktemplate.ReleaseByteBuffer(qb)
-	//line testdata/test.qtpl:106
+	//line testdata/test.qtpl:107
 	return qs
-//line testdata/test.qtpl:106
+//line testdata/test.qtpl:107
 }
 
 // unused code may be commented:

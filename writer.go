@@ -110,3 +110,11 @@ func (w *QWriter) J(s string) {
 func (w *QWriter) V(v interface{}) {
 	fmt.Fprintf(w.w, "%v", v)
 }
+
+// U writes url-encoded s to w.
+func (w *QWriter) U(s string) {
+	bb := AcquireByteBuffer()
+	bb.B = appendURLEncode(bb.B, s)
+	w.w.Write(bb.B)
+	ReleaseByteBuffer(bb)
+}

@@ -301,7 +301,8 @@ func (p *parser) tryParseCommonTags(tagBytes []byte) (bool, error) {
 	s := p.s
 	tagNameStr := string(tagBytes)
 	switch tagNameStr {
-	case "s", "v", "d", "f", "q", "z", "j", "s=", "v=", "d=", "f=", "q=", "z=", "j=":
+	case "s", "v", "d", "f", "q", "z", "j", "u",
+		"s=", "v=", "d=", "f=", "q=", "z=", "j=", "u=":
 		t, err := expectTagContents(s)
 		if err != nil {
 			return false, err

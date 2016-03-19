@@ -70,6 +70,7 @@ Now define private printArgs, which is used in Foo via {%= %} tag
 	<li>
 		a[{%d i %}] = {S: {%q a.S %}, N: {%d a.N %}}<br>
 		alert("foo {%j "bar\naaa" %} baz")<br/>
+		<a href="?{%u "аргумент 1"%}={%u "значение=&1"%}">test</a>
 	</li>
 {% endfunc %}
 

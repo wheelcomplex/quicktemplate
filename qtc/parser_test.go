@@ -25,6 +25,9 @@ func TestParseOutputTagSuccess(t *testing.T) {
 
 	// jsons-safe string
 	testParseSuccess(t, `{% func f() %}{%j "foo\nbar" %}{%endfunc%}`)
+
+	// url-encoded string
+	testParseSuccess(t, `{% func A() %}{%u "fooab" %}{%endfunc%}`)
 }
 
 func TestParseOutputTagFailure(t *testing.T) {
