@@ -392,3 +392,7 @@ There are other useful tags supported by quicktemplate:
         to template arguments, template inheritance and embedding function
         templates into other templates.
       * Performance optimizations.
+
+* *I didn't find an answer for my question here*
+
+  Try exploring [these questions](https://github.com/valyala/quicktemplate/issues?q=label%3Aquestion).
