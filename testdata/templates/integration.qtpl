@@ -48,6 +48,17 @@ It should contains all the quicktemplate stuff.
 			Tags aren't parsed {%inside %}
 			plain
 		{%endplain%}
+		{% code // one-liner comment %}
+		{% code
+		// multi-line
+		// comment
+		%}
+		{% code
+		/*
+		  yet another
+		  multi-line comment
+		*/
+		%}
 	{% endstripspace %}
 
 	{% collapsespace %}
