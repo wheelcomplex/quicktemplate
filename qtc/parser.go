@@ -579,7 +579,7 @@ func validateIfStmt(stmt []byte) error {
 }
 
 func validateFuncCode(code []byte) error {
-	exprStr := fmt.Sprintf("func () { for { %s } }", code)
+	exprStr := fmt.Sprintf("func () { for { %s\n } }", code)
 	_, err := goparser.ParseExpr(exprStr)
 	return err
 }

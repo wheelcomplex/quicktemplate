@@ -49,6 +49,38 @@ func TestParseOutputTagFailure(t *testing.T) {
 func TestParseTemplateCodeSuccess(t *testing.T) {
 	// empty code
 	testParseSuccess(t, "{% code %}")
+	testParseSuccess(t, "{% func f() %}{% code %}{% endfunc %}")
+
+	// comment
+	testParseSuccess(t, `{% code // foobar %}`)
+	testParseSuccess(t, `{% func f() %}{% code // foobar %}{% endfunc %}`)
+	testParseSuccess(t, `{% code
+		// foo
+		// bar
+	%}`)
+	testParseSuccess(t, `{% func f() %}{% code
+		// foo
+		// bar
+	%}{% endfunc %}`)
+	testParseSuccess(t, `{%
+		code
+		/*
+			foo
+			bar
+		*/
+	%}`)
+	testParseSuccess(t, `{% func f() %}{%
+		code
+		/*
+			foo
+			bar
+		*/
+	%}{% endfunc %}`)
+
+	testParseSuccess(t, `{% code var a int %}`)
+	testParseSuccess(t, `{% func f() %}{% code var a int %}{% endfunc %}`)
+	testParseSuccess(t, `{% func f() %}{% code a := 0 %}{% endfunc %}`)
+	testParseSuccess(t, `{% func f() %}{% code type A struct{} %}{% endfunc %}`)
 
 	// declarations
 	testParseSuccess(t, `{%code
