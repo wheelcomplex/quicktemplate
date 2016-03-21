@@ -33,7 +33,7 @@ Inspired by [mako templates](http://www.makotemplates.org/) philosophy.
 # Performance comparison with html/template
 
 Quicktemplate is more than 20x faster than [html/template](https://golang.org/pkg/html/template/).
-The following simple template is used:
+The following simple template is used in the benchmark:
 
   * [html/template version](https://github.com/valyala/quicktemplate/blob/master/testdata/templates/bench.tpl)
   * [quicktemplate version](https://github.com/valyala/quicktemplate/blob/master/testdata/templates/bench.qtpl)
