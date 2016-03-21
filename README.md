@@ -194,7 +194,7 @@ other output tags:
   * `{%j str %}` for embedding str into json string. Unlike `{%q str %}`
     it doesn't quote the string.
   * `{%u str %}` for [URL encoding](https://en.wikipedia.org/wiki/Percent-encoding) the given str.
-  * `{%v anything %}` is equivalent to `%v` in printf-like functions.
+  * `{%v anything %}` is equivalent to `%v` in [printf-like functions](https://golang.org/pkg/fmt/).
 
 All these output tags produce html-safe output, i.e. they escape `<` to `&lt;`,
 `>` to `&gt;`, etc. If you don't want html-safe output, then just put `=` after
