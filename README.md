@@ -325,15 +325,15 @@ There are other useful tags supported by quicktemplate:
     Base page implementation
     {% code
     type BasePage struct {
-        Title string
-        Footer string
+        TitleStr string
+        FooterStr string
     }
     %}
-    {% func (bp *BasePage) Title() %}{%s bp.Title %}{% endfunc %}
+    {% func (bp *BasePage) Title() %}{%s bp.TitleStr %}{% endfunc %}
     {% func (bp *BasePage) Body(s string, n int) %}
         <b>s={%q s %}, n={%d n %}</b>
     {% endfunc %}
-    {% func (bp *BasePage) Footer() %}{%s bp.Footer %}{% endfunc %}
+    {% func (bp *BasePage) Footer() %}{%s bp.FooterStr %}{% endfunc %}
 
     Main page implementation
     {% code
@@ -342,14 +342,14 @@ There are other useful tags supported by quicktemplate:
         BasePage
 
         // real body for main page
-        Body string
+        BodyStr string
     }
 
     Override only Body
     Title and Footer are used from BasePage.
     {% func (mp *MainPage) Body(s string, n int) %}
         <div>
-            main body: {%s mp.Body %}
+            main body: {%s mp.BodyStr %}
         </div>
         <div>
             base body: {%= mp.BasePage.Body(s, n) %}
