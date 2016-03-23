@@ -345,6 +345,7 @@ There are other useful tags supported by quicktemplate:
         // real body for main page
         BodyStr string
     }
+    %}
 
     Override only Body
     Title and Footer are used from BasePage.
