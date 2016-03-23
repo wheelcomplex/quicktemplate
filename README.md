@@ -17,7 +17,8 @@ Inspired by [mako templates](http://www.makotemplates.org/) philosophy.
     for details.
   * Powerful. Arbitrary Go code may be embedded into and mixed with templates.
     Be careful with this power - do not query db and/or external resources from
-    templates unless you miss php way in Go :)
+    templates unless you miss php way in Go :) This power is mostly for
+    arbitrary data transformations.
   * Easy to understand template inheritance powered by [Go interfaces](https://golang.org/doc/effective_go.html#interfaces).
     See [this example](https://github.com/valyala/quicktemplate/tree/master/examples/basicserver) for details.
   * Templates are compiled into a single binary, so there is no need in copying
