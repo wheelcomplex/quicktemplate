@@ -17,6 +17,9 @@ var (
 		"The compiler recursively processes all the subdirectories.\n"+
 		"Compiled template files are placed near the original file with .go extension added.")
 
+	file = flag.String("file", "", "Path to template file to compile.\n"+
+		"Flags -dir and -ext are ignored if file is set.\n"+
+		"The compiled file will be placed near the original file with .go extension added.")
 	ext = flag.String("ext", "qtpl", "Only files with this extension are compiled")
 )
 
@@ -26,6 +29,11 @@ var filesCompiled int
 
 func main() {
 	flag.Parse()
+
+	if len(*file) > 0 {
+		compileSingleFile(*file)
+		return
+	}
 
 	if len(*ext) == 0 {
 		logger.Fatalf("ext cannot be empty")
@@ -40,6 +48,17 @@ func main() {
 	logger.Printf("Compiling *%s template files in directory %q", *ext, *dir)
 	compileDir(*dir)
 	logger.Printf("Total files compiled: %d", filesCompiled)
+}
+
+func compileSingleFile(filename string) {
+	fi, err := os.Stat(filename)
+	if err != nil {
+		logger.Fatalf("cannot stat file %q: %s", filename, err)
+	}
+	if fi.IsDir() {
+		logger.Fatalf("cannot compile directory %q. Use -dir flag", filename)
+	}
+	compileFile(filename)
 }
 
 func compileDir(path string) {
@@ -87,6 +106,7 @@ func compileDir(path string) {
 func compileFile(infile string) {
 	outfile := infile + ".go"
 	logger.Printf("Compiling %q to %q...", infile, outfile)
+
 	inf, err := os.Open(infile)
 	if err != nil {
 		logger.Fatalf("cannot open file %q: %s", infile, err)
