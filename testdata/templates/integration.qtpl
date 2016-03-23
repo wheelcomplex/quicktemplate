@@ -80,6 +80,7 @@ It should contains all the quicktemplate stuff.
 					{% return %}
 				{% endif %}
 				s = {%s s %}
+				{% continue %}
 			{% endif %}
 		{% endfor %}
 	{% endcollapsespace %}

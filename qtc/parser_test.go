@@ -10,6 +10,16 @@ import (
 	"github.com/valyala/quicktemplate"
 )
 
+func TestParseBreakContinueReturn(t *testing.T) {
+	testParseSuccess(t, `{% func a() %}{% for %}{% continue %}{% break %}{% return %}{% endfor %}{% endfunc %}`)
+	testParseSuccess(t, `{% func a() %}{% for %}
+		{% if f1() %}{% continue %}skip this{%s "and this" %}{% endif %}
+		{% if f2() %}{% break %}{% for %}{% endfor %}skip this{% endif %}
+		{% if f3() %}{% return %}foo{% if f4() %}{% for %}noop{% endfor %}{% endif %}bar skip this{% endif %}
+		text
+	{% endfor %}{% endfunc %}`)
+}
+
 func TestParseOutputTagSuccess(t *testing.T) {
 	// identifier
 	testParseSuccess(t, "{%func a()%}{%s foobar %}{%endfunc%}")
@@ -295,13 +305,13 @@ func TestParserSuccess(t *testing.T) {
 	%}{%endfunc%}`)
 
 	// break inside for loop
-	testParseSuccess(t, `{%func f()%}{%for%}{%code
-		if a() {
-			break
-		} else {
-			return
-		}
-	%}{%endfor%}{%endfunc%}`)
+	testParseSuccess(t, `{%func f()%}{%for%}
+		{% if a() %}
+			{% break %}
+		{% else %}
+			{% return %}
+		{% endif %}
+	{%endfor%}{%endfunc%}`)
 
 	// interface
 	testParseSuccess(t, "{%interface Foo { Bar()\nBaz() } %}")

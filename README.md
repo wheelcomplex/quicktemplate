@@ -113,7 +113,7 @@ Then run `go run`. If all went ok, you'll see something like this:
 ```
 
 Let's create more complex template, which calls other template functions,
-contains loops, conditions, breaks and returns.
+contains loops, conditions, breaks, continue and returns.
 Put the following template into `templates/greetings.qtpl`:
 
 ```qtpl
@@ -132,7 +132,8 @@ It also greets John differently comparing to others.
 			{% break %}
 		{% elseif name == "John" %}
 			{%= sayHi("Mr. " + name) %}
-		{% else %}
+			{% continue %}
+		{% else%}
 			{%= Hello(name) %}
 		{% endif %}
 	{% endfor %}

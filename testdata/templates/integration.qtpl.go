@@ -213,176 +213,178 @@ func StreamIntegration(qw422016 *qt422016.Writer) {
 			//line testdata/templates/integration.qtpl:82
 			qw422016.E().S(s)
 			//line testdata/templates/integration.qtpl:83
+			continue
+			//line testdata/templates/integration.qtpl:84
 		}
-		//line testdata/templates/integration.qtpl:84
+		//line testdata/templates/integration.qtpl:85
 	}
-	//line testdata/templates/integration.qtpl:85
+	//line testdata/templates/integration.qtpl:86
 	qw422016.N().S(`
 
 	tail of the func
 `)
-//line testdata/templates/integration.qtpl:88
+//line testdata/templates/integration.qtpl:89
 }
 
-//line testdata/templates/integration.qtpl:88
+//line testdata/templates/integration.qtpl:89
 func WriteIntegration(qq422016 qtio422016.Writer) {
-	//line testdata/templates/integration.qtpl:88
+	//line testdata/templates/integration.qtpl:89
 	qw422016 := qt422016.AcquireWriter(qq422016)
-	//line testdata/templates/integration.qtpl:88
+	//line testdata/templates/integration.qtpl:89
 	StreamIntegration(qw422016)
-	//line testdata/templates/integration.qtpl:88
+	//line testdata/templates/integration.qtpl:89
 	qt422016.ReleaseWriter(qw422016)
-//line testdata/templates/integration.qtpl:88
+//line testdata/templates/integration.qtpl:89
 }
 
-//line testdata/templates/integration.qtpl:88
+//line testdata/templates/integration.qtpl:89
 func Integration() string {
-	//line testdata/templates/integration.qtpl:88
+	//line testdata/templates/integration.qtpl:89
 	qb422016 := qt422016.AcquireByteBuffer()
-	//line testdata/templates/integration.qtpl:88
+	//line testdata/templates/integration.qtpl:89
 	WriteIntegration(qb422016)
-	//line testdata/templates/integration.qtpl:88
+	//line testdata/templates/integration.qtpl:89
 	qs422016 := string(qb422016.B)
-	//line testdata/templates/integration.qtpl:88
+	//line testdata/templates/integration.qtpl:89
 	qt422016.ReleaseByteBuffer(qb422016)
-	//line testdata/templates/integration.qtpl:88
+	//line testdata/templates/integration.qtpl:89
 	return qs422016
-//line testdata/templates/integration.qtpl:88
+//line testdata/templates/integration.qtpl:89
 }
 
-//line testdata/templates/integration.qtpl:91
+//line testdata/templates/integration.qtpl:92
 type Page interface {
-	//line testdata/templates/integration.qtpl:91
+	//line testdata/templates/integration.qtpl:92
 	Header() string
-	//line testdata/templates/integration.qtpl:91
+	//line testdata/templates/integration.qtpl:92
 	StreamHeader(qw422016 *qt422016.Writer)
-	//line testdata/templates/integration.qtpl:91
+	//line testdata/templates/integration.qtpl:92
 	WriteHeader(qq422016 qtio422016.Writer)
-	//line testdata/templates/integration.qtpl:91
+	//line testdata/templates/integration.qtpl:92
 	Body() string
-	//line testdata/templates/integration.qtpl:91
+	//line testdata/templates/integration.qtpl:92
 	StreamBody(qw422016 *qt422016.Writer)
-	//line testdata/templates/integration.qtpl:91
+	//line testdata/templates/integration.qtpl:92
 	WriteBody(qq422016 qtio422016.Writer)
-//line testdata/templates/integration.qtpl:91
+//line testdata/templates/integration.qtpl:92
 }
 
-//line testdata/templates/integration.qtpl:97
+//line testdata/templates/integration.qtpl:98
 func streamembeddedFunc(qw422016 *qt422016.Writer, p Page) {
-	//line testdata/templates/integration.qtpl:97
+	//line testdata/templates/integration.qtpl:98
 	qw422016.N().S(`
 	Page's header: `)
-	//line testdata/templates/integration.qtpl:98
+	//line testdata/templates/integration.qtpl:99
 	p.StreamHeader(qw422016)
-	//line testdata/templates/integration.qtpl:98
+	//line testdata/templates/integration.qtpl:99
 	qw422016.N().S(`
 	Body: `)
-	//line testdata/templates/integration.qtpl:99
+	//line testdata/templates/integration.qtpl:100
 	qw422016.N().S(fmt.Sprintf("<b>%s</b>", p.Body()))
-	//line testdata/templates/integration.qtpl:99
+	//line testdata/templates/integration.qtpl:100
 	qw422016.N().S(`
 `)
-//line testdata/templates/integration.qtpl:100
+//line testdata/templates/integration.qtpl:101
 }
 
-//line testdata/templates/integration.qtpl:100
+//line testdata/templates/integration.qtpl:101
 func writeembeddedFunc(qq422016 qtio422016.Writer, p Page) {
-	//line testdata/templates/integration.qtpl:100
+	//line testdata/templates/integration.qtpl:101
 	qw422016 := qt422016.AcquireWriter(qq422016)
-	//line testdata/templates/integration.qtpl:100
+	//line testdata/templates/integration.qtpl:101
 	streamembeddedFunc(qw422016, p)
-	//line testdata/templates/integration.qtpl:100
+	//line testdata/templates/integration.qtpl:101
 	qt422016.ReleaseWriter(qw422016)
-//line testdata/templates/integration.qtpl:100
+//line testdata/templates/integration.qtpl:101
 }
 
-//line testdata/templates/integration.qtpl:100
+//line testdata/templates/integration.qtpl:101
 func embeddedFunc(p Page) string {
-	//line testdata/templates/integration.qtpl:100
+	//line testdata/templates/integration.qtpl:101
 	qb422016 := qt422016.AcquireByteBuffer()
-	//line testdata/templates/integration.qtpl:100
+	//line testdata/templates/integration.qtpl:101
 	writeembeddedFunc(qb422016, p)
-	//line testdata/templates/integration.qtpl:100
+	//line testdata/templates/integration.qtpl:101
 	qs422016 := string(qb422016.B)
-	//line testdata/templates/integration.qtpl:100
+	//line testdata/templates/integration.qtpl:101
 	qt422016.ReleaseByteBuffer(qb422016)
-	//line testdata/templates/integration.qtpl:100
+	//line testdata/templates/integration.qtpl:101
 	return qs422016
-//line testdata/templates/integration.qtpl:100
+//line testdata/templates/integration.qtpl:101
 }
 
-//line testdata/templates/integration.qtpl:103
+//line testdata/templates/integration.qtpl:104
 type integrationPage struct {
 	S string
 }
 
-//line testdata/templates/integration.qtpl:108
+//line testdata/templates/integration.qtpl:109
 func (p *integrationPage) StreamHeader(qw422016 *qt422016.Writer) {
-//line testdata/templates/integration.qtpl:108
+//line testdata/templates/integration.qtpl:109
 qw422016.N().S(`Header`) }
 
-//line testdata/templates/integration.qtpl:108
-//line testdata/templates/integration.qtpl:108
+//line testdata/templates/integration.qtpl:109
+//line testdata/templates/integration.qtpl:109
 func (p *integrationPage) WriteHeader(qq422016 qtio422016.Writer) {
-	//line testdata/templates/integration.qtpl:108
+	//line testdata/templates/integration.qtpl:109
 	qw422016 := qt422016.AcquireWriter(qq422016)
-	//line testdata/templates/integration.qtpl:108
+	//line testdata/templates/integration.qtpl:109
 	p.StreamHeader(qw422016)
-	//line testdata/templates/integration.qtpl:108
+	//line testdata/templates/integration.qtpl:109
 	qt422016.ReleaseWriter(qw422016)
-//line testdata/templates/integration.qtpl:108
+//line testdata/templates/integration.qtpl:109
 }
 
-//line testdata/templates/integration.qtpl:108
+//line testdata/templates/integration.qtpl:109
 func (p *integrationPage) Header() string {
-	//line testdata/templates/integration.qtpl:108
+	//line testdata/templates/integration.qtpl:109
 	qb422016 := qt422016.AcquireByteBuffer()
-	//line testdata/templates/integration.qtpl:108
+	//line testdata/templates/integration.qtpl:109
 	p.WriteHeader(qb422016)
-	//line testdata/templates/integration.qtpl:108
+	//line testdata/templates/integration.qtpl:109
 	qs422016 := string(qb422016.B)
-	//line testdata/templates/integration.qtpl:108
+	//line testdata/templates/integration.qtpl:109
 	qt422016.ReleaseByteBuffer(qb422016)
-	//line testdata/templates/integration.qtpl:108
+	//line testdata/templates/integration.qtpl:109
 	return qs422016
-//line testdata/templates/integration.qtpl:108
+//line testdata/templates/integration.qtpl:109
 }
 
-//line testdata/templates/integration.qtpl:110
+//line testdata/templates/integration.qtpl:111
 func (p *integrationPage) StreamBody(qw422016 *qt422016.Writer) {
-	//line testdata/templates/integration.qtpl:110
+	//line testdata/templates/integration.qtpl:111
 	qw422016.N().S(`
 	S=`)
-	//line testdata/templates/integration.qtpl:111
+	//line testdata/templates/integration.qtpl:112
 	qw422016.E().Q(p.S)
-	//line testdata/templates/integration.qtpl:111
+	//line testdata/templates/integration.qtpl:112
 	qw422016.N().S(`
 `)
-//line testdata/templates/integration.qtpl:112
+//line testdata/templates/integration.qtpl:113
 }
 
-//line testdata/templates/integration.qtpl:112
+//line testdata/templates/integration.qtpl:113
 func (p *integrationPage) WriteBody(qq422016 qtio422016.Writer) {
-	//line testdata/templates/integration.qtpl:112
+	//line testdata/templates/integration.qtpl:113
 	qw422016 := qt422016.AcquireWriter(qq422016)
-	//line testdata/templates/integration.qtpl:112
+	//line testdata/templates/integration.qtpl:113
 	p.StreamBody(qw422016)
-	//line testdata/templates/integration.qtpl:112
+	//line testdata/templates/integration.qtpl:113
 	qt422016.ReleaseWriter(qw422016)
-//line testdata/templates/integration.qtpl:112
+//line testdata/templates/integration.qtpl:113
 }
 
-//line testdata/templates/integration.qtpl:112
+//line testdata/templates/integration.qtpl:113
 func (p *integrationPage) Body() string {
-	//line testdata/templates/integration.qtpl:112
+	//line testdata/templates/integration.qtpl:113
 	qb422016 := qt422016.AcquireByteBuffer()
-	//line testdata/templates/integration.qtpl:112
+	//line testdata/templates/integration.qtpl:113
 	p.WriteBody(qb422016)
-	//line testdata/templates/integration.qtpl:112
+	//line testdata/templates/integration.qtpl:113
 	qs422016 := string(qb422016.B)
-	//line testdata/templates/integration.qtpl:112
+	//line testdata/templates/integration.qtpl:113
 	qt422016.ReleaseByteBuffer(qb422016)
-	//line testdata/templates/integration.qtpl:112
+	//line testdata/templates/integration.qtpl:113
 	return qs422016
-//line testdata/templates/integration.qtpl:112
+//line testdata/templates/integration.qtpl:113
 }

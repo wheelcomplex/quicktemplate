@@ -332,14 +332,21 @@ func (p *parser) tryParseCommonTags(tagBytes []byte) (bool, error) {
 		}
 		p.Printf("%s", f.CallStream("qw422016"))
 	case "return":
-		if err := p.skipAfterTag("return"); err != nil {
+		if err := p.skipAfterTag(tagNameStr); err != nil {
 			return false, err
 		}
 	case "break":
 		if p.forDepth <= 0 {
 			return false, fmt.Errorf("found break tag outside for loop")
 		}
-		if err := p.skipAfterTag("break"); err != nil {
+		if err := p.skipAfterTag(tagNameStr); err != nil {
+			return false, err
+		}
+	case "continue":
+		if p.forDepth <= 0 {
+			return false, fmt.Errorf("found continue tag outside for loop")
+		}
+		if err := p.skipAfterTag(tagNameStr); err != nil {
 			return false, err
 		}
 	case "code":

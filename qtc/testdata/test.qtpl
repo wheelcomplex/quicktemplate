@@ -31,7 +31,11 @@ Now define an exported function template
 				{% if i >= 42 %}
 					There are other args, but only the first 42 of them are shown
 					{% break %}
-					All the stuff after break {%s "is" %} ignored
+					All the stuff after break {%s "is" %} ignored,
+					{% for %}even loops{% if i == 43 %}and conditions{% endif %}{% endfor %}
+				{% elseif aa.N == 3 %}
+					{% continue %}
+					This should be {%s "ignored" %}.
 				{% endif %}
 				{%= printArgs(i, &aa) %}
 				Arbitrary Go code may be inserted here: {% code	str := strconv.Itoa(i+42) %}
