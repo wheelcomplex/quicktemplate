@@ -7,7 +7,7 @@ import (
 func TestHTMLEscapeWriter(t *testing.T) {
 	testHTMLEscapeWriter(t, "", "")
 	testHTMLEscapeWriter(t, "foobar", "foobar")
-	testHTMLEscapeWriter(t, `<h1>fo'"bar</h1>`, "&lt;h1&gt;fo&#39;&quot;bar&lt;/h1&gt;")
+	testHTMLEscapeWriter(t, `<h1>fo'"bar&</h1>`, "&lt;h1&gt;fo&#39;&quot;bar&amp;&lt;/h1&gt;")
 	testHTMLEscapeWriter(t, "fo<b>bar", "fo&lt;b&gt;bar")
 }
 

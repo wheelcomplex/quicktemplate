@@ -46,6 +46,8 @@ func (w *htmlEscapeWriter) Write(p []byte) (int, error) {
 			b = strQuot
 		case '\'':
 			b = strApos
+		case '&':
+			b = strAmp
 		}
 		if b != nil {
 			if n, err = ww.Write(p[i:j]); err != nil {
@@ -68,4 +70,5 @@ var (
 	strGT   = []byte("&gt;")
 	strQuot = []byte("&quot;")
 	strApos = []byte("&#39;")
+	strAmp  = []byte("&amp;")
 )
