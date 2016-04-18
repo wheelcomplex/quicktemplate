@@ -280,6 +280,21 @@ There are other useful tags supported by quicktemplate:
     or is used</div></div>
     ```
 
+  * `{% switch %}`, `{% case %}` and `{% default %}`:
+
+
+    ```qtpl
+    1 + 1 =
+    {% switch 1+1 %}
+    {% case 2 %}
+	2?
+    {% case 42 %}
+	42!
+    {% default %}
+        I don't know :(
+    {% endswitch %}
+    ```
+
   * `{% code %}`:
 
     ```qtpl
