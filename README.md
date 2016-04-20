@@ -53,6 +53,8 @@ BenchmarkHTMLTemplate10-4  	  100000	     13527 ns/op	    3521 B/op	     117 all
 BenchmarkHTMLTemplate100-4 	   10000	    133503 ns/op	   34499 B/op	    1152 allocs/op
 ```
 
+[goTemplateBenchmark](https://github.com/SlinSo/goTemplateBenchmark) compares QuickTemplate with numerous go templating packages. QuickTemplate performs favorably.
+
 # Security
 
 By default all the template placeholders are html-escaped.
