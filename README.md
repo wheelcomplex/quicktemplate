@@ -44,7 +44,7 @@ The following simple template is used in the benchmark:
 Benchmark results:
 
 ```
-$ go test -bench=Template -benchmem
+$ go test -bench=Template -benchmem ./tests
 BenchmarkQuickTemplate1-4  	10000000	       158 ns/op	       0 B/op	       0 allocs/op
 BenchmarkQuickTemplate10-4 	 2000000	       604 ns/op	       0 B/op	       0 allocs/op
 BenchmarkQuickTemplate100-4	  300000	      5498 ns/op	       0 B/op	       0 allocs/op
