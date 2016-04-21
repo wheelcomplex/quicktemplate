@@ -431,6 +431,19 @@ There are other useful tags supported by quicktemplate:
     {% endstripspace %}
     ```
 
+  * Make sure that the `io.Writer` passed to `Write*` functions
+    is [buffered](https://golang.org/pkg/bufio/#Writer).
+    This will minimize the number of `write`
+    [syscalls](https://en.wikipedia.org/wiki/System_call),
+    which may be quite expensive.
+
+    Note: There is no need in wrapping [fasthttp.RequestCtx](https://godoc.org/github.com/valyala/fasthttp#RequestCtx)
+    into [bufio.Writer](https://golang.org/pkg/bufio/#Writer), since it is already buffered.
+
+  * [Profile](http://blog.golang.org/profiling-go-programs) your programs
+    for memory allocations and fix top functions from
+    `go tool pprof --alloc_objects` output.
+
 # FAQ
 
   * *Why quicktemplate syntax is incompatible with [html/template](https://golang.org/pkg/html/template/)?*
