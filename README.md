@@ -383,6 +383,54 @@ There are other useful tags supported by quicktemplate:
     for more details.
 
 
+# Performance optimization tips
+
+  * Prefer calling `WriteFoo` instead of `Foo` when generating template output
+    for `{% func Foo() %}`. This avoids unnesessary memory allocation and a copy
+    for a `string` returned from `Foo()`.
+
+  * Prefer `{%= Foo() %}` instead of `{%s= Foo() %}` when embedding
+    a function template `{% func Foo() %}`. Though both approaches generate
+    identical output, the first approach is optimized for speed.
+
+  * Prefer using existing output tags instead of passing `fmt.Sprintf`
+    to `{%s %}` output tag. For instance, use `{%d num %}` instead
+    of `{%s fmt.Sprintf("%d", num) %}`, because the first approach is optimized
+    for speed.
+
+  * Prefer creating custom function templates instead of composing complex
+    strings by hands before passing them to `{%s %}`.
+    For instance, the first approach is slower than the second one:
+
+    ```qtpl
+    {% func Foo(n int) %}
+        {% code
+        // construct complex string
+        complexStr := ""
+        for i := 0; i < n; i++ {
+            complexStr += fmt.Sprintf("num %d,", i)
+        }
+        %}
+        complex string = {%s= complexStr %}
+    {% endfunc %}
+    ```
+
+    ```qtpl
+    {% func Foo(n int) %}
+        complex string = {%= complexStr(n) %}
+    {% endfunc %}
+
+    // Wrap complexStr func into stripspace for stripping unnesessary space
+    // between tags and lines.
+    {% stripspace %}
+    {% func complexStr(n int) %}
+        {% for i := 0; i < n; i++ %}
+            num {%d i %}{% newline %}
+        {% endfor %}
+    {% endfunc %}
+    {% endstripspace %}
+    ```
+
 # FAQ
 
   * *Why quicktemplate syntax is incompatible with [html/template](https://golang.org/pkg/html/template/)?*
