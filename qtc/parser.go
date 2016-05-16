@@ -435,7 +435,9 @@ func (p *parser) tryParseCommonTags(tagBytes []byte) (bool, error) {
 	tagNameStr := string(tagBytes)
 	switch tagNameStr {
 	case "s", "v", "d", "f", "q", "z", "j", "u",
-		"s=", "v=", "d=", "f=", "q=", "z=", "j=", "u=":
+		"s=", "v=", "d=", "f=", "q=", "z=", "j=", "u=",
+		"sz", "qz", "jz", "uz",
+		"sz=", "qz=", "jz=", "uz=":
 		t, err := expectTagContents(s)
 		if err != nil {
 			return false, err
@@ -444,12 +446,11 @@ func (p *parser) tryParseCommonTags(tagBytes []byte) (bool, error) {
 			return false, fmt.Errorf("invalid output tag value at %s: %s", s.Context(), err)
 		}
 		filter := "N()."
-		if len(tagNameStr) == 1 {
-			switch tagNameStr {
-			case "s", "v", "q", "z", "j":
-				filter = "E()."
-			}
-		} else {
+		switch tagNameStr {
+		case "s", "v", "q", "z", "j", "sz", "qz", "jz":
+			filter = "E()."
+		}
+		if tagNameStr[len(tagNameStr)-1] == '=' {
 			tagNameStr = tagNameStr[:len(tagNameStr)-1]
 		}
 		tagNameStr = strings.ToUpper(tagNameStr)

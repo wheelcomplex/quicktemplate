@@ -72,6 +72,11 @@ func (w *QWriter) Z(z []byte) {
 	w.w.Write(z)
 }
 
+// SZ is a synonym to Z.
+func (w *QWriter) SZ(z []byte) {
+	w.w.Write(z)
+}
+
 // D writes n to w.
 func (w *QWriter) D(n int) {
 	bb := AcquireByteBuffer()
@@ -96,6 +101,11 @@ func (w *QWriter) Q(s string) {
 	ReleaseByteBuffer(bb)
 }
 
+// QZ writes quoted json-safe z to w.
+func (w *QWriter) QZ(z []byte) {
+	w.Q(unsafeBytesToStr(z))
+}
+
 // J writes json-safe s to w.
 //
 // Unlike Q it doesn't qoute resulting s.
@@ -104,6 +114,13 @@ func (w *QWriter) J(s string) {
 	bb.B = appendJSONString(bb.B, s)
 	w.w.Write(bb.B[1 : len(bb.B)-1])
 	ReleaseByteBuffer(bb)
+}
+
+// JZ writes json-safe z to w.
+//
+// Unlike Q it doesn't qoute resulting z.
+func (w *QWriter) JZ(z []byte) {
+	w.J(unsafeBytesToStr(z))
 }
 
 // V writes v to w.
@@ -117,4 +134,9 @@ func (w *QWriter) U(s string) {
 	bb.B = appendURLEncode(bb.B, s)
 	w.w.Write(bb.B)
 	ReleaseByteBuffer(bb)
+}
+
+// UZ writes url-encoded z to w.
+func (w *QWriter) UZ(z []byte) {
+	w.U(unsafeBytesToStr(z))
 }

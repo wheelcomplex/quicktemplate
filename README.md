@@ -193,13 +193,14 @@ The `{%s x %}` is used for printing html-safe strings, while `{%= F() %}`
 is used for embedding template function calls. Quicktemplate supports also
 other output tags:
 
-  * `{%d num %}` for integers
-  * `{%f float %}` for float64
-  * `{%z bytes %}` for byte slices
-  * `{%q str %}` for json-compatible quoted strings.
-  * `{%j str %}` for embedding str into json string. Unlike `{%q str %}`
+  * `{%d num %}` for integers.
+  * `{%f float %}` for float64.
+  * `{%sz bytes %}` for byte slices.
+  * `{%q str %}` and `{%qz bytes %}` for json-compatible quoted strings.
+  * `{%j str %}` and `{%jz bytes %}` for embedding str into json string. Unlike `{%q str %}`
     it doesn't quote the string.
-  * `{%u str %}` for [URL encoding](https://en.wikipedia.org/wiki/Percent-encoding) the given str.
+  * `{%u str %}` and `{%uz bytes %}` for [URL encoding](https://en.wikipedia.org/wiki/Percent-encoding)
+    the given str.
   * `{%v anything %}` is equivalent to `%v` in [printf-like functions](https://golang.org/pkg/fmt/).
 
 All these output tags produce html-safe output, i.e. they escape `<` to `&lt;`,
