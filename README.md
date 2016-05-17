@@ -449,6 +449,92 @@ There are other useful tags supported by quicktemplate:
     for memory allocations and fix top functions from
     `go tool pprof --alloc_objects` output.
 
+
+# Use cases
+
+While the main quicktemplate purpose is generating html, it may be used
+for generating other data too. For example, JSON and XML marshaling may
+be easily implemented with quicktemplate:
+
+```qtpl
+{% code
+type MarshalRow struct {
+	Msg string
+	N int
+}
+
+type MarshalData struct {
+	Foo int
+	Bar string
+	Rows []MarshalRow
+}
+%}
+
+// JSON marshaling
+{% stripspace %}
+{% func (d *MarshalData) JSON() %}
+{
+	"Foo": {%d d.Foo %},
+	"Bar": {%q= d.Bar %},
+	"Rows":[
+		{% for i, r := range d.Rows %}
+			{
+				"Msg": {%q= r.Msg %},
+				"N": {%d r.N %}
+			}
+			{% if i + 1 < len(d.Rows) %},{% endif %}
+		{% endfor %}
+	]
+}
+{% endfunc %}
+{% endstripspace %}
+
+// XML marshaling
+{% stripspace %}
+{% func (d *MarshalData) XML() %}
+<MarshalData>
+	<Foo>{%d d.Foo %}</Foo>
+	<Bar>{%s d.Bar %}</Bar>
+	<Rows>
+	{% for _, r := range d.Rows %}
+		<Row>
+			<Msg>{%s r.Msg %}</Msg>
+			<N>{%d r.N %}</N>
+		</Row>
+	{% endfor %}
+	</Rows>
+</MarshalData>
+{% endfunc %}
+{% endstripspace %}
+```
+
+Usually marshaling built with quicktemplate works faster than the marshaling
+implemented via standard [encoding/json](https://golang.org/pkg/encoding/json/)
+and [encoding/xml](https://golang.org/pkg/encoding/xml/).
+The corresponding benchmark results:
+
+```
+go test -bench=Marshal -benchmem github.com/valyala/quicktemplate/tests
+BenchmarkMarshalJSONStd1-4                	 3000000	       480 ns/op	       8 B/op	       1 allocs/op
+BenchmarkMarshalJSONStd10-4               	 1000000	      1835 ns/op	       8 B/op	       1 allocs/op
+BenchmarkMarshalJSONStd100-4              	  100000	     15735 ns/op	       8 B/op	       1 allocs/op
+BenchmarkMarshalJSONStd1000-4             	   10000	    158933 ns/op	      59 B/op	       1 allocs/op
+BenchmarkMarshalJSONQuickTemplate1-4      	 5000000	       244 ns/op	       0 B/op	       0 allocs/op
+BenchmarkMarshalJSONQuickTemplate10-4     	 1000000	      1383 ns/op	       0 B/op	       0 allocs/op
+BenchmarkMarshalJSONQuickTemplate100-4    	  100000	     11076 ns/op	       0 B/op	       0 allocs/op
+BenchmarkMarshalJSONQuickTemplate1000-4   	   10000	    119238 ns/op	      58 B/op	       0 allocs/op
+BenchmarkMarshalXMLStd1-4                 	 1000000	      1607 ns/op	       2 B/op	       2 allocs/op
+BenchmarkMarshalXMLStd10-4                	  200000	      7352 ns/op	      11 B/op	      11 allocs/op
+BenchmarkMarshalXMLStd100-4               	   20000	     64587 ns/op	     195 B/op	     101 allocs/op
+BenchmarkMarshalXMLStd1000-4              	    2000	    648316 ns/op	    3522 B/op	    1002 allocs/op
+BenchmarkMarshalXMLQuickTemplate1-4       	10000000	       193 ns/op	       0 B/op	       0 allocs/op
+BenchmarkMarshalXMLQuickTemplate10-4      	 2000000	       859 ns/op	       0 B/op	       0 allocs/op
+BenchmarkMarshalXMLQuickTemplate100-4     	  200000	      8056 ns/op	       0 B/op	       0 allocs/op
+BenchmarkMarshalXMLQuickTemplate1000-4    	   20000	     80055 ns/op	      49 B/op	       0 allocs/op
+PASS
+ok  	github.com/valyala/quicktemplate/tests	27.783s
+```
+
 # FAQ
 
   * *Why quicktemplate syntax is incompatible with [html/template](https://golang.org/pkg/html/template/)?*
