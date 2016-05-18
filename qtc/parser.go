@@ -8,6 +8,7 @@ import (
 	gotoken "go/token"
 	"io"
 	"path/filepath"
+	"strconv"
 	"strings"
 )
 
@@ -432,7 +433,7 @@ func (p *parser) parseIf() error {
 
 func (p *parser) tryParseCommonTags(tagBytes []byte) (bool, error) {
 	s := p.s
-	tagNameStr := string(tagBytes)
+	tagNameStr, prec := splitTagNamePrec(string(tagBytes))
 	switch tagNameStr {
 	case "s", "v", "d", "f", "q", "z", "j", "u",
 		"s=", "v=", "d=", "f=", "q=", "z=", "j=", "u=",
@@ -450,11 +451,15 @@ func (p *parser) tryParseCommonTags(tagBytes []byte) (bool, error) {
 		case "s", "v", "q", "z", "j", "sz", "qz", "jz":
 			filter = "E()."
 		}
-		if tagNameStr[len(tagNameStr)-1] == '=' {
+		if strings.HasSuffix(tagNameStr, "=") {
 			tagNameStr = tagNameStr[:len(tagNameStr)-1]
 		}
-		tagNameStr = strings.ToUpper(tagNameStr)
-		p.Printf("qw422016.%s%s(%s)", filter, tagNameStr, t.Value)
+		if tagNameStr == "f" && prec >= 0 {
+			p.Printf("qw422016.N().FPrec(%s, %d)", t.Value, prec)
+		} else {
+			tagNameStr = strings.ToUpper(tagNameStr)
+			p.Printf("qw422016.%s%s(%s)", filter, tagNameStr, t.Value)
+		}
 	case "=":
 		t, err := expectTagContents(s)
 		if err != nil {
@@ -503,6 +508,24 @@ func (p *parser) tryParseCommonTags(tagBytes []byte) (bool, error) {
 		return false, nil
 	}
 	return true, nil
+}
+
+func splitTagNamePrec(tagName string) (string, int) {
+	parts := strings.Split(tagName, ".")
+	if len(parts) == 2 && parts[0] == "f" {
+		p := parts[1]
+		if strings.HasSuffix(p, "=") {
+			p = p[:len(p)-1]
+		}
+		if len(p) == 0 {
+			return "f", 0
+		}
+		prec, err := strconv.Atoi(p)
+		if err == nil && prec >= 0 {
+			return "f", prec
+		}
+	}
+	return tagName, -1
 }
 
 func (p *parser) skipAfterTag(tagStr string) error {

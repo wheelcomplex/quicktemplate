@@ -86,8 +86,13 @@ func (w *QWriter) D(n int) {
 
 // F writes f to w.
 func (w *QWriter) F(f float64) {
+	w.FPrec(f, -1)
+}
+
+// FPrec writes f to w using the given floating point precision.
+func (w *QWriter) FPrec(f float64, prec int) {
 	writeQuick(w.w, func(dst []byte) []byte {
-		return strconv.AppendFloat(dst, f, 'f', -1, 64)
+		return strconv.AppendFloat(dst, f, 'f', prec, 64)
 	})
 }
 

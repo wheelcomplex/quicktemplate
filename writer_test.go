@@ -167,6 +167,26 @@ func TestQWriterV(t *testing.T) {
 	})
 }
 
+func TestQWriterF(t *testing.T) {
+	testQWriter(t, func(wn, we *QWriter) string {
+		f := 1.9234
+		wn.F(f)
+		we.F(f)
+		return "1.92341.9234"
+	})
+}
+
+func TestQWriterFPrec(t *testing.T) {
+	testQWriter(t, func(wn, we *QWriter) string {
+		f := 1.9254
+		wn.FPrec(f, 2)
+		we.FPrec(f, 3)
+		wn.FPrec(f, 0)
+		we.FPrec(f, 1)
+		return "1.931.92521.9"
+	})
+}
+
 func testQWriter(t *testing.T, f func(wn, we *QWriter) (expectedS string)) {
 	bb := AcquireByteBuffer()
 	qw := AcquireWriter(bb)

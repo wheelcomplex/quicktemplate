@@ -10,6 +10,20 @@ import (
 	"github.com/valyala/quicktemplate"
 )
 
+func TestParseFPrec(t *testing.T) {
+	// no precision
+	testParseSuccess(t, "{% func a()%}{%f 1.2 %}{% endfunc %}")
+	testParseSuccess(t, "{% func a()%}{%f= 1.2 %}{% endfunc %}")
+
+	// precision set
+	testParseSuccess(t, "{% func a()%}{%f.1 1.234 %}{% endfunc %}")
+	testParseSuccess(t, "{% func a()%}{%f.10= 1.234 %}{% endfunc %}")
+
+	// missing precision
+	testParseSuccess(t, "{% func a()%}{%f. 1.234 %}{% endfunc %}")
+	testParseSuccess(t, "{% func a()%}{%f.= 1.234 %}{% endfunc %}")
+}
+
 func TestParseSwitchCaseSuccess(t *testing.T) {
 	// single-case switch
 	testParseSuccess(t, "{%func a()%}{%switch n%}{%case 1%}aaa{%endswitch%}{%endfunc%}")
