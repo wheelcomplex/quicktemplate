@@ -10,7 +10,19 @@ import (
 	"github.com/valyala/quicktemplate"
 )
 
-func TestParseFPrec(t *testing.T) {
+func TestParseFPrecFailure(t *testing.T) {
+	// negative precision
+	testParseFailure(t, "{% func a()%}{%f.-1 1.2 %}{% endfunc %}")
+
+	// non-numeric precision
+	testParseFailure(t, "{% func a()%}{%f.foo 1.2 %}{% endfunc %}")
+
+	// more than one dot
+	testParseFailure(t, "{% func a()%}{%f.1.234 1.2 %}{% endfunc %}")
+	testParseFailure(t, "{% func a()%}{%f.1.foo 1.2 %}{% endfunc %}")
+}
+
+func TestParseFPrecSuccess(t *testing.T) {
 	// no precision
 	testParseSuccess(t, "{% func a()%}{%f 1.2 %}{% endfunc %}")
 	testParseSuccess(t, "{% func a()%}{%f= 1.2 %}{% endfunc %}")
