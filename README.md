@@ -44,13 +44,13 @@ The following simple template is used in the benchmark:
 Benchmark results:
 
 ```
-$ go test -bench=Template -benchmem ./tests
-BenchmarkQuickTemplate1-4  	10000000	       158 ns/op	       0 B/op	       0 allocs/op
-BenchmarkQuickTemplate10-4 	 2000000	       604 ns/op	       0 B/op	       0 allocs/op
-BenchmarkQuickTemplate100-4	  300000	      5498 ns/op	       0 B/op	       0 allocs/op
-BenchmarkHTMLTemplate1-4   	  500000	      2807 ns/op	     752 B/op	      23 allocs/op
-BenchmarkHTMLTemplate10-4  	  100000	     13527 ns/op	    3521 B/op	     117 allocs/op
-BenchmarkHTMLTemplate100-4 	   10000	    133503 ns/op	   34499 B/op	    1152 allocs/op
+$ go test -bench=Template -benchmem github.com/valyala/quicktemplate/tests
+BenchmarkQuickTemplate1-4                 	10000000	       124 ns/op	       0 B/op	       0 allocs/op
+BenchmarkQuickTemplate10-4                	 3000000	       443 ns/op	       0 B/op	       0 allocs/op
+BenchmarkQuickTemplate100-4               	  300000	      3951 ns/op	       0 B/op	       0 allocs/op
+BenchmarkHTMLTemplate1-4                  	  500000	      2491 ns/op	     752 B/op	      23 allocs/op
+BenchmarkHTMLTemplate10-4                 	  100000	     12312 ns/op	    3521 B/op	     117 allocs/op
+BenchmarkHTMLTemplate100-4                	   10000	    121682 ns/op	   34498 B/op	    1152 allocs/op
 ```
 
 [goTemplateBenchmark](https://github.com/SlinSo/goTemplateBenchmark) compares QuickTemplate with numerous go templating packages. QuickTemplate performs favorably.
@@ -515,24 +515,22 @@ The corresponding benchmark results:
 
 ```
 go test -bench=Marshal -benchmem github.com/valyala/quicktemplate/tests
-BenchmarkMarshalJSONStd1-4                	 3000000	       480 ns/op	       8 B/op	       1 allocs/op
-BenchmarkMarshalJSONStd10-4               	 1000000	      1835 ns/op	       8 B/op	       1 allocs/op
-BenchmarkMarshalJSONStd100-4              	  100000	     15735 ns/op	       8 B/op	       1 allocs/op
-BenchmarkMarshalJSONStd1000-4             	   10000	    158933 ns/op	      59 B/op	       1 allocs/op
-BenchmarkMarshalJSONQuickTemplate1-4      	 5000000	       244 ns/op	       0 B/op	       0 allocs/op
-BenchmarkMarshalJSONQuickTemplate10-4     	 1000000	      1383 ns/op	       0 B/op	       0 allocs/op
-BenchmarkMarshalJSONQuickTemplate100-4    	  100000	     11076 ns/op	       0 B/op	       0 allocs/op
-BenchmarkMarshalJSONQuickTemplate1000-4   	   10000	    119238 ns/op	      58 B/op	       0 allocs/op
-BenchmarkMarshalXMLStd1-4                 	 1000000	      1607 ns/op	       2 B/op	       2 allocs/op
-BenchmarkMarshalXMLStd10-4                	  200000	      7352 ns/op	      11 B/op	      11 allocs/op
-BenchmarkMarshalXMLStd100-4               	   20000	     64587 ns/op	     195 B/op	     101 allocs/op
-BenchmarkMarshalXMLStd1000-4              	    2000	    648316 ns/op	    3522 B/op	    1002 allocs/op
-BenchmarkMarshalXMLQuickTemplate1-4       	10000000	       193 ns/op	       0 B/op	       0 allocs/op
-BenchmarkMarshalXMLQuickTemplate10-4      	 2000000	       859 ns/op	       0 B/op	       0 allocs/op
-BenchmarkMarshalXMLQuickTemplate100-4     	  200000	      8056 ns/op	       0 B/op	       0 allocs/op
-BenchmarkMarshalXMLQuickTemplate1000-4    	   20000	     80055 ns/op	      49 B/op	       0 allocs/op
-PASS
-ok  	github.com/valyala/quicktemplate/tests	27.783s
+BenchmarkMarshalJSONStd1-4                	 3000000	       486 ns/op	       8 B/op	       1 allocs/op
+BenchmarkMarshalJSONStd10-4               	 1000000	      1849 ns/op	       8 B/op	       1 allocs/op
+BenchmarkMarshalJSONStd100-4              	  100000	     15812 ns/op	       8 B/op	       1 allocs/op
+BenchmarkMarshalJSONStd1000-4             	   10000	    158340 ns/op	      59 B/op	       1 allocs/op
+BenchmarkMarshalJSONQuickTemplate1-4      	10000000	       151 ns/op	       0 B/op	       0 allocs/op
+BenchmarkMarshalJSONQuickTemplate10-4     	 2000000	       675 ns/op	       0 B/op	       0 allocs/op
+BenchmarkMarshalJSONQuickTemplate100-4    	  200000	      6192 ns/op	       0 B/op	       0 allocs/op
+BenchmarkMarshalJSONQuickTemplate1000-4   	   20000	     62616 ns/op	      29 B/op	       0 allocs/op
+BenchmarkMarshalXMLStd1-4                 	 1000000	      1587 ns/op	       2 B/op	       2 allocs/op
+BenchmarkMarshalXMLStd10-4                	  200000	      7269 ns/op	      11 B/op	      11 allocs/op
+BenchmarkMarshalXMLStd100-4               	   20000	     63170 ns/op	     195 B/op	     101 allocs/op
+BenchmarkMarshalXMLStd1000-4              	    2000	    640233 ns/op	    3522 B/op	    1002 allocs/op
+BenchmarkMarshalXMLQuickTemplate1-4       	10000000	       152 ns/op	       0 B/op	       0 allocs/op
+BenchmarkMarshalXMLQuickTemplate10-4      	 2000000	       618 ns/op	       0 B/op	       0 allocs/op
+BenchmarkMarshalXMLQuickTemplate100-4     	  300000	      5445 ns/op	       0 B/op	       0 allocs/op
+BenchmarkMarshalXMLQuickTemplate1000-4    	   30000	     56987 ns/op	      32 B/op	       0 allocs/op
 ```
 
 # FAQ
