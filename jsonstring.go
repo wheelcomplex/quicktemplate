@@ -3,38 +3,50 @@ package quicktemplate
 // appendJSONString is a synonym to strconv.AppendQuote, but works 3x faster.
 func appendJSONString(dst []byte, s string) []byte {
 	j := 0
-	out := ""
-	dst = append(dst, `"`...)
-	for i, n := 0, len(s); i < n; i++ {
-		switch s[i] {
+	b := unsafeStrToBytes(s)
+	for i, n := 0, len(b); i < n; i++ {
+		switch b[i] {
 		case '"':
-			out = `\"`
-		case '\\':
-			out = `\\`
-		case '\n':
-			out = `\n`
-		case '\r':
-			out = `\r`
-		case '\t':
-			out = `\t`
-		case '\f':
-			out = `\u000c`
-		case '\b':
-			out = `\u0008`
-		case '<':
-			out = `\u003c`
-		case '\'':
-			out = `\u0027`
-		case 0:
-			out = `\u0000`
-		}
-		if len(out) > 0 {
-			dst = append(dst, s[j:i]...)
-			dst = append(dst, out...)
+			dst = append(dst, b[j:i]...)
+			dst = append(dst, `\"`...)
 			j = i + 1
-			out = ""
+		case '\\':
+			dst = append(dst, b[j:i]...)
+			dst = append(dst, `\\`...)
+			j = i + 1
+		case '\n':
+			dst = append(dst, b[j:i]...)
+			dst = append(dst, `\n`...)
+			j = i + 1
+		case '\r':
+			dst = append(dst, b[j:i]...)
+			dst = append(dst, `\r`...)
+			j = i + 1
+		case '\t':
+			dst = append(dst, b[j:i]...)
+			dst = append(dst, `\t`...)
+			j = i + 1
+		case '\f':
+			dst = append(dst, b[j:i]...)
+			dst = append(dst, `\u000c`...)
+			j = i + 1
+		case '\b':
+			dst = append(dst, b[j:i]...)
+			dst = append(dst, `\u0008`...)
+			j = i + 1
+		case '<':
+			dst = append(dst, b[j:i]...)
+			dst = append(dst, `\u003c`...)
+			j = i + 1
+		case '\'':
+			dst = append(dst, b[j:i]...)
+			dst = append(dst, `\u0027`...)
+			j = i + 1
+		case 0:
+			dst = append(dst, b[j:i]...)
+			dst = append(dst, `\u0000`...)
+			j = i + 1
 		}
 	}
-	dst = append(dst, s[j:]...)
-	return append(dst, `"`...)
+	return append(dst, b[j:]...)
 }

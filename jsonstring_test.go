@@ -27,6 +27,7 @@ func testAppendJSONString(t *testing.T, s string) {
 	if err != nil {
 		t.Fatalf("unexpected error when encoding string %q: %s", s, err)
 	}
+	expectedResult = expectedResult[1 : len(expectedResult)-1]
 
 	result := string(appendJSONString(nil, s))
 	if strings.Contains(result, "'") {
