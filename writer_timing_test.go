@@ -32,8 +32,29 @@ func BenchmarkQWriterVInt(b *testing.B) {
 	})
 }
 
-func BenchmarkQWriterQ(b *testing.B) {
-	s := createTestS(100)
+func BenchmarkQWriterQ1(b *testing.B) {
+	benchmarkQWriterQ(b, 1)
+}
+
+func BenchmarkQWriterQ10(b *testing.B) {
+	benchmarkQWriterQ(b, 10)
+}
+
+func BenchmarkQWriterQ100(b *testing.B) {
+	benchmarkQWriterQ(b, 100)
+}
+
+func BenchmarkQWriterQ1K(b *testing.B) {
+	benchmarkQWriterQ(b, 1000)
+}
+
+func BenchmarkQWriterQ10K(b *testing.B) {
+	benchmarkQWriterQ(b, 10000)
+}
+
+func benchmarkQWriterQ(b *testing.B, size int) {
+	s := createTestS(size)
+	b.SetBytes(int64(size))
 	b.RunParallel(func(pb *testing.PB) {
 		var w QWriter
 		bb := AcquireByteBuffer()
@@ -46,8 +67,29 @@ func BenchmarkQWriterQ(b *testing.B) {
 	})
 }
 
-func BenchmarkQWriterJ(b *testing.B) {
-	s := createTestS(100)
+func BenchmarkQWriterJ1(b *testing.B) {
+	benchmarkQWriterJ(b, 1)
+}
+
+func BenchmarkQWriterJ10(b *testing.B) {
+	benchmarkQWriterJ(b, 10)
+}
+
+func BenchmarkQWriterJ100(b *testing.B) {
+	benchmarkQWriterJ(b, 100)
+}
+
+func BenchmarkQWriterJ1K(b *testing.B) {
+	benchmarkQWriterJ(b, 1000)
+}
+
+func BenchmarkQWriterJ10K(b *testing.B) {
+	benchmarkQWriterJ(b, 10000)
+}
+
+func benchmarkQWriterJ(b *testing.B, size int) {
+	s := createTestS(size)
+	b.SetBytes(int64(size))
 	b.RunParallel(func(pb *testing.PB) {
 		var w QWriter
 		bb := AcquireByteBuffer()
@@ -60,8 +102,29 @@ func BenchmarkQWriterJ(b *testing.B) {
 	})
 }
 
-func BenchmarkQWriterU(b *testing.B) {
-	s := createTestS(100)
+func BenchmarkQWriterU1(b *testing.B) {
+	benchmarkQWriterU(b, 1)
+}
+
+func BenchmarkQWriterU10(b *testing.B) {
+	benchmarkQWriterU(b, 10)
+}
+
+func BenchmarkQWriterU100(b *testing.B) {
+	benchmarkQWriterU(b, 100)
+}
+
+func BenchmarkQWriterU1K(b *testing.B) {
+	benchmarkQWriterU(b, 1000)
+}
+
+func BenchmarkQWriterU10K(b *testing.B) {
+	benchmarkQWriterU(b, 10000)
+}
+
+func benchmarkQWriterU(b *testing.B, size int) {
+	s := createTestS(size)
+	b.SetBytes(int64(size))
 	b.RunParallel(func(pb *testing.PB) {
 		var w QWriter
 		bb := AcquireByteBuffer()
@@ -102,48 +165,49 @@ func BenchmarkQWriterD(b *testing.B) {
 	})
 }
 
-func BenchmarkQWriterZ1Byte(b *testing.B) {
+func BenchmarkQWriterZ1(b *testing.B) {
 	benchmarkQWriterZ(b, 1)
 }
 
-func BenchmarkQWriterZ10Bytes(b *testing.B) {
+func BenchmarkQWriterZ10(b *testing.B) {
 	benchmarkQWriterZ(b, 10)
 }
 
-func BenchmarkQWriterZ100Byte(b *testing.B) {
+func BenchmarkQWriterZ100(b *testing.B) {
 	benchmarkQWriterZ(b, 100)
 }
 
-func BenchmarkQWriterZ1KByte(b *testing.B) {
+func BenchmarkQWriterZ1K(b *testing.B) {
 	benchmarkQWriterZ(b, 1000)
 }
 
-func BenchmarkQWriterZ10KByte(b *testing.B) {
+func BenchmarkQWriterZ10K(b *testing.B) {
 	benchmarkQWriterZ(b, 10000)
 }
 
-func BenchmarkQWriterS1Byte(b *testing.B) {
+func BenchmarkQWriterS1(b *testing.B) {
 	benchmarkQWriterS(b, 1)
 }
 
-func BenchmarkQWriterS10Bytes(b *testing.B) {
+func BenchmarkQWriterS10(b *testing.B) {
 	benchmarkQWriterS(b, 10)
 }
 
-func BenchmarkQWriterS100Byte(b *testing.B) {
+func BenchmarkQWriterS100(b *testing.B) {
 	benchmarkQWriterS(b, 100)
 }
 
-func BenchmarkQWriterS1KByte(b *testing.B) {
+func BenchmarkQWriterS1K(b *testing.B) {
 	benchmarkQWriterS(b, 1000)
 }
 
-func BenchmarkQWriterS10KByte(b *testing.B) {
+func BenchmarkQWriterS10K(b *testing.B) {
 	benchmarkQWriterS(b, 10000)
 }
 
 func benchmarkQWriterZ(b *testing.B, size int) {
 	z := createTestZ(size)
+	b.SetBytes(int64(size))
 	b.RunParallel(func(pb *testing.PB) {
 		var w QWriter
 		bb := AcquireByteBuffer()
@@ -158,6 +222,7 @@ func benchmarkQWriterZ(b *testing.B, size int) {
 
 func benchmarkQWriterS(b *testing.B, size int) {
 	s := createTestS(size)
+	b.SetBytes(int64(size))
 	b.RunParallel(func(pb *testing.PB) {
 		var w QWriter
 		bb := AcquireByteBuffer()
@@ -174,7 +239,7 @@ func createTestS(size int) string {
 	return string(createTestZ(size))
 }
 
-var sample = []byte("\n\t\r\f\u0000" + `'"<>&;+ =@%\/?1234567890-_#$^sdffds`)
+var sample = []byte(`0123456789qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM`)
 
 func createTestZ(size int) []byte {
 	var b []byte
