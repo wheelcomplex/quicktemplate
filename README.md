@@ -57,7 +57,17 @@ BenchmarkHTMLTemplate100-4                	   10000	    121682 ns/op	   34498 B/
 
 # Security
 
-By default all the template placeholders are html-escaped.
+  * All the template placeholders are html-escaped by default.
+  * Template placeholders for JSON strings prevents from `</script>`-based
+    XSS attacks:
+
+  ```qtpl
+  {% func FailedXSS() %}
+  <script>
+      var s = {%q= "</script><script>alert('you pwned!')" %};
+  </script>
+  {% endfunc %}
+  ```
 
 # Examples
 
