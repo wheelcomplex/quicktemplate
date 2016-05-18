@@ -60,6 +60,20 @@ func BenchmarkQWriterJ(b *testing.B) {
 	})
 }
 
+func BenchmarkQWriterU(b *testing.B) {
+	s := createTestS(100)
+	b.RunParallel(func(pb *testing.PB) {
+		var w QWriter
+		bb := AcquireByteBuffer()
+		w.w = bb
+		for pb.Next() {
+			w.U(s)
+			bb.Reset()
+		}
+		ReleaseByteBuffer(bb)
+	})
+}
+
 func BenchmarkQWriterF(b *testing.B) {
 	f := 123.456
 	b.RunParallel(func(pb *testing.PB) {
@@ -160,10 +174,12 @@ func createTestS(size int) string {
 	return string(createTestZ(size))
 }
 
+var sample = []byte("\n\t\r\f\u0000" + `'"<>&;+ =@%\/?1234567890-_#$^sdffds`)
+
 func createTestZ(size int) []byte {
 	var b []byte
 	for i := 0; i < size; i++ {
-		b = append(b, '0'+byte(i%10))
+		b = append(b, sample[i%len(sample)])
 	}
 	return b
 }
