@@ -98,12 +98,13 @@ func (w *QWriter) FPrec(f float64, prec int) {
 
 // Q writes quoted json-safe s to w.
 func (w *QWriter) Q(s string) {
-	writeQuick(w.w, func(dst []byte) []byte {
-		dst = append(dst, '"')
-		dst = appendJSONString(dst, s)
-		return append(dst, '"')
-	})
+	ww := w.w
+	ww.Write(strQuote)
+	writeJSONString(w.w, s)
+	ww.Write(strQuote)
 }
+
+var strQuote = []byte(`"`)
 
 // QZ writes quoted json-safe z to w.
 func (w *QWriter) QZ(z []byte) {
@@ -114,9 +115,7 @@ func (w *QWriter) QZ(z []byte) {
 //
 // Unlike Q it doesn't qoute resulting s.
 func (w *QWriter) J(s string) {
-	writeQuick(w.w, func(dst []byte) []byte {
-		return appendJSONString(dst, s)
-	})
+	writeJSONString(w.w, s)
 }
 
 // JZ writes json-safe z to w.

@@ -1,52 +1,69 @@
 package quicktemplate
 
-// appendJSONString is a synonym to strconv.AppendQuote, but works 3x faster.
-func appendJSONString(dst []byte, s string) []byte {
-	j := 0
+import (
+	"io"
+)
+
+func writeJSONString(w io.Writer, s string) {
+	write := w.Write
 	b := unsafeStrToBytes(s)
+	j := 0
 	for i, n := 0, len(b); i < n; i++ {
 		switch b[i] {
 		case '"':
-			dst = append(dst, b[j:i]...)
-			dst = append(dst, `\"`...)
+			write(b[j:i])
+			write(strBackslashQuote)
 			j = i + 1
 		case '\\':
-			dst = append(dst, b[j:i]...)
-			dst = append(dst, `\\`...)
+			write(b[j:i])
+			write(strBackslashBackslash)
 			j = i + 1
 		case '\n':
-			dst = append(dst, b[j:i]...)
-			dst = append(dst, `\n`...)
+			write(b[j:i])
+			write(strBackslashN)
 			j = i + 1
 		case '\r':
-			dst = append(dst, b[j:i]...)
-			dst = append(dst, `\r`...)
+			write(b[j:i])
+			write(strBackslashR)
 			j = i + 1
 		case '\t':
-			dst = append(dst, b[j:i]...)
-			dst = append(dst, `\t`...)
+			write(b[j:i])
+			write(strBackslashT)
 			j = i + 1
 		case '\f':
-			dst = append(dst, b[j:i]...)
-			dst = append(dst, `\u000c`...)
+			write(b[j:i])
+			write(strBackslashF)
 			j = i + 1
 		case '\b':
-			dst = append(dst, b[j:i]...)
-			dst = append(dst, `\u0008`...)
+			write(b[j:i])
+			write(strBackslashB)
 			j = i + 1
 		case '<':
-			dst = append(dst, b[j:i]...)
-			dst = append(dst, `\u003c`...)
+			write(b[j:i])
+			write(strBackslashLT)
 			j = i + 1
 		case '\'':
-			dst = append(dst, b[j:i]...)
-			dst = append(dst, `\u0027`...)
+			write(b[j:i])
+			write(strBackslashQ)
 			j = i + 1
 		case 0:
-			dst = append(dst, b[j:i]...)
-			dst = append(dst, `\u0000`...)
+			write(b[j:i])
+			write(strBackslashZero)
 			j = i + 1
 		}
 	}
-	return append(dst, b[j:]...)
+	write(b[j:])
 }
+
+var (
+	strBackslashQuote     = []byte(`\"`)
+	strBackslashBackslash = []byte(`\\`)
+	strBackslashN         = []byte(`\n`)
+	strBackslashR         = []byte(`\r`)
+	strBackslashT         = []byte(`\t`)
+	strBackslashF         = []byte(`\u000c`)
+	strBackslashB         = []byte(`\u0008`)
+	strBackslashLT        = []byte(`\u003c`)
+	strBackslashQ         = []byte(`\u0027`)
+	strBackslashZero      = []byte(`\u0000`)
+)
