@@ -8,7 +8,12 @@ func writeJSONString(w io.Writer, s string) {
 	write := w.Write
 	b := unsafeStrToBytes(s)
 	j := 0
-	for i, n := 0, len(b); i < n; i++ {
+	n := len(b)
+	if n > 0 {
+		// Hint the compiler to remove bounds checks in the loop below.
+		_ = b[n-1]
+	}
+	for i := 0; i < n; i++ {
 		switch b[i] {
 		case '"':
 			write(b[j:i])

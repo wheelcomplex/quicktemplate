@@ -17,7 +17,7 @@ func TestWriteJSONString(t *testing.T) {
 	testWriteJSONString(t, `foo "bar"
 		baz`)
 	testWriteJSONString(t, `this is a "тест"`)
-	testWriteJSONString(t, `привет test`)
+	testWriteJSONString(t, `привет test ыва`)
 
 	testWriteJSONString(t, `</script><script>alert('evil')</script>`)
 }
