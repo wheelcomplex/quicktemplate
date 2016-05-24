@@ -46,15 +46,19 @@ func TestParseSwitchCaseSuccess(t *testing.T) {
 	// default statement
 	testParseSuccess(t, "{%func a()%}{%switch%}{%default%}{%endswitch%}{%endfunc%}")
 
+	// switch with break
+	testParseSuccess(t, "{%func a()%}{%switch n%}{%case 1%}aaa{%break%}ignore{%endswitch%}{%endfunc%}")
+
 	// complex switch
 	testParseSuccess(t, `{%func f()%}{% for %}
 		{%switch foo() %}
 		The text before the first case
-		is converted into comment
+		is converted into a comment
 		{%case "foobar" %}
 			{% switch %}
 			{% case bar() %}
-				aaaa
+				aaaa{% break %}
+				ignore this line
 			{% case baz() %}
 				bbbb
 			{% endswitch %}
@@ -66,11 +70,16 @@ func TestParseSwitchCaseSuccess(t *testing.T) {
 			aaaa
 			{% return %}
 		{% case "www" %}
-			break from the outer loop, not from the switch
+			break from the switch
 			{% break %}
 		{% default %}
 			foobar
 		{%endswitch%}
+		{% if 42 == 2 %}
+			break for the loop
+			{% break %}
+			ignore this
+		{% endif %}
 	{% endfor %}{%endfunc%}`)
 }
 
@@ -86,9 +95,8 @@ func TestParseSwitchCaseFailure(t *testing.T) {
 
 	// the first tag inside switch is non-case
 	testParseFailure(t, "{%func f()%}{%switch%}{%return%}{%endswitch%}{%endfunc%}")
-
-	// break inside switch without outer loop
-	testParseFailure(t, "{%func f()%}{%switch%}{%case 1%}{%break%}{%endswitch%}{%endfunc%}")
+	testParseFailure(t, "{%func F()%}{%switch%}{%break%}{%endswitch%}{%endfunc%}")
+	testParseFailure(t, "{%func f()%}{%switch 1%}{%return%}{%case 1%}aaa{%endswitch%}{%endfunc%}")
 
 	// empty case
 	testParseFailure(t, "{%func f()%}{%switch%}{%case%}aaa{%endswitch%}{%endfunc%}")

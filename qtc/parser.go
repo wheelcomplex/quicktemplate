@@ -18,6 +18,7 @@ type parser struct {
 	packageName       string
 	prefix            string
 	forDepth          int
+	switchDepth       int
 	skipOutputDepth   int
 	importsUseEmitted bool
 }
@@ -308,6 +309,7 @@ func (p *parser) parseSwitch() error {
 	p.Printf("switch %s {", t.Value)
 	caseNum := 0
 	defaultFound := false
+	p.switchDepth++
 	for s.Next() {
 		t := s.Token()
 		switch t.ID {
@@ -329,6 +331,7 @@ func (p *parser) parseSwitch() error {
 				if err = skipTagContents(s); err != nil {
 					return err
 				}
+				p.switchDepth--
 				p.Printf("}")
 				return nil
 			case "case":
@@ -475,8 +478,8 @@ func (p *parser) tryParseCommonTags(tagBytes []byte) (bool, error) {
 			return false, err
 		}
 	case "break":
-		if p.forDepth <= 0 {
-			return false, fmt.Errorf("found break tag outside for loop")
+		if p.forDepth <= 0 && p.switchDepth <= 0 {
+			return false, fmt.Errorf("found break tag outside for loop and switch block")
 		}
 		if err := p.skipAfterTag(tagNameStr); err != nil {
 			return false, err

@@ -86,6 +86,8 @@ Now define private printArgs, which is used in Foo via {%= %} tag
 	{% switch a.S %}
 	{% case "foo" %}
 		foo
+		{%break%}
+		ignore this
 	{% case "bar" %}
 		bar
 	{% default %}
