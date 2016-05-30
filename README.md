@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/valyala/quicktemplate.svg)](https://travis-ci.org/valyala/quicktemplate)
 [![GoDoc](https://godoc.org/github.com/valyala/quicktemplate?status.svg)](http://godoc.org/github.com/valyala/quicktemplate)
-[![Coverage](http://gocover.io/_badge/github.com/valyala/quicktemplate)](http://gocover.io/github.com/valyala/quicktemplate)
+[![Coverage Status](https://coveralls.io/repos/github/valyala/quicktemplate/badge.svg?branch=master)](https://coveralls.io/github/valyala/quicktemplate?branch=master)
 [![Go Report](http://goreportcard.com/badge/valyala/quicktemplate)](http://goreportcard.com/report/valyala/quicktemplate)
 
 # quicktemplate
