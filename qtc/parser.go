@@ -159,7 +159,7 @@ func (p *parser) parseFunc() error {
 				continue
 			}
 			switch string(t.Value) {
-			case "endfunc":
+			case "endfunc", "end":
 				if err = skipTagContents(s); err != nil {
 					return err
 				}
@@ -205,7 +205,7 @@ func (p *parser) parseFor() error {
 				continue
 			}
 			switch string(t.Value) {
-			case "endfor":
+			case "endfor", "end":
 				if err = skipTagContents(s); err != nil {
 					return err
 				}
@@ -324,7 +324,7 @@ func (p *parser) parseSwitch() error {
 			}
 		case tagName:
 			switch string(t.Value) {
-			case "endswitch":
+			case "endswitch", "end":
 				if caseNum == 0 {
 					return fmt.Errorf("empty statement %q found at %s", switchStr, s.Context())
 				}
@@ -391,7 +391,7 @@ func (p *parser) parseIf() error {
 				continue
 			}
 			switch string(t.Value) {
-			case "endif":
+			case "endif", "end":
 				if err = skipTagContents(s); err != nil {
 					return err
 				}
@@ -555,7 +555,7 @@ func (p *parser) skipAfterTag(tagStr string) error {
 				continue
 			}
 			switch string(t.Value) {
-			case "endfunc", "endfor", "endif", "else", "elseif", "case", "default", "endswitch":
+			case "end", "endfunc", "endfor", "endif", "else", "elseif", "case", "default", "endswitch":
 				s.Rewind()
 				return nil
 			default:

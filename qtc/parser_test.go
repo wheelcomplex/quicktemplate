@@ -10,6 +10,39 @@ import (
 	"github.com/valyala/quicktemplate"
 )
 
+func TestParserGenericEnd(t *testing.T) {
+	// function
+	testParseSuccess(t, "{% func a() %}{% end %}")
+
+	// if
+	testParseSuccess(t, "{% func a() %}{% if true %}{% end %}{% end %}")
+
+	// switch
+	testParseSuccess(t, "{% func f() %}{% switch true %}{% case true %}{% end %}{% end %}")
+
+	// for
+	testParseSuccess(t, "{% func f() %}{% for %}{% end %}{% end %}")
+
+	// all together
+	testParseSuccess(t, `{% func f() %}
+		{% for i := 0; i < 10; i++ %}
+			{% if i < 5 %}
+				foo
+			{% else %}
+				{% switch i %}
+				{% case -1 %}
+					42
+				{% case 6 %}
+					sfdfs
+				{% default %}
+					{% if i + 1 == 2 %}sss{% end %}
+					{% if i + 1 == 3 %}sss{% endif %}
+				{% end %}
+			{% end %}
+		{% end %}
+	{% end %}`)
+}
+
 func TestParseFPrecFailure(t *testing.T) {
 	// negative precision
 	testParseFailure(t, "{% func a()%}{%f.-1 1.2 %}{% endfunc %}")
