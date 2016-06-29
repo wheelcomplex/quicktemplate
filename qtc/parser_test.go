@@ -293,6 +293,9 @@ func TestParseFailure(t *testing.T) {
 	// empty if condition
 	testParseFailure(t, "{% func a() %}{% if    %}aaaa{% endif %}{% endfunc %}")
 
+	// else with content
+	testParseFailure(t, "{% func a() %}{% if 3 == 4%}aaaa{% else if 3 ==  5 %}bug{% endif %}{% endfunc %}")
+
 	// missing endif
 	testParseFailure(t, "{%func a() %}{%if foo %}aaa{% endfunc %}")
 
