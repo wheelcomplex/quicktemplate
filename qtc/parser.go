@@ -402,12 +402,8 @@ func (p *parser) parseIf() error {
 				if elseUsed {
 					return fmt.Errorf("duplicate else branch found for %q at %s", ifStr, s.Context())
 				}
-				tok, err := expectToken(s, tagContents)
-				if err != nil {
+				if err = skipTagContents(s); err != nil {
 					return err
-				}
-				if len(tok.Value) > 0 {
-					return fmt.Errorf("unexpected content after else: %q at %s", tok.Value, s.Context())
 				}
 				p.prefix = p.prefix[1:]
 				p.Printf("} else {")
@@ -716,7 +712,14 @@ func (p *parser) Printf(format string, args ...interface{}) {
 }
 
 func skipTagContents(s *scanner) error {
-	_, err := expectTagContents(s)
+	tagName := string(s.Token().Value)
+	t, err := expectTagContents(s)
+	if err != nil {
+		return err
+	}
+	if len(t.Value) > 0 {
+		return fmt.Errorf("unexpected extra value after %s: %q at %s", tagName, t.Value, s.Context())
+	}
 	return err
 }
 
