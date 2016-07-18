@@ -134,3 +134,11 @@ unused code may be commented:
 	foobar
 {% endfunc %}
 {% endcomment %}
+
+variadic function
+{% func Variadic(a int, b ...string) %}
+	a = {%d a %}
+	{% for i, s := range b %}
+		{%d i %}: {%s s %}
+	{% endfor %}
+{% endfunc %}
