@@ -74,11 +74,19 @@ See [examples](https://github.com/valyala/quicktemplate/tree/master/examples).
 
 # Quick start
 
+First of all, install `quicktemplate` package
+and [quicktemplate compiler](https://github.com/valyala/quicktemplate/tree/master/qtc) (`qtc`):
+
+```
+go get -u github.com/valyala/quicktemplate
+go get -u github.com/valyala/quicktemplate/qtc
+```
+
 Let's start with a minimal template example:
 
 ```qtpl
 All the text outside function templates is treated as comments,
-i.e. it is just ignored by quicktemplate compiler (qtc). It is for humans.
+i.e. it is just ignored by quicktemplate compiler (`qtc`). It is for humans.
 
 Hello is a simple template function.
 {% func Hello(name string) %}
@@ -87,12 +95,7 @@ Hello is a simple template function.
 ```
 
 Save this file into `templates` folder under the name `hello.qtpl`
-and run [qtc](https://github.com/valyala/quicktemplate/tree/master/qtc)
-inside this folder. `qtc` may be installed by issuing:
-
-```
-go get -u github.com/valyala/quicktemplate/qtc
-```
+and run `qtc` inside this folder.
 
 If all went ok, `hello.qtpl.go` file must appear in the `templates` folder.
 This file contains Go code for `hello.qtpl`. Let's use it!
@@ -115,7 +118,7 @@ func main() {
 }
 ```
 
-Then run `go run`. If all went ok, you'll see something like this:
+Then issue `go run`. If all went ok, you'll see something like this:
 
 ```
 
