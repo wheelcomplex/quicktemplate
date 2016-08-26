@@ -12,6 +12,8 @@ Inspired by [mako templates](http://www.makotemplates.org/) philosophy.
 
   * [Extremely fast](#performance-comparison-with-htmltemplate).
     Templates are converted into Go code and then compiled.
+  * Quicktemplate syntax is very close to Go - there is no need in learning
+    yet another template language before starting to use quicktemplate.
   * Almost all the bugs are caught during template compilation, so production
     suffers less from template-related bugs.
   * Easy to use. See [quickstart](#quick-start) and [examples](https://github.com/valyala/quicktemplate/tree/master/examples)
@@ -20,7 +22,7 @@ Inspired by [mako templates](http://www.makotemplates.org/) philosophy.
     Be careful with this power - do not query db and/or external resources from
     templates unless you miss php way in Go :) This power is mostly for
     arbitrary data transformations.
-  * Easy to understand template inheritance powered by [Go interfaces](https://golang.org/doc/effective_go.html#interfaces).
+  * Easy to use template inheritance powered by [Go interfaces](https://golang.org/doc/effective_go.html#interfaces).
     See [this example](https://github.com/valyala/quicktemplate/tree/master/examples/basicserver) for details.
   * Templates are compiled into a single binary, so there is no need in copying
     template files to the server.
@@ -172,8 +174,8 @@ form a single `templates` Go package. Template functions and other template
 stuff is shared between template files located in the same folder.
 So `Hello` template function may be used inside `greetings.qtpl` while
 it is defined in `hello.qtpl`.
-Moreover, the folder may contain ordinary Go files and its' contents may
-be used inside templates.
+Moreover, the folder may contain ordinary Go files, so its' contents may
+be used inside templates and vice versa.
 
 Now put the following code into `main.go`:
 
