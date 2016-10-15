@@ -581,6 +581,10 @@ BenchmarkMarshalXMLQuickTemplate1000-4    	   30000	     53000 ns/op	      32 B/
         templates into other templates.
       * Performance optimizations.
 
+* *Is there a syntax highlighting for qtpl files?*
+
+  Yes - see [this issue](https://github.com/valyala/quicktemplate/issues/19) for details.
+
 * *I didn't find an answer for my question here*
 
   Try exploring [these questions](https://github.com/valyala/quicktemplate/issues?q=label%3Aquestion).
