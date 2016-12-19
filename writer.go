@@ -67,7 +67,7 @@ var writerPool sync.Pool
 type QWriter struct {
 	w   io.Writer
 	err error
-	bb  *ByteBuffer
+	bb  ByteBuffer
 }
 
 // Write implements io.Writer.
@@ -86,9 +86,7 @@ func (w *QWriter) Write(p []byte) (int, error) {
 func (w *QWriter) Reset() {
 	w.w = nil
 	w.err = nil
-	if w.bb != nil {
-		w.bb.Reset()
-	}
+	w.bb.Reset()
 }
 
 // S writes s to w.
@@ -176,10 +174,7 @@ func (w *QWriter) writeQuick(f func(dst []byte) []byte) {
 	}
 	bb, ok := w.w.(*ByteBuffer)
 	if !ok {
-		if w.bb == nil {
-			w.bb = &ByteBuffer{}
-		}
-		bb = w.bb
+		bb = &w.bb
 	}
 	bb.B = f(bb.B)
 	if !ok {
