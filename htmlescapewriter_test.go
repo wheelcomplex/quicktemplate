@@ -13,7 +13,7 @@ func TestHTMLEscapeWriter(t *testing.T) {
 
 func testHTMLEscapeWriter(t *testing.T, s, expectedS string) {
 	bb := AcquireByteBuffer()
-	w := acquireHTMLEscapeWriter(bb)
+	w := &htmlEscapeWriter{w: bb}
 	n, err := w.Write([]byte(s))
 	if err != nil {
 		t.Fatalf("unexpected error when writing %q: %s", s, err)
@@ -21,7 +21,6 @@ func testHTMLEscapeWriter(t *testing.T, s, expectedS string) {
 	if n != len(s) {
 		t.Fatalf("unexpected n returned: %d. Expecting %d. s=%q", n, len(s), s)
 	}
-	releaseHTMLEscapeWriter(w)
 
 	if string(bb.B) != expectedS {
 		t.Fatalf("unexpected result: %q. Expecting %q", bb.B, expectedS)

@@ -37,10 +37,12 @@ func (qw *Writer) N() *QWriter {
 func AcquireWriter(w io.Writer) *Writer {
 	v := writerPool.Get()
 	if v == nil {
-		v = &Writer{}
+		qw := &Writer{}
+		qw.e.w = &htmlEscapeWriter{}
+		v = qw
 	}
 	qw := v.(*Writer)
-	qw.e.w = acquireHTMLEscapeWriter(w)
+	qw.e.w.(*htmlEscapeWriter).w = w
 	qw.n.w = w
 	return qw
 }
@@ -49,9 +51,13 @@ func AcquireWriter(w io.Writer) *Writer {
 //
 // Do not access released writer, otherwise data races may occur.
 func ReleaseWriter(qw *Writer) {
-	releaseHTMLEscapeWriter(qw.e.w)
+	hw := qw.e.w.(*htmlEscapeWriter)
+	hw.w = nil
 	qw.e.Reset()
+	qw.e.w = hw
+
 	qw.n.Reset()
+
 	writerPool.Put(qw)
 }
 
@@ -61,6 +67,7 @@ var writerPool sync.Pool
 type QWriter struct {
 	w   io.Writer
 	err error
+	bb  *ByteBuffer
 }
 
 // Write implements io.Writer.
@@ -79,6 +86,9 @@ func (w *QWriter) Write(p []byte) (int, error) {
 func (w *QWriter) Reset() {
 	w.w = nil
 	w.err = nil
+	if w.bb != nil {
+		w.bb.Reset()
+	}
 }
 
 // S writes s to w.
@@ -166,11 +176,14 @@ func (w *QWriter) writeQuick(f func(dst []byte) []byte) {
 	}
 	bb, ok := w.w.(*ByteBuffer)
 	if !ok {
-		bb = AcquireByteBuffer()
+		if w.bb == nil {
+			w.bb = &ByteBuffer{}
+		}
+		bb = w.bb
 	}
 	bb.B = f(bb.B)
 	if !ok {
 		w.Write(bb.B)
-		ReleaseByteBuffer(bb)
+		bb.Reset()
 	}
 }

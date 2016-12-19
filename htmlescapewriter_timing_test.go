@@ -19,14 +19,13 @@ func benchmarkHTMLEscapeWriter(b *testing.B, s string) {
 	b.RunParallel(func(pb *testing.PB) {
 		var err error
 		bb := AcquireByteBuffer()
-		w := acquireHTMLEscapeWriter(bb)
+		w := &htmlEscapeWriter{w: bb}
 		for pb.Next() {
 			if _, err = w.Write(sBytes); err != nil {
 				b.Fatalf("unexpected error: %s", err)
 			}
 			bb.Reset()
 		}
-		releaseHTMLEscapeWriter(w)
 		ReleaseByteBuffer(bb)
 	})
 }
