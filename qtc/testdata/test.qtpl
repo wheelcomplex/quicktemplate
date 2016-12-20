@@ -58,6 +58,7 @@ Now define an exported function template
 		Leading and trailing space between lines and tags is completely
 		removed unless {%space%} or {%newline%} is used
 	{% endstripspace %}
+	{% cat "test.qtpl" %}
 {% endfunc %}
 
 {%plain%}

@@ -10,6 +10,23 @@ import (
 	"github.com/valyala/quicktemplate"
 )
 
+func TestParseCat(t *testing.T) {
+	// relative paths
+	testParseSuccess(t, `{% func a() %}{% cat "parser.go" %}{% endfunc %}`)
+	testParseSuccess(t, `{% func a() %}{% cat "./parser.go" %}{% endfunc %}`)
+	testParseSuccess(t, `{% func a() %}{% cat "../qtc/parser.go" %}{% endfunc %}`)
+
+	// multi-cat
+	testParseSuccess(t, `{% func a() %}{% cat "parser.go" %}{% cat "./parser.go" %}{% endfunc %}`)
+
+	// non-existing file
+	testParseFailure(t, `{% func a() %}{% cat "non-existing-file.go" %}{% endfunc %}`)
+
+	// non-const string
+	testParseFailure(t, `{% func a() %}{% cat "foobar"+".baz" %}{% endfunc %}`)
+	testParseFailure(t, `{% func a() %}{% cat foobar %}{% endfunc %}`)
+}
+
 func TestParseUnexpectedValueAfterTag(t *testing.T) {
 	// endfunc
 	testParseSuccess(t, "{% func a() %}{% endfunc %}")
@@ -459,7 +476,7 @@ else
 func testParseFailure(t *testing.T, str string) {
 	r := bytes.NewBufferString(str)
 	w := &bytes.Buffer{}
-	if err := parse(w, r, "memory/foobar.tpl", "memory"); err == nil {
+	if err := parse(w, r, "./foobar.tpl", "memory"); err == nil {
 		t.Fatalf("expecting error when parsing %q", str)
 	}
 }
@@ -467,7 +484,7 @@ func testParseFailure(t *testing.T, str string) {
 func testParseSuccess(t *testing.T, str string) {
 	r := bytes.NewBufferString(str)
 	w := &bytes.Buffer{}
-	if err := parse(w, r, "memory/foobar.tpl", "memory"); err != nil {
+	if err := parse(w, r, "./foobar.tpl", "memory"); err != nil {
 		t.Fatalf("unexpected error when parsing %q: %s", str, err)
 	}
 }

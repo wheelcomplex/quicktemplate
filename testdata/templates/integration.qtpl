@@ -94,6 +94,8 @@ It should contains all the quicktemplate stuff.
 		{% endfor %}
 	{% endcollapsespace %}
 
+	{% cat "integration.qtpl" %}
+
 	tail of the func
 {% endfunc %}
 

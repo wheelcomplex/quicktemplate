@@ -2,6 +2,9 @@ package main
 
 import (
 	"bytes"
+	"errors"
+	"io/ioutil"
+	"os"
 	"path/filepath"
 	"unicode"
 )
@@ -81,4 +84,25 @@ func getPackageName(filename string) (string, error) {
 	}
 	dir, _ := filepath.Split(filenameAbs)
 	return filepath.Base(dir), nil
+}
+
+func readFile(cwd, filename string) ([]byte, error) {
+	if len(filename) == 0 {
+		return nil, errors.New("filename cannot be empty")
+	}
+	if filename[0] != '/' {
+		cwdAbs, err := filepath.Abs(cwd)
+		if err != nil {
+			return nil, err
+		}
+		dir, _ := filepath.Split(cwdAbs)
+		filename = filepath.Join(dir, filename)
+	}
+
+	f, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	return ioutil.ReadAll(f)
 }

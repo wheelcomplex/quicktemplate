@@ -337,6 +337,16 @@ There are other useful tags supported by quicktemplate:
     ) %}
     ```
 
+  * `{% cat "/path/to/file" %}`:
+
+    ```qtpl
+    Cat emits the given file contents as a plaintext:
+    {% func passwords() %}
+        /etc/passwd contents:
+        {% cat "/etc/passwd" %}
+    {% endfunc %}
+    ```
+
   * `{% interface %}`:
 
     ```qtpl
