@@ -45,7 +45,7 @@ The following simple template is used in the benchmark:
 Benchmark results:
 
 ```
-$ go test -bench=Template -benchmem github.com/valyala/quicktemplate/tests
+$ go test -bench='Benchmark(Quick|HTML)Template' -benchmem github.com/valyala/quicktemplate/tests
 BenchmarkQuickTemplate1-4                 	10000000	       120 ns/op	       0 B/op	       0 allocs/op
 BenchmarkQuickTemplate10-4                	 3000000	       441 ns/op	       0 B/op	       0 allocs/op
 BenchmarkQuickTemplate100-4               	  300000	      3945 ns/op	       0 B/op	       0 allocs/op
