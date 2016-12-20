@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"io/ioutil"
-	"os"
 	"path/filepath"
 	"unicode"
 )
@@ -99,10 +98,5 @@ func readFile(cwd, filename string) ([]byte, error) {
 		filename = filepath.Join(dir, filename)
 	}
 
-	f, err := os.Open(filename)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-	return ioutil.ReadAll(f)
+	return ioutil.ReadFile(filename)
 }
