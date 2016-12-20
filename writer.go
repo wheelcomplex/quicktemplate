@@ -86,7 +86,6 @@ func (w *QWriter) Write(p []byte) (int, error) {
 func (w *QWriter) Reset() {
 	w.w = nil
 	w.err = nil
-	w.b = w.b[:0]
 }
 
 // S writes s to w.
@@ -106,8 +105,13 @@ func (w *QWriter) SZ(z []byte) {
 
 // D writes n to w.
 func (w *QWriter) D(n int) {
-	w.b = strconv.AppendInt(w.b[:0], int64(n), 10)
-	w.Write(w.b)
+	bb, ok := w.w.(*ByteBuffer)
+	if ok {
+		bb.B = strconv.AppendInt(bb.B, int64(n), 10)
+	} else {
+		w.b = strconv.AppendInt(w.b[:0], int64(n), 10)
+		w.Write(w.b)
+	}
 }
 
 // F writes f to w.
@@ -117,8 +121,13 @@ func (w *QWriter) F(f float64) {
 
 // FPrec writes f to w using the given floating point precision.
 func (w *QWriter) FPrec(f float64, prec int) {
-	w.b = strconv.AppendFloat(w.b[:0], f, 'f', prec, 64)
-	w.Write(w.b)
+	bb, ok := w.w.(*ByteBuffer)
+	if ok {
+		bb.B = strconv.AppendFloat(bb.B, f, 'f', prec, 64)
+	} else {
+		w.b = strconv.AppendFloat(w.b[:0], f, 'f', prec, 64)
+		w.Write(w.b)
+	}
 }
 
 // Q writes quoted json-safe s to w.
@@ -156,8 +165,13 @@ func (w *QWriter) V(v interface{}) {
 
 // U writes url-encoded s to w.
 func (w *QWriter) U(s string) {
-	w.b = appendURLEncode(w.b[:0], s)
-	w.Write(w.b)
+	bb, ok := w.w.(*ByteBuffer)
+	if ok {
+		bb.B = appendURLEncode(bb.B, s)
+	} else {
+		w.b = appendURLEncode(w.b[:0], s)
+		w.Write(w.b)
+	}
 }
 
 // UZ writes url-encoded z to w.
