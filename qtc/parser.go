@@ -296,6 +296,25 @@ func (p *parser) parseCase() error {
 	return fmt.Errorf("cannot find end of %q at %s", caseStr, s.Context())
 }
 
+func (p *parser) parseCat() error {
+	s := p.s
+	t, err := expectTagContents(s)
+	if err != nil {
+		return err
+	}
+	filename, err := strconv.Unquote(string(t.Value))
+	if err != nil {
+		return fmt.Errorf("invalid cat value %q at %s: %s", t.Value, s.Context(), err)
+	}
+
+	data, err := readFile(s.filePath, filename)
+	if err != nil {
+		return fmt.Errorf("cannot cat file %q at %s: %s", filename, s.Context(), err)
+	}
+	p.emitText(data)
+	return nil
+}
+
 func (p *parser) parseSwitch() error {
 	s := p.s
 	t, err := expectTagContents(s)
@@ -505,6 +524,10 @@ func (p *parser) tryParseCommonTags(tagBytes []byte) (bool, error) {
 		}
 	case "switch":
 		if err := p.parseSwitch(); err != nil {
+			return false, err
+		}
+	case "cat":
+		if err := p.parseCat(); err != nil {
 			return false, err
 		}
 	default:
